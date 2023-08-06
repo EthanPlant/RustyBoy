@@ -11,7 +11,7 @@ pub struct Gameboy {
 impl Gameboy {
     /// Initialize the emulator
     pub fn new(rom_name: &str) -> Self {
-        let cpu = Cpu::new(rom_name);
+        let cpu = Cpu::new_with_rom(rom_name);
         Self { cpu: cpu }
     }
 }
