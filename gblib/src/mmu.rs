@@ -44,6 +44,8 @@ impl Memory {
 
 #[cfg(test)]
 mod tests {
+    use std::path::PathBuf;
+
     use super::*;
 
     #[test]
@@ -72,5 +74,17 @@ mod tests {
         let mut mem = Memory::new();
         mem.set_word(0x1234 as u16, 0x1234);
         assert_eq!(mem.get_word(0x1234 as u16), 0x1234);
+    }
+
+    #[test]
+    fn test_new_with_rom() {
+        let mem = Memory::new_with_rom("resources/test-file");
+        assert_eq!(mem.get_byte(0 as u16), 'T' as u8);
+    }
+
+    #[test]
+    fn test_new() {
+        let mem = Memory::new();
+        assert_eq!(mem.get_byte(0 as u16), 0);
     }
 }

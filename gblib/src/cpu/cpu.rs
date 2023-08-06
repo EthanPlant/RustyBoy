@@ -16,3 +16,14 @@ impl Cpu {
         Cpu { reg: registers, mmu: cpu_mmu }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new() {
+        let cpu = Cpu::new("resources/test-file");
+        assert_eq!(cpu.mmu.get_byte(0 as u16), 'T' as u8);
+    }
+}

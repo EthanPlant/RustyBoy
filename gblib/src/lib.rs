@@ -15,3 +15,14 @@ impl Gameboy {
         Self { cpu: cpu }
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_new() {
+        let gb = Gameboy::new("resources/test-file");
+        assert_eq!(gb.cpu.mmu.get_byte(0 as u16), 'T' as u8);
+    }
+}
