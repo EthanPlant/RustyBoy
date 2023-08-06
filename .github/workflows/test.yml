@@ -1,12 +1,62 @@
-name: Tests
-on: [pull_request, push]
+name: Run Tests
+on:
+  push:
+    branches: [main]
+    paths:
+      - "emu/**"
+      - "gblib/**"
+  pull_request:
+    branches: [main]
+    paths:
+      - "emu/**"
+      - "gblib/**"
+  workflow_dispatch:
 
-env:
-  CARGO_TERM_COLOR: always
 jobs:
   test:
+    name: Run Tests
     runs-on: ubuntu-latest
+    env:
+      CARGO_TERM_COLOR: always
+
     steps:
       - uses: actions/checkout@v3
+      - name: Install Rust toolchain
+        run: rustup update --no-self-update stable
+      - name: Build
+        run: cargo build --verbose
       - name: Run Tests
         run: cargo test --verbose
+  coverage:
+    name: Generate Coverage Report
+    runs-on: ubuntu-latest
+    env:
+      CARGO_TERM_COLOR: always
+    steps:
+      - name: Install Rust toolchain
+        run: rustup update --no-self-update stable
+      - uses: actions/checkout@v3
+      - name: Install cargo-llvm-cov
+        uses: taiki-e/install-action@cargo-llvm-cov
+      - name: Generate Coverage Report
+        run: cargo llvm-cov --all-features --workspace --codecov --output-path lcov.info
+      - name: Upload Coverage Report to codecov
+        uses: codecov/codecov-action@v1
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          file: lcov.info
+          fail_ci_if_error: true
+  deploy_docs:
+    name: Deploy Documentation
+    runs-on: ubuntu-latest
+    steps:
+      - name: Install Rust toolchain
+        run: rustup update --no-self-update stable
+      - name: Build Documentation
+        run: cargo doc --all --no-deps
+      - name: Deploy Documentation
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./target/doc
