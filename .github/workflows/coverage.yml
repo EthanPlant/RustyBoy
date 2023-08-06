@@ -1,6 +1,6 @@
-name Generate Coverage Report
+name: Generate Coverage Report
 
-on [pull_request, push]
+on: [pull_request, push]
 
 jobs:
   coverage:
