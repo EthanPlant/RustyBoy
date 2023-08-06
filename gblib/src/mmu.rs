@@ -5,10 +5,17 @@ pub struct Memory {
 }
 
 impl Memory {
-    pub fn new() -> Self {
-        Self {
-            mem: vec![0; 0x10000],
+    pub fn new_with_rom(rom_name: &str) -> Self {
+        let mut mem = vec![0; 0x10000];
+        let rom_data = std::fs::read(rom_name).expect("Failed to open ROM file");
+        for (i, b) in rom_data.iter().enumerate() {
+            mem[i] = *b;
         }
+        Memory { mem: mem }
+    }
+
+    pub fn new() -> Self {
+        Memory { mem: vec![0; 0x10000] }
     }
 
     /// Reads a byte from the memory address space
