@@ -1,4 +1,4 @@
-name: Run Tests
+name: Build and Run Tests
 on:
   push:
     branches: [main]
@@ -48,8 +48,11 @@ jobs:
           fail_ci_if_error: true
   deploy_docs:
     name: Deploy Documentation
-    runs-on: ubuntu-latest
+    runs-on: macos-latest
+    env:
+      CARGO_TERM_COLOR: always
     steps:
+      - uses: actions/checkout@v3
       - name: Install Rust toolchain
         run: rustup update --no-self-update stable
       - name: Build Documentation
