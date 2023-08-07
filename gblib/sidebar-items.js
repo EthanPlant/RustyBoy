@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["cpu"],"struct":["Gameboy"]};
+window.SIDEBAR_ITEMS = {"mod":["cpu","gameboy","mmu"]};
