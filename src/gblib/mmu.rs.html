@@ -134,14 +134,12 @@
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
-    <span class="kw">use </span>std::path::PathBuf;
-
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_get_byte() {
         <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
-        mem.set_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16, <span class="number">0x12</span>);
+        mem.mem[<span class="number">0x1234</span>] = <span class="number">0x12</span>;
         <span class="macro">assert_eq!</span>(mem.get_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16), <span class="number">0x12</span>);
     }
 
@@ -149,13 +147,14 @@
     </span><span class="kw">fn </span>test_set_byte() {
         <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
         mem.set_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16, <span class="number">0x12</span>);
-        <span class="macro">assert_eq!</span>(mem.get_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16), <span class="number">0x12</span>);
+        <span class="macro">assert_eq!</span>(mem.mem[<span class="number">0x1234</span>], <span class="number">0x12</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_get_word() {
         <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
-        mem.set_word(<span class="number">0x1234 </span><span class="kw">as </span>u16, <span class="number">0x1234</span>);
+        mem.mem[<span class="number">0x1234</span>] = <span class="number">0x34</span>;
+        mem.mem[<span class="number">0x1235</span>] = <span class="number">0x12</span>;
         <span class="macro">assert_eq!</span>(mem.get_word(<span class="number">0x1234 </span><span class="kw">as </span>u16), <span class="number">0x1234</span>);
     }
 
@@ -163,18 +162,19 @@
     </span><span class="kw">fn </span>test_set_word() {
         <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
         mem.set_word(<span class="number">0x1234 </span><span class="kw">as </span>u16, <span class="number">0x1234</span>);
-        <span class="macro">assert_eq!</span>(mem.get_word(<span class="number">0x1234 </span><span class="kw">as </span>u16), <span class="number">0x1234</span>);
+        <span class="macro">assert_eq!</span>(mem.mem[<span class="number">0x1234</span>], <span class="number">0x34</span>);
+        <span class="macro">assert_eq!</span>(mem.mem[<span class="number">0x1235</span>], <span class="number">0x12</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_new_with_rom() {
         <span class="kw">let </span>mem = Memory::new_with_rom(<span class="string">&quot;resources/test-file&quot;</span>);
-        <span class="macro">assert_eq!</span>(mem.get_byte(<span class="number">0 </span><span class="kw">as </span>u16), <span class="string">&#39;T&#39; </span><span class="kw">as </span>u8);
+        <span class="macro">assert_eq!</span>(mem.mem[<span class="number">0</span>], <span class="string">&#39;T&#39; </span><span class="kw">as </span>u8);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_new() {
         <span class="kw">let </span>mem = Memory::new();
-        <span class="macro">assert_eq!</span>(mem.get_byte(<span class="number">0 </span><span class="kw">as </span>u16), <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(mem.mem[<span class="number">0</span>], <span class="number">0</span>);
     }
 }</code></pre></div></section></main></body></html>
