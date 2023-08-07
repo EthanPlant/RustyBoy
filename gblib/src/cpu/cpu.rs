@@ -1,32 +1,25 @@
+use std::mem;
+
 use crate::cpu::instructions;
 use crate::cpu::instructions::{Instruction, OpCode};
 use crate::cpu::registers::Registers;
 use crate::mmu::Memory;
 
 /// Emulation of the Gameboy CPU
-pub struct Cpu {
+pub struct Cpu<> {
     /// The CPU registers
     reg: Registers,
-    /// The MMU (Memory Management Unit)
-    pub mmu: Memory,
 }
 
 impl Cpu {
     pub fn new() -> Self {
-        let cpu_mmu = Memory::new();
         let registers = Registers::new();
-        Cpu { reg: registers, mmu: cpu_mmu }
-    }
-
-    pub fn new_with_rom(rom_name: &str) ->  Cpu {
-        let cpu_mmu = Memory::new_with_rom(rom_name);
-        let registers = Registers::new();
-        Cpu { reg: registers, mmu: cpu_mmu }
+        Cpu { reg: registers}
     }
 
     /// Step through the emulator
-    pub fn step(&mut self) {
-        let op_code = self.read_opcode();
+    pub fn step(&mut self, mmu: &Memory) {
+        let op_code = self.read_opcode(mmu);
 
         let instruction = match instructions::get_instruction_by_opcode(&op_code) {
             Some(instruction) => instruction,
@@ -61,10 +54,10 @@ impl Cpu {
     }
 
     /// Read an opcode from memory
-    fn read_opcode(&mut self) -> OpCode {
-        let opcode = self.mmu.get_byte(self.reg.pc);
+    fn read_opcode(&mut self, mmu: &Memory) -> OpCode {
+        let opcode = mmu.get_byte(self.reg.pc);
         match opcode {
-            0xCB => OpCode::CB(self.mmu.get_byte(self.reg.pc + 1)),
+            0xCB => OpCode::CB(mmu.get_byte(self.reg.pc + 1)),
             _ => OpCode::Regular(opcode),
         }
     }
@@ -72,6 +65,8 @@ impl Cpu {
 
 #[cfg(test)]
 mod tests {
+    use crate::cpu;
+
     use super::*;
 
     #[test]
@@ -81,29 +76,26 @@ mod tests {
     }
 
     #[test]
-    fn test_new_with_rom() {
-        let cpu = Cpu::new_with_rom("resources/test-file");
-        assert_eq!(cpu.mmu.get_byte(0 as u16), 'T' as u8);
-    }
-
-    #[test]
     fn test_read_opcode() {
+        let mmu = Memory::new();
         let mut cpu = Cpu::new();
         cpu.reg.pc = 0;
-        assert_eq!(cpu.read_opcode(), OpCode::Regular(0));
+        assert_eq!(cpu.read_opcode(&mmu), OpCode::Regular(0));
     }
 
     #[test]
     fn test_read_opcode_cb() {
+        let mut mmu = Memory::new();
         let mut cpu = Cpu::new();
         cpu.reg.pc = 0;
-        cpu.mmu.set_byte(0 as u8, 0xCB);
-        cpu.mmu.set_byte(1 as u8, 0x00);
-        assert_eq!(cpu.read_opcode(), OpCode::CB(0));
+        mmu.set_byte(0 as u8, 0xCB);
+        mmu.set_byte(1 as u8, 0x00);
+        assert_eq!(cpu.read_opcode(&mmu), OpCode::CB(0));
     }
 
     #[test]
     fn test_execute_instruction() {
+        let mmu = Memory::new();
         let mut cpu = Cpu::new();
         cpu.reg.pc = 0;
         let instruction = Instruction {
@@ -123,16 +115,18 @@ mod tests {
     #[test]
     #[should_panic(expected = "Unimplemented instruction! 0x:0 PC: 0x:0")]
     fn test_step_unimplemented_instruction() {
+        let mmu = Memory::new();
         let mut cpu = Cpu::new();
-        cpu.step();
+        cpu.step(&mmu);
     }
 
     #[test]
     #[should_panic(expected = "Unimplemented CB instruction! 0x:0 PC: 0x:0")]
     fn test_step_unimplemented_cb_instruction() {
+        let mut mmu = Memory::new();
         let mut cpu = Cpu::new();
-        cpu.mmu.set_byte(0 as u8, 0xCB);
-        cpu.mmu.set_byte(1 as u8, 0x00);
-        cpu.step();
+        mmu.set_byte(0 as u8, 0xCB);
+        mmu.set_byte(1 as u8, 0x00);
+        cpu.step(&mmu);
     }
 }

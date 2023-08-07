@@ -1,6 +1,6 @@
 use clap::Parser;
 
-use gblib::Gameboy;
+use gblib::gameboy::Gameboy;
 
 #[derive(Debug, Parser)]
 #[command(author, version, about)]
