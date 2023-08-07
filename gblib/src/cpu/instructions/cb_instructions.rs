@@ -6,3 +6,14 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
         _ => None
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_get_cb_instruction() {
+        let instruction = get_instruction(&0x00);
+        assert_eq!(instruction, None);
+    }
+}

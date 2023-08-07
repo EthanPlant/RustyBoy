@@ -1,5 +1,5 @@
 use crate::cpu::instructions;
-use crate::cpu::instructions::{Instruction, ExecutionType, OpCode};
+use crate::cpu::instructions::{Instruction, OpCode};
 use crate::cpu::registers::Registers;
 use crate::mmu::Memory;
 
@@ -32,17 +32,16 @@ impl Cpu {
             Some(instruction) => instruction,
             None => {
                 match op_code {
-                    OpCode::CB(value) => eprintln!(
+                    OpCode::CB(value) => panic!(
                         "Unimplemented CB instruction! 0x:{:X} PC: 0x:{:X}",
                         value, self.reg.pc,
                     ),
-                    OpCode::Regular(value) => eprintln!(
+                    OpCode::Regular(value) => panic!(
                         "Unimplemented instruction! 0x:{:X} PC: 0x:{:X}",
                         value, self.reg.pc,
                     ),
                 };
 
-                std::process::exit(1);
             }
         };
 
@@ -95,6 +94,15 @@ mod tests {
     }
 
     #[test]
+    fn test_read_opcode_cb() {
+        let mut cpu = Cpu::new();
+        cpu.reg.pc = 0;
+        cpu.mmu.set_byte(0 as u8, 0xCB);
+        cpu.mmu.set_byte(1 as u8, 0x00);
+        assert_eq!(cpu.read_opcode(), OpCode::CB(0));
+    }
+
+    #[test]
     fn test_execute_instruction() {
         let mut cpu = Cpu::new();
         cpu.reg.pc = 0;
@@ -106,9 +114,25 @@ mod tests {
             handler: |cpu: &mut Cpu, op_code: &OpCode| {
                 assert_eq!(cpu.reg.pc, 0);
                 assert_eq!(op_code, &OpCode::Regular(0));
-                ExecutionType::None
             },
         };
         cpu.execute_instruction(&instruction, &OpCode::Regular(0));
+        assert_eq!(cpu.reg.pc, 1);
+    }
+
+    #[test]
+    #[should_panic(expected = "Unimplemented instruction! 0x:0 PC: 0x:0")]
+    fn test_step_unimplemented_instruction() {
+        let mut cpu = Cpu::new();
+        cpu.step();
+    }
+
+    #[test]
+    #[should_panic(expected = "Unimplemented CB instruction! 0x:0 PC: 0x:0")]
+    fn test_step_unimplemented_cb_instruction() {
+        let mut cpu = Cpu::new();
+        cpu.mmu.set_byte(0 as u8, 0xCB);
+        cpu.mmu.set_byte(1 as u8, 0x00);
+        cpu.step();
     }
 }

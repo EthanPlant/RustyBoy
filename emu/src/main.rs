@@ -11,5 +11,8 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-    let _gb = Gameboy::new(&args.rom);
+    let mut gb = Gameboy::new(&args.rom);
+    loop {
+        gb.step();
+    }
 }

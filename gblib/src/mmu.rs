@@ -44,14 +44,12 @@ impl Memory {
 
 #[cfg(test)]
 mod tests {
-    use std::path::PathBuf;
-
     use super::*;
 
     #[test]
     fn test_get_byte() {
         let mut mem = Memory::new();
-        mem.set_byte(0x1234 as u16, 0x12);
+        mem.mem[0x1234] = 0x12;
         assert_eq!(mem.get_byte(0x1234 as u16), 0x12);
     }
 
@@ -59,13 +57,14 @@ mod tests {
     fn test_set_byte() {
         let mut mem = Memory::new();
         mem.set_byte(0x1234 as u16, 0x12);
-        assert_eq!(mem.get_byte(0x1234 as u16), 0x12);
+        assert_eq!(mem.mem[0x1234], 0x12);
     }
 
     #[test]
     fn test_get_word() {
         let mut mem = Memory::new();
-        mem.set_word(0x1234 as u16, 0x1234);
+        mem.mem[0x1234] = 0x34;
+        mem.mem[0x1235] = 0x12;
         assert_eq!(mem.get_word(0x1234 as u16), 0x1234);
     }
 
@@ -73,18 +72,19 @@ mod tests {
     fn test_set_word() {
         let mut mem = Memory::new();
         mem.set_word(0x1234 as u16, 0x1234);
-        assert_eq!(mem.get_word(0x1234 as u16), 0x1234);
+        assert_eq!(mem.mem[0x1234], 0x34);
+        assert_eq!(mem.mem[0x1235], 0x12);
     }
 
     #[test]
     fn test_new_with_rom() {
         let mem = Memory::new_with_rom("resources/test-file");
-        assert_eq!(mem.get_byte(0 as u16), 'T' as u8);
+        assert_eq!(mem.mem[0], 'T' as u8);
     }
 
     #[test]
     fn test_new() {
         let mem = Memory::new();
-        assert_eq!(mem.get_byte(0 as u16), 0);
+        assert_eq!(mem.mem[0], 0);
     }
 }

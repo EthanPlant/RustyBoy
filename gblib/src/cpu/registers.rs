@@ -69,18 +69,63 @@ mod tests {
     use super::*;
 
     #[test]
-    fn test_set_flag() {
+    fn test_set_zero_flag() {
         let mut regs = Registers::new();
         regs.set_flag(Flag::Zero);
         assert_eq!(regs.f, 0x80);
     }
 
     #[test]
-    fn test_clear_flag() {
+    fn test_set_subtract_flag() {
+        let mut regs = Registers::new();
+        regs.set_flag(Flag::Subtract);
+        assert_eq!(regs.f, 0x40);
+    }
+
+    #[test]
+    fn test_set_half_carry_flag() {
+        let mut regs = Registers::new();
+        regs.set_flag(Flag::HalfCarry);
+        assert_eq!(regs.f, 0x20);
+    }
+
+    #[test]
+    fn test_set_carry_flag() {
+        let mut regs = Registers::new();
+        regs.set_flag(Flag::Carry);
+        assert_eq!(regs.f, 0x10);
+    }
+
+    #[test]
+    fn test_clear_zero_flag() {
         let mut regs = Registers::new();
         regs.f = 0xFF;
         regs.clear_flag(Flag::Zero);
         assert_eq!(regs.f, 0x7F);
+    }
+
+    #[test]
+    fn test_clear_subtract_flag() {
+        let mut regs = Registers::new();
+        regs.f = 0xFF;
+        regs.clear_flag(Flag::Subtract);
+        assert_eq!(regs.f, 0xBF);
+    }
+
+    #[test]
+    fn test_clear_half_carry_flag() {
+        let mut regs = Registers::new();
+        regs.f = 0xFF;
+        regs.clear_flag(Flag::HalfCarry);
+        assert_eq!(regs.f, 0xDF);
+    }
+
+    #[test]
+    fn test_clear_carry_flag() {
+        let mut regs = Registers::new();
+        regs.f = 0xFF;
+        regs.clear_flag(Flag::Carry);
+        assert_eq!(regs.f, 0xEF);
     }
 
     #[test]

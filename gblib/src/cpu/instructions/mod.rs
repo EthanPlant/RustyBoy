@@ -10,14 +10,6 @@ pub enum OpCode {
     CB(u8)
 }
 
-/// Type of instruction
-pub enum ExecutionType {
-    ActionTaken,
-    Jumped,
-    JumpedActionTaken,
-    None
-}
-
 /// Information about an instructions
 #[derive(Debug, PartialEq)]
 pub struct Instruction {
@@ -30,7 +22,7 @@ pub struct Instruction {
     /// Description of the instruction
     pub description: String,
     /// The handler for the instruction
-    pub handler: fn(cpu: &mut Cpu, op_code: &OpCode) -> ExecutionType
+    pub handler: fn(cpu: &mut Cpu, op_code: &OpCode)
 }
 
 /// Get an instruction by opcode

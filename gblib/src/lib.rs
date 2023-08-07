@@ -14,6 +14,11 @@ impl Gameboy {
         let cpu = Cpu::new_with_rom(rom_name);
         Self { cpu: cpu }
     }
+
+    /// Step through the emulator
+    pub fn step(&mut self) {
+        self.cpu.step();
+    }
 }
 
 #[cfg(test)]
