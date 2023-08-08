@@ -11,7 +11,7 @@ const RL_C: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.c = functions::rl(cpu, cpu.reg.c);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x7C - BIT 7 H
@@ -23,7 +23,7 @@ const BIT_7_H: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         functions::bit(cpu, cpu.reg.h, 7);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// Get a CB instruction by opcode
@@ -31,7 +31,7 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
     match op_code {
         0x11 => Some(&RL_C),
         0x7C => Some(&BIT_7_H),
-        _ => None
+        _ => None,
     }
 }
 

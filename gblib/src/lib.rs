@@ -1,3 +1,3 @@
 pub mod cpu;
-pub mod mmu;
 pub mod gameboy;
+pub mod mmu;

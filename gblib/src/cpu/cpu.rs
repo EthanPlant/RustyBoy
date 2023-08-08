@@ -4,7 +4,7 @@ use crate::cpu::registers::Registers;
 use crate::mmu::Memory;
 
 /// Emulation of the Gameboy CPU
-pub struct Cpu<> {
+pub struct Cpu {
     /// The CPU registers
     pub reg: Registers,
 }
@@ -12,7 +12,7 @@ pub struct Cpu<> {
 impl Cpu {
     pub fn new() -> Self {
         let registers = Registers::new();
-        Cpu { reg: registers}
+        Cpu { reg: registers }
     }
 
     /// Step through the emulator
@@ -32,18 +32,22 @@ impl Cpu {
                         value, self.reg.pc,
                     ),
                 };
-
             }
         };
 
         println!("A: {:02X} F: {:02X} B: {:02X} C: {:02X} D: {:02X} E: {:02X} H: {:02X} L: {:02X} SP: {:02X} PC: 00:{:04X} ({:02X} {:02X} {:02X} {:02X})",
         self.reg.a, self.reg.f, self.reg.b, self.reg.c, self.reg.d, self.reg.e, self.reg.h, self.reg.l, self.reg.sp, self.reg.pc, mmu.get_byte(self.reg.pc), mmu.get_byte(self.reg.pc + 1), mmu.get_byte(self.reg.pc + 2), mmu.get_byte(self.reg.pc + 3));
-        
+
         self.execute_instruction(mmu, instruction, &op_code)
     }
 
     /// Execute an instruction
-    fn execute_instruction(&mut self, mmu: &mut Memory, instruction: &Instruction, op_code: &OpCode) {
+    fn execute_instruction(
+        &mut self,
+        mmu: &mut Memory,
+        instruction: &Instruction,
+        op_code: &OpCode,
+    ) {
         let result = (instruction.handler)(self, mmu, op_code);
         // Update the program counter
         match result {

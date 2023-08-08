@@ -1,9 +1,9 @@
 use crate::cpu::cpu::Cpu;
 use crate::mmu::Memory;
 
-pub mod instructions;
 pub mod cb_instructions;
 mod functions;
+pub mod instructions;
 
 #[derive(Debug, PartialEq)]
 pub enum InstructionType {
@@ -16,7 +16,7 @@ pub enum InstructionType {
 #[derive(Debug, PartialEq)]
 pub enum OpCode {
     Regular(u8),
-    CB(u8)
+    CB(u8),
 }
 
 /// Information about an instructions
@@ -46,7 +46,6 @@ pub fn get_instruction_by_opcode(op_code: &OpCode) -> Option<&Instruction> {
 mod tests {
     use super::*;
 
-
     #[test]
     fn test_get_instruction_by_opcode() {
         let nop = Instruction {
@@ -54,14 +53,15 @@ mod tests {
             clock_cycles: 4,
             clock_cycles_condition: None,
             description: "NOP",
-            handler: |_: &mut Cpu, _: &mut Memory, _: &OpCode| {
-                InstructionType::None
-            }
+            handler: |_: &mut Cpu, _: &mut Memory, _: &OpCode| InstructionType::None,
         };
         let instruction = get_instruction_by_opcode(&OpCode::Regular(0x00));
         assert_eq!(instruction.unwrap().clock_cycles, nop.clock_cycles);
         assert_eq!(instruction.unwrap().length, nop.length);
-        assert_eq!(instruction.unwrap().clock_cycles_condition, nop.clock_cycles_condition);
+        assert_eq!(
+            instruction.unwrap().clock_cycles_condition,
+            nop.clock_cycles_condition
+        );
         assert_eq!(instruction.unwrap().description, nop.description);
     }
 
@@ -78,14 +78,15 @@ mod tests {
             clock_cycles: 8,
             clock_cycles_condition: None,
             description: "RL C",
-            handler: |_: &mut Cpu, _: &mut Memory, _: &OpCode| {
-                InstructionType::None
-            }
+            handler: |_: &mut Cpu, _: &mut Memory, _: &OpCode| InstructionType::None,
         };
         let instruction = get_instruction_by_opcode(&OpCode::CB(0x11));
         assert_eq!(instruction.unwrap().clock_cycles, rl_c.clock_cycles);
         assert_eq!(instruction.unwrap().length, rl_c.length);
-        assert_eq!(instruction.unwrap().clock_cycles_condition, rl_c.clock_cycles_condition);
+        assert_eq!(
+            instruction.unwrap().clock_cycles_condition,
+            rl_c.clock_cycles_condition
+        );
         assert_eq!(instruction.unwrap().description, rl_c.description);
     }
 

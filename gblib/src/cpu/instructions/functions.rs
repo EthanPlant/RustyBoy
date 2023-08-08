@@ -2,7 +2,7 @@ use crate::cpu::cpu::Cpu;
 use crate::cpu::registers::Flag;
 use crate::mmu::Memory;
 
-/// Get the n'th 8 bit instruction operand 
+/// Get the n'th 8 bit instruction operand
 pub fn get_op8(cpu: &Cpu, mmu: &Memory, n: u8) -> u8 {
     mmu.get_byte(cpu.reg.pc + n as u16)
 }
@@ -89,7 +89,6 @@ pub fn cp(cpu: &mut Cpu, byte: u8) {
     }
     cpu.reg.set_flag(Flag::Subtract);
 }
-
 
 /// Decrement a byte.
 /// Sets the zero flag if the result is zero.

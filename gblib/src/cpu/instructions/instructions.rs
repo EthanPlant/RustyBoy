@@ -9,9 +9,7 @@ const NOP: Instruction = Instruction {
     clock_cycles: 4,
     clock_cycles_condition: None,
     description: "NOP",
-    handler: |_: &mut Cpu, _: &mut Memory, _: &OpCode| {
-        InstructionType::None
-    }
+    handler: |_: &mut Cpu, _: &mut Memory, _: &OpCode| InstructionType::None,
 };
 
 /// 0x04 - INC B
@@ -23,7 +21,7 @@ const INC_B: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.b = functions::inc(cpu, cpu.reg.b);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x05 - DEC B
@@ -35,7 +33,7 @@ const DEC_B: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.b = functions::dec(cpu, cpu.reg.b);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x06 - LD B, n
@@ -47,7 +45,7 @@ const LD_B_N: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         cpu.reg.b = functions::get_op8(cpu, mmu, 1);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x0C - INC C
@@ -59,7 +57,7 @@ const INC_C: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.c = functions::inc(cpu, cpu.reg.c);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x0D - DEC C
@@ -71,7 +69,7 @@ const DEC_C: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.c = functions::dec(cpu, cpu.reg.c);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x0E - LD C, n
@@ -83,7 +81,7 @@ const LD_C_N: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         cpu.reg.c = functions::get_op8(cpu, mmu, 1);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x11 - LD DE, nn
@@ -95,7 +93,7 @@ const LD_DE_NN: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         cpu.reg.set_de(functions::get_op16(cpu, mmu));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x13 - INC DE
@@ -107,7 +105,7 @@ const INC_DE: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.set_de(cpu.reg.de().wrapping_add(1));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x15 - DEC D
@@ -119,7 +117,7 @@ const DEC_D: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.d = functions::dec(cpu, cpu.reg.d);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x16 - LD D, n
@@ -131,7 +129,7 @@ const LD_D_N: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         cpu.reg.d = functions::get_op8(cpu, mmu, 1);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x17 - RLA
@@ -145,7 +143,7 @@ const RLA: Instruction = Instruction {
         // Unlike normal RL operations, RLA always clears the zero flag
         cpu.reg.clear_flag(Flag::Zero);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x18 - JR n
@@ -157,7 +155,7 @@ const JR_N: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         functions::jr(cpu, mmu);
         InstructionType::Jumped
-    }
+    },
 };
 
 /// 0x1A - LD A, (DE)
@@ -169,7 +167,7 @@ const LD_A_DE: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         cpu.reg.a = mmu.get_byte(cpu.reg.de());
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x1D - DEC E
@@ -181,7 +179,7 @@ const DEC_E: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.e = functions::dec(cpu, cpu.reg.e);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x1E - LD E, n
@@ -193,7 +191,7 @@ const LD_E_N: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         cpu.reg.e = functions::get_op8(cpu, mmu, 1);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x20 - JR NZ, n
@@ -205,10 +203,10 @@ const JR_NZ_N: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         if !cpu.reg.check_flag(Flag::Zero) {
             functions::jr(cpu, mmu);
-            return InstructionType::Jumped
+            return InstructionType::Jumped;
         }
         InstructionType::None
-    }
+    },
 };
 
 /// 0x21 - LD HL, nn
@@ -220,7 +218,7 @@ const LD_HL_NN: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         cpu.reg.set_hl(functions::get_op16(cpu, mmu));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x22 - LD (HL+), A
@@ -233,7 +231,7 @@ const LD_HL_INC_A: Instruction = Instruction {
         functions::set_hl(cpu, mmu, cpu.reg.a);
         cpu.reg.set_hl(cpu.reg.hl().wrapping_add(1));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x23 - INC HL
@@ -245,7 +243,7 @@ const INC_HL: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.set_hl(cpu.reg.hl().wrapping_add(1));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x24 - INC H
@@ -257,7 +255,7 @@ const INC_H: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.h = functions::inc(cpu, cpu.reg.h);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x28 - JR Z, n
@@ -269,10 +267,10 @@ const JR_Z_N: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         if cpu.reg.check_flag(Flag::Zero) {
             functions::jr(cpu, mmu);
-            return InstructionType::Jumped
+            return InstructionType::Jumped;
         }
         InstructionType::None
-    }
+    },
 };
 
 /// 0x2E - LD L, n
@@ -284,7 +282,7 @@ const LD_L_N: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         cpu.reg.l = functions::get_op8(cpu, mmu, 1);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x31 - LD SP, nn
@@ -296,7 +294,7 @@ const LD_SP_NN: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         cpu.reg.sp = functions::get_op16(cpu, mmu);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x32 - LD (HL-), A
@@ -309,7 +307,7 @@ const LD_HL_DEC_A: Instruction = Instruction {
         functions::set_hl(cpu, mmu, cpu.reg.a);
         cpu.reg.set_hl(cpu.reg.hl().wrapping_sub(1));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x3D - DEC A
@@ -321,7 +319,7 @@ const DEC_A: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.a = functions::dec(cpu, cpu.reg.a);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x3E - LD A, n
@@ -333,7 +331,7 @@ const LD_A_N: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         cpu.reg.a = functions::get_op8(cpu, mmu, 1);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x4F - LD C, A
@@ -345,7 +343,7 @@ const LD_C_A: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.c = cpu.reg.a;
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x57 - LD D, A
@@ -357,7 +355,7 @@ const LD_D_A: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.d = cpu.reg.a;
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x67 - LD H, A
@@ -369,7 +367,7 @@ const LD_H_A: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.h = cpu.reg.a;
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x77 - LD (HL), A
@@ -381,9 +379,8 @@ const LD_HL_A: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         functions::set_hl(cpu, mmu, cpu.reg.a);
         InstructionType::ActionTaken
-    }
+    },
 };
-
 
 /// 0x78 - LD A, B
 const LD_A_B: Instruction = Instruction {
@@ -394,7 +391,7 @@ const LD_A_B: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.a = cpu.reg.b;
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x7B - LD A, E
@@ -406,7 +403,7 @@ const LD_A_E: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.a = cpu.reg.e;
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x7C - LD A, H
@@ -418,7 +415,7 @@ const LD_A_H: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.a = cpu.reg.h;
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x7D - LD A, L
@@ -430,7 +427,7 @@ const LD_A_L: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.a = cpu.reg.l;
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x86 - ADD (HL)
@@ -442,7 +439,7 @@ const ADD_HL: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         functions::add(cpu, functions::get_hl(cpu, mmu));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0x90 - SUB B
@@ -454,7 +451,7 @@ const SUB_B: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         functions::sub(cpu, cpu.reg.b);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0xAF - XOR A
@@ -466,7 +463,7 @@ const XOR_A: Instruction = Instruction {
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         functions::xor_bytes(cpu, cpu.reg.a, cpu.reg.a);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0xBE - CP (HL)
@@ -478,7 +475,7 @@ const CP_HL: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         functions::cp(cpu, functions::get_hl(cpu, mmu));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0xC1 - POP BC
@@ -491,7 +488,7 @@ const POP_BC: Instruction = Instruction {
         let val = functions::pop(cpu, mmu);
         cpu.reg.set_bc(val);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0xC5 - PUSH BC
@@ -503,7 +500,7 @@ const PUSH_BC: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         functions::push(cpu, mmu, cpu.reg.bc());
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0xC9 - RET
@@ -515,7 +512,7 @@ const RET: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         cpu.reg.pc = functions::pop(cpu, mmu);
         InstructionType::Jumped
-    }
+    },
 };
 
 /// 0xCD - CALL nn
@@ -527,7 +524,7 @@ const CALL_NN: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         functions::call(cpu, mmu);
         InstructionType::Jumped
-    }
+    },
 };
 
 /// 0xE0 - LDH (n), A
@@ -539,7 +536,7 @@ const LDH_N_A: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         mmu.set_byte(0xFF00 + functions::get_op8(cpu, mmu, 1) as u16, cpu.reg.a);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0xE2 - LD (C), A
@@ -551,7 +548,7 @@ const LD_PTR_C_A: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         mmu.set_byte(0xFF00 + cpu.reg.c as u16, cpu.reg.a);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0xEA - LD (nn), A
@@ -563,7 +560,7 @@ const LD_NN_A: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         mmu.set_byte(functions::get_op16(cpu, mmu), cpu.reg.a);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0xF0 - LDH A, (n)
@@ -575,7 +572,7 @@ const LDH_A_N: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         cpu.reg.a = mmu.get_byte(0xFF00 + functions::get_op8(cpu, mmu, 1) as u16);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// 0xFE - CP A, n
@@ -587,7 +584,7 @@ const CP_A_N: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         functions::cp(cpu, functions::get_op8(cpu, mmu, 1));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 /// Get an instruction by opcode
@@ -618,7 +615,7 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
         0x24 => Some(&INC_H),
         0x28 => Some(&JR_Z_N),
         0x2E => Some(&LD_L_N),
-        
+
         0x31 => Some(&LD_SP_NN),
         0x32 => Some(&LD_HL_DEC_A),
         0x3D => Some(&DEC_A),
@@ -656,7 +653,7 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
         0xF0 => Some(&LDH_A_N),
         0xFE => Some(&CP_A_N),
 
-        _ => None
+        _ => None,
     }
 }
 
@@ -1054,7 +1051,7 @@ mod tests {
         let mut mmu = Memory::new();
         cpu.reg.pc = 0x000A;
         mmu.set_byte(0x000B as u16, 0xFB);
-        let t= (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x20));
+        let t = (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x20));
         assert_eq!(cpu.reg.pc, 0x0007);
         assert!(t == InstructionType::Jumped)
     }
@@ -1124,7 +1121,7 @@ mod tests {
         assert_eq!(cpu.reg.h, 0x00);
         assert_eq!(cpu.reg.l, 0x00);
     }
-    
+
     #[test]
     fn test_get_instruction_inc_h() {
         let instruction = get_instruction(&0x24);
