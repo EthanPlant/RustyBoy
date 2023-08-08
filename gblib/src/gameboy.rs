@@ -26,7 +26,7 @@ mod tests {
 
     #[test]
     fn test_new() {
-        let gameboy = Gameboy::new("resources/test-file");
-        assert_eq!(gameboy.mmu.get_byte(0 as u8), 'T' as u8)
+        let gameboy = Gameboy::new("resources/test-rom.gb");
+        assert_eq!(gameboy.mmu.get_word(0x0100 as usize), 0xC300);
     }
 }

@@ -191,8 +191,8 @@ mod tests {
     fn test_get_op8() {
         let mut cpu = Cpu::new();
         let mut mem = Memory::new();
-        mem.set_byte(0x0000 as u16, 0x01);
-        cpu.reg.pc = 0x0000;
+        mem.set_byte(0xC000 as u16, 0x01);
+        cpu.reg.pc = 0xC000;
         let op = get_op8(&cpu, &mem, 0);
         assert_eq!(op, 0x01);
     }
@@ -201,8 +201,8 @@ mod tests {
     fn test_get_op16() {
         let mut cpu = Cpu::new();
         let mut mem = Memory::new();
-        mem.set_word(0x0001 as u16, 0x0102);
-        cpu.reg.pc = 0x0000;
+        mem.set_word(0xC001 as u16, 0x0102);
+        cpu.reg.pc = 0xC000;
         let op = get_op16(&cpu, &mem);
         assert_eq!(op, 0x0102);
     }
@@ -211,9 +211,9 @@ mod tests {
     fn test_get_hl() {
         let mut cpu = Cpu::new();
         let mut mem = Memory::new();
-        mem.set_byte(0x0000 as u16, 0x01);
-        cpu.reg.pc = 0x0000;
-        cpu.reg.set_hl(0x0000);
+        mem.set_byte(0xC000 as u16, 0x01);
+        cpu.reg.pc = 0xC000;
+        cpu.reg.set_hl(0xC000);
         let op = get_hl(&cpu, &mem);
         assert_eq!(op, 0x01);
     }
@@ -222,10 +222,9 @@ mod tests {
     fn test_set_hl() {
         let mut cpu = Cpu::new();
         let mut mem = Memory::new();
-        cpu.reg.pc = 0x0000;
-        cpu.reg.set_hl(0x0000);
+        cpu.reg.set_hl(0xC000);
         set_hl(&mut cpu, &mut mem, 0x01);
-        assert_eq!(mem.get_byte(0x0000 as u16), 0x01);
+        assert_eq!(mem.get_byte(0xC000 as u16), 0x01);
     }
 
     #[test]
@@ -257,10 +256,10 @@ mod tests {
     fn test_call() {
         let mut cpu = Cpu::new();
         let mut mem = Memory::new();
-        cpu.reg.pc = 0x0000;
+        cpu.reg.pc = 0xC000;
         cpu.reg.sp = 0xFFFE;
-        mem.set_byte(0x0001 as u16, 0x02);
-        mem.set_byte(0x0002 as u16, 0x01);
+        mem.set_byte(0xC001 as usize, 0x02);
+        mem.set_byte(0xC002 as usize, 0x01);
         call(&mut cpu, &mut mem);
         assert_eq!(cpu.reg.pc, 0x0102);
         assert_eq!(cpu.reg.sp, 0xFFFC);
@@ -272,10 +271,10 @@ mod tests {
     fn test_jr() {
         let mut cpu = Cpu::new();
         let mut mem = Memory::new();
-        mem.set_byte(0x000B as u16, 0xFB);
-        cpu.reg.pc = 0x000A;
+        mem.set_byte(0xC00B as u16, 0xFB);
+        cpu.reg.pc = 0xC00A;
         jr(&mut cpu, &mut mem);
-        assert_eq!(cpu.reg.pc, 0x0007);
+        assert_eq!(cpu.reg.pc, 0xC007);
     }
 
     #[test]

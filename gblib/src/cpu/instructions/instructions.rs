@@ -666,8 +666,9 @@ mod tests {
         let instruction = get_instruction(&0x00);
         assert!(instruction == Some(&NOP));
         let mut cpu = Cpu::new();
+        cpu.reg.pc = 0xC000;
         (instruction.unwrap().handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x00));
-        assert_eq!(cpu.reg.pc, 0x0000);
+        assert_eq!(cpu.reg.pc, 0xC000);
     }
 
     #[test]
@@ -749,8 +750,9 @@ mod tests {
         let instruction = get_instruction(&0x06);
         assert!(instruction == Some(&LD_B_N));
         let mut cpu = Cpu::new();
+        cpu.reg.pc = 0xC000;
         let mut mmu = Memory::new();
-        mmu.set_byte(0x01 as u16, 0x12);
+        mmu.set_byte(0xC001 as usize, 0x12);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x06));
         assert_eq!(cpu.reg.b, 0x12);
     }
@@ -825,6 +827,7 @@ mod tests {
         assert!(instruction == Some(&DEC_C));
         let mut cpu = Cpu::new();
         cpu.reg.c = 0x00;
+        cpu.reg.pc = 0xC000;
         (instruction.unwrap().handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x0D));
         assert_eq!(cpu.reg.c, 0xFF);
     }
@@ -834,8 +837,9 @@ mod tests {
         let instruction = get_instruction(&0x0E);
         assert!(instruction == Some(&LD_C_N));
         let mut cpu = Cpu::new();
+        cpu.reg.pc = 0xC000;
         let mut mmu = Memory::new();
-        mmu.set_byte(0x01 as u16, 0x12);
+        mmu.set_byte(0xC001 as usize, 0x12);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x0E));
         assert_eq!(cpu.reg.c, 0x12);
     }
@@ -845,8 +849,9 @@ mod tests {
         let instruction = get_instruction(&0x11);
         assert!(instruction == Some(&LD_DE_NN));
         let mut cpu = Cpu::new();
+        cpu.reg.pc = 0xC000;
         let mut mmu = Memory::new();
-        mmu.set_word(0x01 as u8, 0x1234);
+        mmu.set_word(0xC001 as usize, 0x1234);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x11));
         assert_eq!(cpu.reg.d, 0x12);
         assert_eq!(cpu.reg.e, 0x34);
@@ -923,8 +928,9 @@ mod tests {
         let instruction = get_instruction(&0x16);
         assert!(instruction == Some(&LD_D_N));
         let mut cpu = Cpu::new();
+        cpu.reg.pc = 0xC000;
         let mut mmu = Memory::new();
-        mmu.set_byte(0x01 as u16, 0x12);
+        mmu.set_byte(0xC001 as usize, 0x12);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x16));
         assert_eq!(cpu.reg.d, 0x12);
     }
@@ -957,10 +963,10 @@ mod tests {
         assert!(instruction == Some(&JR_N));
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
-        cpu.reg.pc = 0x000A;
-        mmu.set_byte(0x000B as u16, 0xFB);
+        cpu.reg.pc = 0xC00A;
+        mmu.set_byte(0xC00B as u16, 0xFB);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x18));
-        assert_eq!(cpu.reg.pc, 0x0007);
+        assert_eq!(cpu.reg.pc, 0xC007);
     }
 
     #[test]
@@ -969,9 +975,9 @@ mod tests {
         assert!(instruction == Some(&LD_A_DE));
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
-        cpu.reg.d = 0x12;
-        cpu.reg.e = 0x34;
-        mmu.set_byte(0x1234 as u16, 0x12);
+        cpu.reg.d = 0xC0;
+        cpu.reg.e = 0x00;
+        mmu.set_byte(0xC000 as u16, 0x12);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x1A));
         assert_eq!(cpu.reg.a, 0x12);
     }
@@ -1024,7 +1030,8 @@ mod tests {
         assert!(instruction == Some(&LD_E_N));
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
-        mmu.set_byte(0x01 as u16, 0x12);
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC001 as usize, 0x12);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x1E));
         assert_eq!(cpu.reg.e, 0x12);
     }
@@ -1035,11 +1042,11 @@ mod tests {
         assert!(instruction == Some(&JR_NZ_N));
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
-        cpu.reg.pc = 0x000A;
-        mmu.set_byte(0x000B as u16, 0xFB);
+        cpu.reg.pc = 0xC00A;
+        mmu.set_byte(0xC00B as usize, 0xFB);
         cpu.reg.set_flag(Flag::Zero);
         let t = (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x20));
-        assert_eq!(cpu.reg.pc, 0x000A);
+        assert_eq!(cpu.reg.pc, 0xC00A);
         assert!(t == InstructionType::None)
     }
 
@@ -1049,10 +1056,10 @@ mod tests {
         assert!(instruction == Some(&JR_NZ_N));
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
-        cpu.reg.pc = 0x000A;
-        mmu.set_byte(0x000B as u16, 0xFB);
+        cpu.reg.pc = 0xC00A;
+        mmu.set_byte(0xC00B as usize, 0xFB);
         let t = (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x20));
-        assert_eq!(cpu.reg.pc, 0x0007);
+        assert_eq!(cpu.reg.pc, 0xC007);
         assert!(t == InstructionType::Jumped)
     }
 
@@ -1062,7 +1069,8 @@ mod tests {
         assert!(instruction == Some(&LD_HL_NN));
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
-        mmu.set_word(0x01 as u8, 0x1234);
+        cpu.reg.pc = 0xC000;
+        mmu.set_word(0xC001 as usize, 0x1234);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x21));
         assert_eq!(cpu.reg.h, 0x12);
         assert_eq!(cpu.reg.l, 0x34);
@@ -1075,12 +1083,12 @@ mod tests {
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
         cpu.reg.a = 0x12;
-        cpu.reg.h = 0x12;
-        cpu.reg.l = 0x34;
+        cpu.reg.h = 0xC0;
+        cpu.reg.l = 0x00;
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x22));
-        assert_eq!(mmu.get_byte(0x1234 as u16), 0x12);
-        assert_eq!(cpu.reg.h, 0x12);
-        assert_eq!(cpu.reg.l, 0x35);
+        assert_eq!(mmu.get_byte(0xC000 as u16), 0x12);
+        assert_eq!(cpu.reg.h, 0xC0);
+        assert_eq!(cpu.reg.l, 0x01);
     }
 
     #[test]
@@ -1160,11 +1168,11 @@ mod tests {
         assert!(instruction == Some(&JR_Z_N));
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
-        cpu.reg.pc = 0x000A;
-        mmu.set_byte(0x000B as u16, 0xFB);
+        cpu.reg.pc = 0xC00A;
+        mmu.set_byte(0xC00B as u16, 0xFB);
         cpu.reg.set_flag(Flag::Zero);
         let t = (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x28));
-        assert_eq!(cpu.reg.pc, 0x0007);
+        assert_eq!(cpu.reg.pc, 0xC007);
         assert!(t == InstructionType::Jumped)
     }
 
@@ -1174,10 +1182,10 @@ mod tests {
         assert!(instruction == Some(&JR_Z_N));
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
-        cpu.reg.pc = 0x000A;
-        mmu.set_byte(0x000B as u16, 0xFB);
+        cpu.reg.pc = 0xC00A;
+        mmu.set_byte(0xC00B as u16, 0xFB);
         let t = (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x28));
-        assert_eq!(cpu.reg.pc, 0x000A);
+        assert_eq!(cpu.reg.pc, 0xC00A);
         assert!(t == InstructionType::None)
     }
 
@@ -1187,7 +1195,8 @@ mod tests {
         assert!(instruction == Some(&LD_L_N));
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
-        mmu.set_byte(0x01 as u16, 0x12);
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC001 as usize, 0x12);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x2E));
         assert_eq!(cpu.reg.l, 0x12);
     }
@@ -1198,7 +1207,8 @@ mod tests {
         assert!(instruction == Some(&LD_SP_NN));
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
-        mmu.set_word(0x01 as u8, 0x1234);
+        cpu.reg.pc = 0xC000;
+        mmu.set_word(0xC001 as usize, 0x1234);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x31));
         assert_eq!(cpu.reg.sp, 0x1234);
     }
@@ -1210,12 +1220,12 @@ mod tests {
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
         cpu.reg.a = 0x12;
-        cpu.reg.h = 0x12;
-        cpu.reg.l = 0x34;
+        cpu.reg.h = 0xC0;
+        cpu.reg.l = 0x00;
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x32));
-        assert_eq!(mmu.get_byte(0x1234 as u16), 0x12);
-        assert_eq!(cpu.reg.h, 0x12);
-        assert_eq!(cpu.reg.l, 0x33);
+        assert_eq!(mmu.get_byte(0xC000 as u16), 0x12);
+        assert_eq!(cpu.reg.h, 0xBF);
+        assert_eq!(cpu.reg.l, 0xFF);
     }
 
     #[test]
@@ -1228,7 +1238,6 @@ mod tests {
         cpu.reg.h = 0x00;
         cpu.reg.l = 0x00;
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x32));
-        assert_eq!(mmu.get_byte(0x0000 as u16), 0x12);
         assert_eq!(cpu.reg.h, 0xFF);
         assert_eq!(cpu.reg.l, 0xFF);
     }
@@ -1281,7 +1290,8 @@ mod tests {
         assert!(instruction == Some(&LD_A_N));
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
-        mmu.set_byte(0x01 as u16, 0x12);
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC001 as usize, 0x12);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x3E));
         assert_eq!(cpu.reg.a, 0x12);
     }
@@ -1323,10 +1333,10 @@ mod tests {
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
         cpu.reg.a = 0x12;
-        cpu.reg.h = 0x12;
-        cpu.reg.l = 0x34;
+        cpu.reg.h = 0xC0;
+        cpu.reg.l = 0x00;
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x77));
-        assert_eq!(mmu.get_byte(0x1234 as u16), 0x12);
+        assert_eq!(mmu.get_byte(0xC000 as u16), 0x12);
     }
 
     #[test]
@@ -1375,10 +1385,10 @@ mod tests {
         assert!(instruction == Some(&ADD_HL));
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
-        cpu.reg.h = 0x12;
-        cpu.reg.l = 0x34;
+        cpu.reg.h = 0xC0;
+        cpu.reg.l = 0x00;
         cpu.reg.a = 0x12;
-        mmu.set_byte(0x1234 as u16, 0x34);
+        mmu.set_byte(0xC000 as u16, 0x34);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x86));
         assert_eq!(cpu.reg.a, 0x46);
     }
@@ -1389,10 +1399,10 @@ mod tests {
         assert!(instruction == Some(&ADD_HL));
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
-        cpu.reg.h = 0x12;
-        cpu.reg.l = 0x34;
+        cpu.reg.h = 0xC0;
+        cpu.reg.l = 0x00;
         cpu.reg.a = 0x00;
-        mmu.set_byte(0x1234 as u16, 0x00);
+        mmu.set_byte(0xC000 as u16, 0x00);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x86));
         assert_eq!(cpu.reg.a, 0x00);
         assert!(cpu.reg.check_flag(Flag::Zero));
@@ -1404,10 +1414,10 @@ mod tests {
         assert!(instruction == Some(&ADD_HL));
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
-        cpu.reg.h = 0x12;
-        cpu.reg.l = 0x34;
+        cpu.reg.h = 0xC0;
+        cpu.reg.l = 0x00;
         cpu.reg.a = 0x0F;
-        mmu.set_byte(0x1234 as u16, 0x01);
+        mmu.set_byte(0xC000 as u16, 0x01);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x86));
         assert_eq!(cpu.reg.a, 0x10);
         assert!(cpu.reg.check_flag(Flag::HalfCarry));
@@ -1419,10 +1429,10 @@ mod tests {
         assert!(instruction == Some(&ADD_HL));
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
-        cpu.reg.h = 0x12;
-        cpu.reg.l = 0x34;
+        cpu.reg.h = 0xC0;
+        cpu.reg.l = 0x00;
         cpu.reg.a = 0xFF;
-        mmu.set_byte(0x1234 as u16, 0x01);
+        mmu.set_byte(0xC000 as u16, 0x01);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x86));
         assert_eq!(cpu.reg.a, 0x00);
         assert!(cpu.reg.check_flag(Flag::Carry));
@@ -1504,8 +1514,8 @@ mod tests {
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
         cpu.reg.a = 0xFF;
-        cpu.reg.h = 0x12;
-        cpu.reg.l = 0x34;
+        cpu.reg.h = 0xC0;
+        cpu.reg.l = 0x00;
         mmu.set_byte(0x1234 as u16, 0x34);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0xBE));
         assert_eq!(cpu.reg.a, 0xFF);
@@ -1522,9 +1532,9 @@ mod tests {
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
         cpu.reg.a = 0x34;
-        cpu.reg.h = 0x12;
-        cpu.reg.l = 0x34;
-        mmu.set_byte(0x1234 as u16, 0x34);
+        cpu.reg.h = 0xC0;
+        cpu.reg.l = 0x00;
+        mmu.set_byte(0xC000 as u16, 0x34);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0xBE));
         assert_eq!(cpu.reg.a, 0x34);
         assert!(cpu.reg.check_flag(Flag::Zero));
@@ -1540,9 +1550,9 @@ mod tests {
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
         cpu.reg.a = 0x10;
-        cpu.reg.h = 0x12;
-        cpu.reg.l = 0x34;
-        mmu.set_byte(0x1234 as u16, 0x01);
+        cpu.reg.h = 0xC0;
+        cpu.reg.l = 0x00;
+        mmu.set_byte(0xC000 as u16, 0x01);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0xBE));
         assert_eq!(cpu.reg.a, 0x10);
         assert!(cpu.reg.check_flag(Flag::Subtract));
@@ -1557,9 +1567,9 @@ mod tests {
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
         cpu.reg.a = 0x01;
-        cpu.reg.h = 0x12;
-        cpu.reg.l = 0x34;
-        mmu.set_byte(0x1234 as u16, 0x10);
+        cpu.reg.h = 0xC0;
+        cpu.reg.l = 0x00;
+        mmu.set_byte(0xC000 as usize, 0x10);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0xBE));
         assert_eq!(cpu.reg.a, 0x01);
         assert!(cpu.reg.check_flag(Flag::Subtract));
@@ -1614,10 +1624,11 @@ mod tests {
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
         cpu.reg.sp = 0xFFFE;
-        mmu.set_word(0x01 as u8, 0x1234);
+        cpu.reg.pc = 0xC000;
+        mmu.set_word(0xC001 as usize, 0x1234);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0xCD));
         assert_eq!(cpu.reg.sp, 0xFFFC);
-        assert_eq!(mmu.get_word(cpu.reg.sp), 0x0003);
+        assert_eq!(mmu.get_word(cpu.reg.sp), 0xC003);
         assert_eq!(cpu.reg.pc, 0x1234);
     }
 
@@ -1628,7 +1639,8 @@ mod tests {
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
         cpu.reg.a = 0x12;
-        mmu.set_byte(0x01 as u16, 0x34);
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC001 as u16, 0x34);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0xE0));
         assert_eq!(mmu.get_byte(0xFF34 as u16), 0x12);
     }
@@ -1652,9 +1664,10 @@ mod tests {
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
         cpu.reg.a = 0x12;
-        mmu.set_word(0x01 as u8, 0x1234);
+        cpu.reg.pc = 0xC000;
+        mmu.set_word(0xC001 as usize, 0xC123);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0xEA));
-        assert_eq!(mmu.get_byte(0x1234 as u16), 0x12);
+        assert_eq!(mmu.get_byte(0xC123 as u16), 0x12);
     }
 
     #[test]
@@ -1663,8 +1676,9 @@ mod tests {
         assert!(instruction == Some(&LDH_A_N));
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
-        mmu.set_byte(0x01 as u16, 0x34);
-        mmu.set_byte(0xFF34 as u16, 0x12);
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC001 as usize, 0x34);
+        mmu.set_byte(0xFF34 as usize, 0x12);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0xF0));
         assert_eq!(cpu.reg.a, 0x12);
     }
@@ -1676,10 +1690,10 @@ mod tests {
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
         cpu.reg.a = 0xFF;
-        mmu.set_byte(0x01 as u16, 0x00);
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC001 as usize, 0x00);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0xFE));
         assert_eq!(cpu.reg.a, 0xFF);
-        assert_eq!(mmu.get_byte(0x01 as u16), 0x00);
         assert!(cpu.reg.check_flag(Flag::Subtract));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
@@ -1692,10 +1706,10 @@ mod tests {
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
         cpu.reg.a = 0x00;
-        mmu.set_byte(0x01 as u16, 0x00);
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC001 as usize, 0x00);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0xFE));
         assert_eq!(cpu.reg.a, 0x00);
-        assert_eq!(mmu.get_byte(0x01 as u16), 0x00);
         assert!(cpu.reg.check_flag(Flag::Zero));
         assert!(cpu.reg.check_flag(Flag::Subtract));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
@@ -1709,10 +1723,10 @@ mod tests {
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
         cpu.reg.a = 0x01;
-        mmu.set_byte(0x01 as u16, 0x1F);
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC001 as usize, 0x1F);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0xFE));
         assert_eq!(cpu.reg.a, 0x01);
-        assert_eq!(mmu.get_byte(0x01 as u16), 0x1F);
         assert!(cpu.reg.check_flag(Flag::Subtract));
         assert!(cpu.reg.check_flag(Flag::HalfCarry));
     }
@@ -1724,10 +1738,10 @@ mod tests {
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
         cpu.reg.a = 0x00;
-        mmu.set_byte(0x01 as u16, 0x01);
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC001 as usize, 0x01);
         (instruction.unwrap().handler)(&mut cpu, &mut mmu, &OpCode::Regular(0xFE));
         assert_eq!(cpu.reg.a, 0x00);
-        assert_eq!(mmu.get_byte(0x01 as u16), 0x01);
         assert!(cpu.reg.check_flag(Flag::Subtract));
         assert!(cpu.reg.check_flag(Flag::Carry));
     }

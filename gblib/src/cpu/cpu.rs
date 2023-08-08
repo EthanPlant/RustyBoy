@@ -11,7 +11,8 @@ pub struct Cpu {
 
 impl Cpu {
     pub fn new() -> Self {
-        let registers = Registers::new();
+        let mut registers = Registers::new();
+        registers.pc = 0x0100;
         Cpu { reg: registers }
     }
 
@@ -75,14 +76,15 @@ mod tests {
     #[test]
     fn test_new() {
         let cpu = Cpu::new();
-        assert_eq!(cpu.reg.pc, 0);
+        assert_eq!(cpu.reg.pc, 0x100);
     }
 
     #[test]
     fn test_read_opcode() {
-        let mmu = Memory::new();
+        let mut mmu = Memory::new();
         let mut cpu = Cpu::new();
-        cpu.reg.pc = 0;
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC000 as usize, 0x00 as u8);
         assert_eq!(cpu.read_opcode(&mmu), OpCode::Regular(0));
     }
 
@@ -90,9 +92,9 @@ mod tests {
     fn test_read_opcode_cb() {
         let mut mmu = Memory::new();
         let mut cpu = Cpu::new();
-        cpu.reg.pc = 0;
-        mmu.set_byte(0 as u8, 0xCB);
-        mmu.set_byte(1 as u8, 0x00);
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC000 as usize, 0xCB);
+        mmu.set_byte(0xC001 as usize, 0x00);
         assert_eq!(cpu.read_opcode(&mmu), OpCode::CB(0));
     }
 
@@ -139,37 +141,41 @@ mod tests {
     fn test_step() {
         let mut mmu = Memory::new();
         let mut cpu = Cpu::new();
-        mmu.set_byte(0x0000 as u16, 0x00 as u8);
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC000 as usize, 0x00 as u8);
         cpu.step(&mut mmu);
-        assert_eq!(cpu.reg.pc, 1);
+        assert_eq!(cpu.reg.pc, 0xC001);
     }
 
     #[test]
     fn test_step_cb() {
         let mut mmu = Memory::new();
         let mut cpu = Cpu::new();
-        mmu.set_byte(0x0000 as u16, 0xCB as u8);
-        mmu.set_byte(0x0001 as u16, 0x7C as u8);
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC000 as usize, 0xCB as u8);
+        mmu.set_byte(0xC001 as usize, 0x7C as u8);
         cpu.step(&mut mmu);
-        assert_eq!(cpu.reg.pc, 2);
+        assert_eq!(cpu.reg.pc, 0xC002);
     }
 
     #[test]
-    #[should_panic(expected = "Unimplemented instruction! 0xD3 PC: 0x0000")]
+    #[should_panic(expected = "Unimplemented instruction! 0xD3 PC: 0xC000")]
     fn test_step_unimplemented_instruction() {
         let mut mmu = Memory::new();
         let mut cpu = Cpu::new();
-        mmu.set_byte(0x0000 as u16, 0xD3 as u8);
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC000 as usize, 0xD3 as u8);
         cpu.step(&mut mmu);
     }
 
     #[test]
-    #[should_panic(expected = "Unimplemented CB instruction! 0x00 PC: 0x0000")]
+    #[should_panic(expected = "Unimplemented CB instruction! 0x00 PC: 0xC000")]
     fn test_step_unimplemented_cb_instruction() {
         let mut mmu = Memory::new();
         let mut cpu = Cpu::new();
-        mmu.set_byte(0 as u8, 0xCB);
-        mmu.set_byte(1 as u8, 0x00);
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC000 as usize, 0xCB);
+        mmu.set_byte(0xC001 as usize, 0x00);
         cpu.step(&mut mmu);
     }
 }
