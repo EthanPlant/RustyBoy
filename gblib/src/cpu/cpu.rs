@@ -1,14 +1,12 @@
-use std::mem;
-
 use crate::cpu::instructions;
-use crate::cpu::instructions::{Instruction, OpCode};
+use crate::cpu::instructions::{Instruction, InstructionType, OpCode};
 use crate::cpu::registers::Registers;
 use crate::mmu::Memory;
 
 /// Emulation of the Gameboy CPU
 pub struct Cpu<> {
     /// The CPU registers
-    reg: Registers,
+    pub reg: Registers,
 }
 
 impl Cpu {
@@ -18,7 +16,7 @@ impl Cpu {
     }
 
     /// Step through the emulator
-    pub fn step(&mut self, mmu: &Memory) {
+    pub fn step(&mut self, mmu: &mut Memory) {
         let op_code = self.read_opcode(mmu);
 
         let instruction = match instructions::get_instruction_by_opcode(&op_code) {
@@ -26,11 +24,11 @@ impl Cpu {
             None => {
                 match op_code {
                     OpCode::CB(value) => panic!(
-                        "Unimplemented CB instruction! 0x:{:X} PC: 0x:{:X}",
+                        "Unimplemented CB instruction! {:#04X} PC: {:#06X}",
                         value, self.reg.pc,
                     ),
                     OpCode::Regular(value) => panic!(
-                        "Unimplemented instruction! 0x:{:X} PC: 0x:{:X}",
+                        "Unimplemented instruction! {:#04X} PC: {:#06X}",
                         value, self.reg.pc,
                     ),
                 };
@@ -38,15 +36,18 @@ impl Cpu {
             }
         };
 
-        self.execute_instruction(instruction, &op_code)
+        println!("A: {:02X} F: {:02X} B: {:02X} C: {:02X} D: {:02X} E: {:02X} H: {:02X} L: {:02X} SP: {:02X} PC: 00:{:04X} ({:02X} {:02X} {:02X} {:02X})",
+        self.reg.a, self.reg.f, self.reg.b, self.reg.c, self.reg.d, self.reg.e, self.reg.h, self.reg.l, self.reg.sp, self.reg.pc, mmu.get_byte(self.reg.pc), mmu.get_byte(self.reg.pc + 1), mmu.get_byte(self.reg.pc + 2), mmu.get_byte(self.reg.pc + 3));
+        
+        self.execute_instruction(mmu, instruction, &op_code)
     }
 
     /// Execute an instruction
-    fn execute_instruction(&mut self, instruction: &Instruction, op_code: &OpCode) {
-        let result = (instruction.handler)(self, op_code);
-
+    fn execute_instruction(&mut self, mmu: &mut Memory, instruction: &Instruction, op_code: &OpCode) {
+        let result = (instruction.handler)(self, mmu, op_code);
         // Update the program counter
         match result {
+            InstructionType::Jumped => {}
             _ => {
                 self.reg.pc += instruction.length;
             }
@@ -65,8 +66,6 @@ impl Cpu {
 
 #[cfg(test)]
 mod tests {
-    use crate::cpu;
-
     use super::*;
 
     #[test]
@@ -95,38 +94,78 @@ mod tests {
 
     #[test]
     fn test_execute_instruction() {
-        let mmu = Memory::new();
+        let mut mmu = Memory::new();
         let mut cpu = Cpu::new();
         cpu.reg.pc = 0;
         let instruction = Instruction {
             length: 1,
             clock_cycles: 1,
             clock_cycles_condition: None,
-            description: String::from("Test instruction"),
-            handler: |cpu: &mut Cpu, op_code: &OpCode| {
+            description: "Test instruction",
+            handler: |cpu: &mut Cpu, _: &mut Memory, op_code: &OpCode| {
                 assert_eq!(cpu.reg.pc, 0);
                 assert_eq!(op_code, &OpCode::Regular(0));
+                InstructionType::ActionTaken
             },
         };
-        cpu.execute_instruction(&instruction, &OpCode::Regular(0));
+        cpu.execute_instruction(&mut mmu, &instruction, &OpCode::Regular(0));
         assert_eq!(cpu.reg.pc, 1);
     }
 
     #[test]
-    #[should_panic(expected = "Unimplemented instruction! 0x:0 PC: 0x:0")]
-    fn test_step_unimplemented_instruction() {
-        let mmu = Memory::new();
+    fn test_execute_instruction_jumped() {
+        let mut mmu = Memory::new();
         let mut cpu = Cpu::new();
-        cpu.step(&mmu);
+        cpu.reg.pc = 0;
+        let instruction = Instruction {
+            length: 1,
+            clock_cycles: 1,
+            clock_cycles_condition: None,
+            description: "Test instruction",
+            handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+                cpu.reg.pc = 10;
+                InstructionType::Jumped
+            },
+        };
+        cpu.execute_instruction(&mut mmu, &instruction, &OpCode::Regular(0));
+        assert_eq!(cpu.reg.pc, 10);
     }
 
     #[test]
-    #[should_panic(expected = "Unimplemented CB instruction! 0x:0 PC: 0x:0")]
+    fn test_step() {
+        let mut mmu = Memory::new();
+        let mut cpu = Cpu::new();
+        mmu.set_byte(0x0000 as u16, 0x00 as u8);
+        cpu.step(&mut mmu);
+        assert_eq!(cpu.reg.pc, 1);
+    }
+
+    #[test]
+    fn test_step_cb() {
+        let mut mmu = Memory::new();
+        let mut cpu = Cpu::new();
+        mmu.set_byte(0x0000 as u16, 0xCB as u8);
+        mmu.set_byte(0x0001 as u16, 0x7C as u8);
+        cpu.step(&mut mmu);
+        assert_eq!(cpu.reg.pc, 2);
+    }
+
+    #[test]
+    #[should_panic(expected = "Unimplemented instruction! 0xD3 PC: 0x0000")]
+    fn test_step_unimplemented_instruction() {
+        let mut mmu = Memory::new();
+        let mut cpu = Cpu::new();
+        mmu.set_byte(0x0000 as u16, 0xD3 as u8);
+        cpu.step(&mut mmu);
+    }
+
+    #[test]
+    #[should_panic(expected = "Unimplemented CB instruction! 0x00 PC: 0x0000")]
     fn test_step_unimplemented_cb_instruction() {
         let mut mmu = Memory::new();
         let mut cpu = Cpu::new();
         mmu.set_byte(0 as u8, 0xCB);
         mmu.set_byte(1 as u8, 0x00);
-        cpu.step(&mmu);
+        cpu.step(&mut mmu);
     }
 }

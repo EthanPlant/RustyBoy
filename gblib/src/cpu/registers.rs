@@ -62,6 +62,39 @@ impl Registers {
     pub fn check_flag(&self, flag: Flag) -> bool {
         self.f & (flag as u8) != 0
     }
+
+    /// Get the BC register pair
+    pub fn bc(&self) -> u16 {
+        ((self.b as u16) << 8) | (self.c as u16)
+    }
+
+    /// Get the DE register pair
+    pub fn de(&self) -> u16 {
+        ((self.d as u16) << 8) | (self.e as u16)
+    }
+
+    /// Get the HL register pair
+    pub fn hl(&self) -> u16 {
+        ((self.h as u16) << 8) | (self.l as u16)
+    }
+
+    /// Set the BC register pair
+    pub fn set_bc(&mut self, value: u16) {
+        self.b = ((value & 0xFF00) >> 8) as u8;
+        self.c = (value & 0x00FF) as u8;
+    }
+
+    /// Set the DE register pair
+    pub fn set_de(&mut self, value: u16) {
+        self.d = ((value & 0xFF00) >> 8) as u8;
+        self.e = (value & 0x00FF) as u8;
+    }
+
+    /// Set the HL register pair
+    pub fn set_hl(&mut self, value: u16) {
+        self.h = ((value & 0xFF00) >> 8) as u8;
+        self.l = (value & 0x00FF) as u8;
+    }
 }
 
 #[cfg(test)]
@@ -144,5 +177,63 @@ mod tests {
         assert_eq!(regs.check_flag(Flag::Subtract), true);
         assert_eq!(regs.check_flag(Flag::HalfCarry), true);
         assert_eq!(regs.check_flag(Flag::Carry), true);
+    }
+
+    #[test]
+    fn test_check_flag_not_set() {
+        let mut regs = Registers::new();
+        regs.f = 0x00;
+        assert_eq!(regs.check_flag(Flag::Zero), false);
+        assert_eq!(regs.check_flag(Flag::Subtract), false);
+        assert_eq!(regs.check_flag(Flag::HalfCarry), false);
+        assert_eq!(regs.check_flag(Flag::Carry), false);
+    }
+
+    #[test]
+    fn test_bc() {
+        let mut regs = Registers::new();
+        regs.b = 0x12;
+        regs.c = 0x34;
+        assert_eq!(regs.bc(), 0x1234);
+    }
+
+    #[test]
+    fn test_de() {
+        let mut regs = Registers::new();
+        regs.d = 0x12;
+        regs.e = 0x34;
+        assert_eq!(regs.de(), 0x1234);
+    }
+
+    #[test]
+    fn test_hl() {
+        let mut regs = Registers::new();
+        regs.h = 0x12;
+        regs.l = 0x34;
+        assert_eq!(regs.hl(), 0x1234);
+    }
+
+    #[test]
+    fn test_set_bc() {
+        let mut regs = Registers::new();
+        regs.set_bc(0x1234);
+        assert_eq!(regs.b, 0x12);
+        assert_eq!(regs.c, 0x34);
+    }
+
+    #[test]
+    fn test_set_de() {
+        let mut regs = Registers::new();
+        regs.set_de(0x1234);
+        assert_eq!(regs.d, 0x12);
+        assert_eq!(regs.e, 0x34);
+    }
+
+    #[test]
+    fn test_set_hl() {
+        let mut regs = Registers::new();
+        regs.set_hl(0x1234);
+        assert_eq!(regs.h, 0x12);
+        assert_eq!(regs.l, 0x34);
     }
 }

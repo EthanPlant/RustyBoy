@@ -16,7 +16,7 @@ impl Gameboy {
 
     /// Step through the emulation
     pub fn step(&mut self) {
-        self.cpu.step(&self.mmu);
+        self.cpu.step(&mut self.mmu);
     }
 }
 
