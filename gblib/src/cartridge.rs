@@ -109,6 +109,7 @@ impl TryFrom<u8> for CartridgeType {
     }
 }
 
+
 enum RomSize {
     K32 = 0x00,
     K64 = 0x01,
@@ -210,6 +211,7 @@ pub struct Cartridge {
 }
 
 impl Cartridge {
+    /// Create a new Cartridge
     pub fn new() -> Self {
         Cartridge {
             rom: vec![0xFF; 0x8000],
@@ -217,6 +219,7 @@ impl Cartridge {
         }
     }
 
+    /// Create a new Cartridge from a ROM file
     pub fn new_from_rom(rom_name: &str) -> Self {
         let rom = std::fs::read(rom_name).expect("Failed to open ROM file");
         let cart_type = CartridgeType::try_from(rom[CART_TYPE_ADDR as usize]).unwrap();
@@ -241,16 +244,19 @@ impl Cartridge {
         }
     }
 
+    /// Read a byte from the ROM
     pub fn read_byte_from_rom(&self, addr: usize) -> u8 {
         self.rom[addr]
     }
 
+    /// Read a word from the ROM
     pub fn read_word_from_rom(&self, addr: usize) -> u16 {
         let low = self.rom[addr];
         let high = self.rom[addr + 1];
         ((high as u16) << 8) | (low as u16)
     }
 
+    /// Get the title of the ROM from the header
     fn get_title(rom: &Vec<u8>) -> String {
         let mut title = String::new();
         for i in TITLE_START_ADDR..=TITLE_END_ADDR {
