@@ -58,8 +58,8 @@
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_new() {
-        <span class="kw">let </span>gameboy = Gameboy::new(<span class="string">&quot;resources/test-file&quot;</span>);
-        <span class="macro">assert_eq!</span>(gameboy.mmu.get_byte(<span class="number">0 </span><span class="kw">as </span>u8), <span class="string">&#39;T&#39; </span><span class="kw">as </span>u8)
+        <span class="kw">let </span>gameboy = Gameboy::new(<span class="string">&quot;resources/test-rom.gb&quot;</span>);
+        <span class="macro">assert_eq!</span>(gameboy.mmu.get_word(<span class="number">0x0100 </span><span class="kw">as </span>usize), <span class="number">0xC300</span>);
     }
 }
 </code></pre></div></section></main></body></html>

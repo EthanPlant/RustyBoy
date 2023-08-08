@@ -173,6 +173,12 @@
 <a href="#173" id="173">173</a>
 <a href="#174" id="174">174</a>
 <a href="#175" id="175">175</a>
+<a href="#176" id="176">176</a>
+<a href="#177" id="177">177</a>
+<a href="#178" id="178">178</a>
+<a href="#179" id="179">179</a>
+<a href="#180" id="180">180</a>
+<a href="#181" id="181">181</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::instructions;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::instructions::{Instruction, InstructionType, OpCode};
 <span class="kw">use </span><span class="kw">crate</span>::cpu::registers::Registers;
@@ -186,7 +192,8 @@
 
 <span class="kw">impl </span>Cpu {
     <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span>registers = Registers::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>registers = Registers::new();
+        registers.pc = <span class="number">0x0100</span>;
         Cpu { reg: registers }
     }
 
@@ -250,14 +257,15 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_new() {
         <span class="kw">let </span>cpu = Cpu::new();
-        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0</span>);
+        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0x100</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_read_opcode() {
-        <span class="kw">let </span>mmu = Memory::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
-        cpu.reg.pc = <span class="number">0</span>;
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>usize, <span class="number">0x00 </span><span class="kw">as </span>u8);
         <span class="macro">assert_eq!</span>(cpu.read_opcode(<span class="kw-2">&amp;</span>mmu), OpCode::Regular(<span class="number">0</span>));
     }
 
@@ -265,9 +273,9 @@
     </span><span class="kw">fn </span>test_read_opcode_cb() {
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
-        cpu.reg.pc = <span class="number">0</span>;
-        mmu.set_byte(<span class="number">0 </span><span class="kw">as </span>u8, <span class="number">0xCB</span>);
-        mmu.set_byte(<span class="number">1 </span><span class="kw">as </span>u8, <span class="number">0x00</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>usize, <span class="number">0xCB</span>);
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x00</span>);
         <span class="macro">assert_eq!</span>(cpu.read_opcode(<span class="kw-2">&amp;</span>mmu), OpCode::CB(<span class="number">0</span>));
     }
 
@@ -314,37 +322,41 @@
     </span><span class="kw">fn </span>test_step() {
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
-        mmu.set_byte(<span class="number">0x0000 </span><span class="kw">as </span>u16, <span class="number">0x00 </span><span class="kw">as </span>u8);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>usize, <span class="number">0x00 </span><span class="kw">as </span>u8);
         cpu.step(<span class="kw-2">&amp;mut </span>mmu);
-        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0xC001</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_step_cb() {
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
-        mmu.set_byte(<span class="number">0x0000 </span><span class="kw">as </span>u16, <span class="number">0xCB </span><span class="kw">as </span>u8);
-        mmu.set_byte(<span class="number">0x0001 </span><span class="kw">as </span>u16, <span class="number">0x7C </span><span class="kw">as </span>u8);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>usize, <span class="number">0xCB </span><span class="kw">as </span>u8);
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x7C </span><span class="kw">as </span>u8);
         cpu.step(<span class="kw-2">&amp;mut </span>mmu);
-        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">2</span>);
+        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0xC002</span>);
     }
 
     <span class="attr">#[test]
-    #[should_panic(expected = <span class="string">&quot;Unimplemented instruction! 0xD3 PC: 0x0000&quot;</span>)]
+    #[should_panic(expected = <span class="string">&quot;Unimplemented instruction! 0xD3 PC: 0xC000&quot;</span>)]
     </span><span class="kw">fn </span>test_step_unimplemented_instruction() {
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
-        mmu.set_byte(<span class="number">0x0000 </span><span class="kw">as </span>u16, <span class="number">0xD3 </span><span class="kw">as </span>u8);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>usize, <span class="number">0xD3 </span><span class="kw">as </span>u8);
         cpu.step(<span class="kw-2">&amp;mut </span>mmu);
     }
 
     <span class="attr">#[test]
-    #[should_panic(expected = <span class="string">&quot;Unimplemented CB instruction! 0x00 PC: 0x0000&quot;</span>)]
+    #[should_panic(expected = <span class="string">&quot;Unimplemented CB instruction! 0x00 PC: 0xC000&quot;</span>)]
     </span><span class="kw">fn </span>test_step_unimplemented_cb_instruction() {
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
-        mmu.set_byte(<span class="number">0 </span><span class="kw">as </span>u8, <span class="number">0xCB</span>);
-        mmu.set_byte(<span class="number">1 </span><span class="kw">as </span>u8, <span class="number">0x00</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>usize, <span class="number">0xCB</span>);
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x00</span>);
         cpu.step(<span class="kw-2">&amp;mut </span>mmu);
     }
 }

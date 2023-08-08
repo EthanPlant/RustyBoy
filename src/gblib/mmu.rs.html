@@ -100,41 +100,74 @@
 <a href="#100" id="100">100</a>
 <a href="#101" id="101">101</a>
 <a href="#102" id="102">102</a>
-</pre></div><pre class="rust"><code><span class="doccomment">/// The MMU (Memory Management Unit) is responsible for managing the gameboy&#39;s memory
+<a href="#103" id="103">103</a>
+<a href="#104" id="104">104</a>
+<a href="#105" id="105">105</a>
+<a href="#106" id="106">106</a>
+<a href="#107" id="107">107</a>
+<a href="#108" id="108">108</a>
+<a href="#109" id="109">109</a>
+<a href="#110" id="110">110</a>
+<a href="#111" id="111">111</a>
+<a href="#112" id="112">112</a>
+<a href="#113" id="113">113</a>
+<a href="#114" id="114">114</a>
+<a href="#115" id="115">115</a>
+<a href="#116" id="116">116</a>
+<a href="#117" id="117">117</a>
+<a href="#118" id="118">118</a>
+<a href="#119" id="119">119</a>
+<a href="#120" id="120">120</a>
+<a href="#121" id="121">121</a>
+<a href="#122" id="122">122</a>
+<a href="#123" id="123">123</a>
+<a href="#124" id="124">124</a>
+<a href="#125" id="125">125</a>
+<a href="#126" id="126">126</a>
+<a href="#127" id="127">127</a>
+<a href="#128" id="128">128</a>
+<a href="#129" id="129">129</a>
+<a href="#130" id="130">130</a>
+<a href="#131" id="131">131</a>
+<a href="#132" id="132">132</a>
+<a href="#133" id="133">133</a>
+<a href="#134" id="134">134</a>
+<a href="#135" id="135">135</a>
+<a href="#136" id="136">136</a>
+</pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cartridge::Cartridge;
+
+<span class="comment">// TODO Proper memory mapping
+</span><span class="kw">const </span>ROM_START: usize = <span class="number">0x0000</span>;
+<span class="kw">const </span>ROM_END: usize = <span class="number">0x7FFF</span>;
+
+<span class="doccomment">/// The MMU (Memory Management Unit) is responsible for managing the gameboy&#39;s memory
 </span><span class="kw">pub struct </span>Memory {
     <span class="doccomment">/// The gameboy&#39;s memory represented as a 64 K byte array
     </span>mem: Vec&lt;u8&gt;,
+    <span class="doccomment">/// The cartridge&#39;s data
+    </span>cart: Cartridge,
 }
 
 <span class="kw">impl </span>Memory {
     <span class="kw">pub fn </span>new_with_rom(rom_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>mem = <span class="macro">vec!</span>[<span class="number">0xFF</span>; <span class="number">0x10000</span>];
-        <span class="kw">let </span>rom_data = std::fs::read(rom_name).expect(<span class="string">&quot;Failed to open ROM file&quot;</span>);
-        <span class="kw">for </span>(i, b) <span class="kw">in </span>rom_data.iter().enumerate() {
-            mem[i] = <span class="kw-2">*</span>b;
-        }
-        mem[<span class="number">0xFF44</span>] = <span class="number">0x90</span>; <span class="comment">// Stub the LY register to 144 to simulate being in VBlank
-                            // Data for the Nintendo logo so bootrom doesn&#39;t lock up
-        </span><span class="kw">let </span>logo: [u8; <span class="number">48</span>] = [
-            <span class="number">0xce</span>, <span class="number">0xed</span>, <span class="number">0x66</span>, <span class="number">0x66</span>, <span class="number">0xcc</span>, <span class="number">0x0d</span>, <span class="number">0x00</span>, <span class="number">0x0b</span>, <span class="number">0x03</span>, <span class="number">0x73</span>, <span class="number">0x00</span>, <span class="number">0x83</span>, <span class="number">0x00</span>, <span class="number">0x0c</span>,
-            <span class="number">0x00</span>, <span class="number">0x0d</span>, <span class="number">0x00</span>, <span class="number">0x08</span>, <span class="number">0x11</span>, <span class="number">0x1f</span>, <span class="number">0x88</span>, <span class="number">0x89</span>, <span class="number">0x00</span>, <span class="number">0x0e</span>, <span class="number">0xdc</span>, <span class="number">0xcc</span>, <span class="number">0x6e</span>, <span class="number">0xe6</span>,
-            <span class="number">0xdd</span>, <span class="number">0xdd</span>, <span class="number">0xd9</span>, <span class="number">0x99</span>, <span class="number">0xbb</span>, <span class="number">0xbb</span>, <span class="number">0x67</span>, <span class="number">0x63</span>, <span class="number">0x6e</span>, <span class="number">0x0e</span>, <span class="number">0xec</span>, <span class="number">0xcc</span>, <span class="number">0xdd</span>, <span class="number">0xdc</span>,
-            <span class="number">0x99</span>, <span class="number">0x9f</span>, <span class="number">0xbb</span>, <span class="number">0xb9</span>, <span class="number">0x33</span>, <span class="number">0x3e</span>,
-        ];
-        mem[<span class="number">0x104</span>..<span class="number">0x134</span>].copy_from_slice(<span class="kw-2">&amp;</span>logo);
-        mem[<span class="number">0x014D</span>] = <span class="number">0x00</span>; <span class="comment">// Set the checksum to 0x00 to pass the bootrom checksum check
-        </span>Memory { mem: mem }
+        <span class="kw">let </span>mem = <span class="macro">vec!</span>[<span class="number">0xFF</span>; <span class="number">0x10000</span>];
+        <span class="kw">let </span>cart = Cartridge::new_from_rom(rom_name);
+        Memory { mem: mem, cart: cart }
     }
 
     <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         Memory {
-            mem: <span class="macro">vec!</span>[<span class="number">0</span>; <span class="number">0x10000</span>],
+            mem: <span class="macro">vec!</span>[<span class="number">0</span>; <span class="number">0x10000</span>], cart: Cartridge::new(),
         }
     }
 
     <span class="doccomment">/// Reads a byte from the memory address space
     </span><span class="kw">pub fn </span>get_byte&lt;T: Into&lt;usize&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, addr: T) -&gt; u8 {
-        <span class="self">self</span>.mem[addr.into()]
+        <span class="kw">let </span>addr = addr.into();
+        <span class="kw">match </span>addr {
+            ROM_START..=ROM_END =&gt; <span class="self">self</span>.cart.read_byte_from_rom(addr),
+            <span class="kw">_ </span>=&gt; <span class="self">self</span>.mem[addr],
+        }
     }
 
     <span class="doccomment">/// Writes a byte to the memory address space
@@ -145,7 +178,16 @@
     <span class="doccomment">/// Reads a word from the memory address space
     </span><span class="kw">pub fn </span>get_word&lt;T: Into&lt;usize&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, addr: T) -&gt; u16 {
         <span class="kw">let </span>addr = addr.into();
-        (<span class="self">self</span>.mem[addr] <span class="kw">as </span>u16) | ((<span class="self">self</span>.mem[addr + <span class="number">1</span>] <span class="kw">as </span>u16) &lt;&lt; <span class="number">8</span>)
+        <span class="kw">match </span>addr {
+            ROM_START..=ROM_END =&gt; {
+                <span class="self">self</span>.cart.read_word_from_rom(addr)
+            }
+            <span class="kw">_ </span>=&gt; {
+                <span class="kw">let </span>low = <span class="self">self</span>.mem[addr];
+                <span class="kw">let </span>high = <span class="self">self</span>.mem[addr + <span class="number">1</span>];
+                ((high <span class="kw">as </span>u16) &lt;&lt; <span class="number">8</span>) | (low <span class="kw">as </span>u16)
+            }
+        }
     }
 
     <span class="doccomment">/// Writes a word to the memory address space
@@ -161,45 +203,71 @@
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
     <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_get_byte() {
-        <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
-        mem.mem[<span class="number">0x1234</span>] = <span class="number">0x12</span>;
-        <span class="macro">assert_eq!</span>(mem.get_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16), <span class="number">0x12</span>);
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_set_byte() {
-        <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
-        mem.set_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16, <span class="number">0x12</span>);
-        <span class="macro">assert_eq!</span>(mem.mem[<span class="number">0x1234</span>], <span class="number">0x12</span>);
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_get_word() {
-        <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
-        mem.mem[<span class="number">0x1234</span>] = <span class="number">0x34</span>;
-        mem.mem[<span class="number">0x1235</span>] = <span class="number">0x12</span>;
-        <span class="macro">assert_eq!</span>(mem.get_word(<span class="number">0x1234 </span><span class="kw">as </span>u16), <span class="number">0x1234</span>);
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_set_word() {
-        <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
-        mem.set_word(<span class="number">0x1234 </span><span class="kw">as </span>u16, <span class="number">0x1234</span>);
-        <span class="macro">assert_eq!</span>(mem.mem[<span class="number">0x1234</span>], <span class="number">0x34</span>);
-        <span class="macro">assert_eq!</span>(mem.mem[<span class="number">0x1235</span>], <span class="number">0x12</span>);
-    }
-
-    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_new_with_rom() {
-        <span class="kw">let </span>mem = Memory::new_with_rom(<span class="string">&quot;resources/test-file&quot;</span>);
-        <span class="macro">assert_eq!</span>(mem.mem[<span class="number">0</span>], <span class="string">&#39;T&#39; </span><span class="kw">as </span>u8);
+        <span class="kw">let </span>mem = Memory::new_with_rom(<span class="string">&quot;resources/test-rom.gb&quot;</span>);
+        <span class="macro">assert_eq!</span>(mem.get_byte(<span class="number">0x0101 </span><span class="kw">as </span>usize), <span class="number">0xC3</span>);
     }
 
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_new() {
         <span class="kw">let </span>mem = Memory::new();
         <span class="macro">assert_eq!</span>(mem.mem[<span class="number">0</span>], <span class="number">0</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_get_byte_in_cart() {
+        <span class="kw">let </span>mem = Memory::new();
+        <span class="macro">assert_eq!</span>(mem.get_byte(<span class="number">0 </span><span class="kw">as </span>usize), <span class="number">0xFF</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_get_byte_not_in_cart() {
+        <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
+        mem.mem[<span class="number">0xC000</span>] = <span class="number">0x12</span>;
+        <span class="macro">assert_eq!</span>(mem.get_byte(<span class="number">0xC000 </span><span class="kw">as </span>usize), <span class="number">0x12</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_set_byte_in_cart() {
+        <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
+        mem.set_byte(<span class="number">0 </span><span class="kw">as </span>usize, <span class="number">0x12</span>);
+        <span class="macro">assert_eq!</span>(mem.get_byte(<span class="number">0 </span><span class="kw">as </span>usize), <span class="number">0xFF</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_set_byte_not_in_cart() {
+        <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
+        mem.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>usize, <span class="number">0x12</span>);
+        <span class="macro">assert_eq!</span>(mem.mem[<span class="number">0xC000</span>], <span class="number">0x12</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_get_word_in_cart() {
+        <span class="kw">let </span>mem = Memory::new();
+        <span class="macro">assert_eq!</span>(mem.get_word(<span class="number">0 </span><span class="kw">as </span>usize), <span class="number">0xFFFF</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_get_word_not_in_cart() {
+        <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
+        mem.mem[<span class="number">0xC000</span>] = <span class="number">0x34</span>;
+        mem.mem[<span class="number">0xC001</span>] = <span class="number">0x12</span>;
+        <span class="macro">assert_eq!</span>(mem.get_word(<span class="number">0xC000 </span><span class="kw">as </span>usize), <span class="number">0x1234</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_set_word_in_cart() {
+        <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
+        mem.set_word(<span class="number">0 </span><span class="kw">as </span>usize, <span class="number">0x1234</span>);
+        <span class="macro">assert_eq!</span>(mem.get_word(<span class="number">0 </span><span class="kw">as </span>usize), <span class="number">0xFFFF</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_set_word_not_in_cart() {
+        <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
+        mem.set_word(<span class="number">0xC000 </span><span class="kw">as </span>usize, <span class="number">0x1234</span>);
+        <span class="macro">assert_eq!</span>(mem.mem[<span class="number">0xC000</span>], <span class="number">0x34</span>);
+        <span class="macro">assert_eq!</span>(mem.mem[<span class="number">0xC001</span>], <span class="number">0x12</span>);
     }
 }
 </code></pre></div></section></main></body></html>

@@ -1738,6 +1738,20 @@
 <a href="#1738" id="1738">1738</a>
 <a href="#1739" id="1739">1739</a>
 <a href="#1740" id="1740">1740</a>
+<a href="#1741" id="1741">1741</a>
+<a href="#1742" id="1742">1742</a>
+<a href="#1743" id="1743">1743</a>
+<a href="#1744" id="1744">1744</a>
+<a href="#1745" id="1745">1745</a>
+<a href="#1746" id="1746">1746</a>
+<a href="#1747" id="1747">1747</a>
+<a href="#1748" id="1748">1748</a>
+<a href="#1749" id="1749">1749</a>
+<a href="#1750" id="1750">1750</a>
+<a href="#1751" id="1751">1751</a>
+<a href="#1752" id="1752">1752</a>
+<a href="#1753" id="1753">1753</a>
+<a href="#1754" id="1754">1754</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::cpu::Cpu;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::instructions::{functions, Instruction, InstructionType, OpCode};
 <span class="kw">use </span><span class="kw">crate</span>::cpu::registers::Flag;
@@ -2406,8 +2420,9 @@
         <span class="kw">let </span>instruction = get_instruction(<span class="kw-2">&amp;</span><span class="number">0x00</span>);
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>NOP));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
+        cpu.reg.pc = <span class="number">0xC000</span>;
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>Memory::new(), <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x00</span>));
-        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0x0000</span>);
+        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0xC000</span>);
     }
 
     <span class="attr">#[test]
@@ -2489,8 +2504,9 @@
         <span class="kw">let </span>instruction = get_instruction(<span class="kw-2">&amp;</span><span class="number">0x06</span>);
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LD_B_N));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
+        cpu.reg.pc = <span class="number">0xC000</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        mmu.set_byte(<span class="number">0x01 </span><span class="kw">as </span>u16, <span class="number">0x12</span>);
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x12</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x06</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.b, <span class="number">0x12</span>);
     }
@@ -2565,6 +2581,7 @@
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>DEC_C));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         cpu.reg.c = <span class="number">0x00</span>;
+        cpu.reg.pc = <span class="number">0xC000</span>;
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>Memory::new(), <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x0D</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.c, <span class="number">0xFF</span>);
     }
@@ -2574,8 +2591,9 @@
         <span class="kw">let </span>instruction = get_instruction(<span class="kw-2">&amp;</span><span class="number">0x0E</span>);
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LD_C_N));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
+        cpu.reg.pc = <span class="number">0xC000</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        mmu.set_byte(<span class="number">0x01 </span><span class="kw">as </span>u16, <span class="number">0x12</span>);
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x12</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x0E</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.c, <span class="number">0x12</span>);
     }
@@ -2585,8 +2603,9 @@
         <span class="kw">let </span>instruction = get_instruction(<span class="kw-2">&amp;</span><span class="number">0x11</span>);
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LD_DE_NN));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
+        cpu.reg.pc = <span class="number">0xC000</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        mmu.set_word(<span class="number">0x01 </span><span class="kw">as </span>u8, <span class="number">0x1234</span>);
+        mmu.set_word(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x1234</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x11</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.d, <span class="number">0x12</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.e, <span class="number">0x34</span>);
@@ -2663,8 +2682,9 @@
         <span class="kw">let </span>instruction = get_instruction(<span class="kw-2">&amp;</span><span class="number">0x16</span>);
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LD_D_N));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
+        cpu.reg.pc = <span class="number">0xC000</span>;
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        mmu.set_byte(<span class="number">0x01 </span><span class="kw">as </span>u16, <span class="number">0x12</span>);
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x12</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x16</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.d, <span class="number">0x12</span>);
     }
@@ -2697,10 +2717,10 @@
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>JR_N));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        cpu.reg.pc = <span class="number">0x000A</span>;
-        mmu.set_byte(<span class="number">0x000B </span><span class="kw">as </span>u16, <span class="number">0xFB</span>);
+        cpu.reg.pc = <span class="number">0xC00A</span>;
+        mmu.set_byte(<span class="number">0xC00B </span><span class="kw">as </span>u16, <span class="number">0xFB</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x18</span>));
-        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0x0007</span>);
+        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0xC007</span>);
     }
 
     <span class="attr">#[test]
@@ -2709,9 +2729,9 @@
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LD_A_DE));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        cpu.reg.d = <span class="number">0x12</span>;
-        cpu.reg.e = <span class="number">0x34</span>;
-        mmu.set_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16, <span class="number">0x12</span>);
+        cpu.reg.d = <span class="number">0xC0</span>;
+        cpu.reg.e = <span class="number">0x00</span>;
+        mmu.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>u16, <span class="number">0x12</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x1A</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x12</span>);
     }
@@ -2764,7 +2784,8 @@
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LD_E_N));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        mmu.set_byte(<span class="number">0x01 </span><span class="kw">as </span>u16, <span class="number">0x12</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x12</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x1E</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.e, <span class="number">0x12</span>);
     }
@@ -2775,11 +2796,11 @@
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>JR_NZ_N));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        cpu.reg.pc = <span class="number">0x000A</span>;
-        mmu.set_byte(<span class="number">0x000B </span><span class="kw">as </span>u16, <span class="number">0xFB</span>);
+        cpu.reg.pc = <span class="number">0xC00A</span>;
+        mmu.set_byte(<span class="number">0xC00B </span><span class="kw">as </span>usize, <span class="number">0xFB</span>);
         cpu.reg.set_flag(Flag::Zero);
         <span class="kw">let </span>t = (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x20</span>));
-        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0x000A</span>);
+        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0xC00A</span>);
         <span class="macro">assert!</span>(t == InstructionType::None)
     }
 
@@ -2789,10 +2810,10 @@
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>JR_NZ_N));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        cpu.reg.pc = <span class="number">0x000A</span>;
-        mmu.set_byte(<span class="number">0x000B </span><span class="kw">as </span>u16, <span class="number">0xFB</span>);
+        cpu.reg.pc = <span class="number">0xC00A</span>;
+        mmu.set_byte(<span class="number">0xC00B </span><span class="kw">as </span>usize, <span class="number">0xFB</span>);
         <span class="kw">let </span>t = (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x20</span>));
-        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0x0007</span>);
+        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0xC007</span>);
         <span class="macro">assert!</span>(t == InstructionType::Jumped)
     }
 
@@ -2802,7 +2823,8 @@
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LD_HL_NN));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        mmu.set_word(<span class="number">0x01 </span><span class="kw">as </span>u8, <span class="number">0x1234</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_word(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x1234</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x21</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.h, <span class="number">0x12</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.l, <span class="number">0x34</span>);
@@ -2815,12 +2837,12 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.a = <span class="number">0x12</span>;
-        cpu.reg.h = <span class="number">0x12</span>;
-        cpu.reg.l = <span class="number">0x34</span>;
+        cpu.reg.h = <span class="number">0xC0</span>;
+        cpu.reg.l = <span class="number">0x00</span>;
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x22</span>));
-        <span class="macro">assert_eq!</span>(mmu.get_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16), <span class="number">0x12</span>);
-        <span class="macro">assert_eq!</span>(cpu.reg.h, <span class="number">0x12</span>);
-        <span class="macro">assert_eq!</span>(cpu.reg.l, <span class="number">0x35</span>);
+        <span class="macro">assert_eq!</span>(mmu.get_byte(<span class="number">0xC000 </span><span class="kw">as </span>u16), <span class="number">0x12</span>);
+        <span class="macro">assert_eq!</span>(cpu.reg.h, <span class="number">0xC0</span>);
+        <span class="macro">assert_eq!</span>(cpu.reg.l, <span class="number">0x01</span>);
     }
 
     <span class="attr">#[test]
@@ -2900,11 +2922,11 @@
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>JR_Z_N));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        cpu.reg.pc = <span class="number">0x000A</span>;
-        mmu.set_byte(<span class="number">0x000B </span><span class="kw">as </span>u16, <span class="number">0xFB</span>);
+        cpu.reg.pc = <span class="number">0xC00A</span>;
+        mmu.set_byte(<span class="number">0xC00B </span><span class="kw">as </span>u16, <span class="number">0xFB</span>);
         cpu.reg.set_flag(Flag::Zero);
         <span class="kw">let </span>t = (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x28</span>));
-        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0x0007</span>);
+        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0xC007</span>);
         <span class="macro">assert!</span>(t == InstructionType::Jumped)
     }
 
@@ -2914,10 +2936,10 @@
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>JR_Z_N));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        cpu.reg.pc = <span class="number">0x000A</span>;
-        mmu.set_byte(<span class="number">0x000B </span><span class="kw">as </span>u16, <span class="number">0xFB</span>);
+        cpu.reg.pc = <span class="number">0xC00A</span>;
+        mmu.set_byte(<span class="number">0xC00B </span><span class="kw">as </span>u16, <span class="number">0xFB</span>);
         <span class="kw">let </span>t = (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x28</span>));
-        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0x000A</span>);
+        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0xC00A</span>);
         <span class="macro">assert!</span>(t == InstructionType::None)
     }
 
@@ -2927,7 +2949,8 @@
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LD_L_N));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        mmu.set_byte(<span class="number">0x01 </span><span class="kw">as </span>u16, <span class="number">0x12</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x12</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x2E</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.l, <span class="number">0x12</span>);
     }
@@ -2938,7 +2961,8 @@
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LD_SP_NN));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        mmu.set_word(<span class="number">0x01 </span><span class="kw">as </span>u8, <span class="number">0x1234</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_word(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x1234</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x31</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.sp, <span class="number">0x1234</span>);
     }
@@ -2950,12 +2974,12 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.a = <span class="number">0x12</span>;
-        cpu.reg.h = <span class="number">0x12</span>;
-        cpu.reg.l = <span class="number">0x34</span>;
+        cpu.reg.h = <span class="number">0xC0</span>;
+        cpu.reg.l = <span class="number">0x00</span>;
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x32</span>));
-        <span class="macro">assert_eq!</span>(mmu.get_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16), <span class="number">0x12</span>);
-        <span class="macro">assert_eq!</span>(cpu.reg.h, <span class="number">0x12</span>);
-        <span class="macro">assert_eq!</span>(cpu.reg.l, <span class="number">0x33</span>);
+        <span class="macro">assert_eq!</span>(mmu.get_byte(<span class="number">0xC000 </span><span class="kw">as </span>u16), <span class="number">0x12</span>);
+        <span class="macro">assert_eq!</span>(cpu.reg.h, <span class="number">0xBF</span>);
+        <span class="macro">assert_eq!</span>(cpu.reg.l, <span class="number">0xFF</span>);
     }
 
     <span class="attr">#[test]
@@ -2968,7 +2992,6 @@
         cpu.reg.h = <span class="number">0x00</span>;
         cpu.reg.l = <span class="number">0x00</span>;
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x32</span>));
-        <span class="macro">assert_eq!</span>(mmu.get_byte(<span class="number">0x0000 </span><span class="kw">as </span>u16), <span class="number">0x12</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.h, <span class="number">0xFF</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.l, <span class="number">0xFF</span>);
     }
@@ -3021,7 +3044,8 @@
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LD_A_N));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        mmu.set_byte(<span class="number">0x01 </span><span class="kw">as </span>u16, <span class="number">0x12</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x12</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x3E</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x12</span>);
     }
@@ -3063,10 +3087,10 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.a = <span class="number">0x12</span>;
-        cpu.reg.h = <span class="number">0x12</span>;
-        cpu.reg.l = <span class="number">0x34</span>;
+        cpu.reg.h = <span class="number">0xC0</span>;
+        cpu.reg.l = <span class="number">0x00</span>;
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x77</span>));
-        <span class="macro">assert_eq!</span>(mmu.get_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16), <span class="number">0x12</span>);
+        <span class="macro">assert_eq!</span>(mmu.get_byte(<span class="number">0xC000 </span><span class="kw">as </span>u16), <span class="number">0x12</span>);
     }
 
     <span class="attr">#[test]
@@ -3115,10 +3139,10 @@
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>ADD_HL));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        cpu.reg.h = <span class="number">0x12</span>;
-        cpu.reg.l = <span class="number">0x34</span>;
+        cpu.reg.h = <span class="number">0xC0</span>;
+        cpu.reg.l = <span class="number">0x00</span>;
         cpu.reg.a = <span class="number">0x12</span>;
-        mmu.set_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16, <span class="number">0x34</span>);
+        mmu.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>u16, <span class="number">0x34</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x86</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x46</span>);
     }
@@ -3129,10 +3153,10 @@
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>ADD_HL));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        cpu.reg.h = <span class="number">0x12</span>;
-        cpu.reg.l = <span class="number">0x34</span>;
+        cpu.reg.h = <span class="number">0xC0</span>;
+        cpu.reg.l = <span class="number">0x00</span>;
         cpu.reg.a = <span class="number">0x00</span>;
-        mmu.set_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16, <span class="number">0x00</span>);
+        mmu.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>u16, <span class="number">0x00</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x86</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x00</span>);
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Zero));
@@ -3144,10 +3168,10 @@
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>ADD_HL));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        cpu.reg.h = <span class="number">0x12</span>;
-        cpu.reg.l = <span class="number">0x34</span>;
+        cpu.reg.h = <span class="number">0xC0</span>;
+        cpu.reg.l = <span class="number">0x00</span>;
         cpu.reg.a = <span class="number">0x0F</span>;
-        mmu.set_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16, <span class="number">0x01</span>);
+        mmu.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>u16, <span class="number">0x01</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x86</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x10</span>);
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::HalfCarry));
@@ -3159,10 +3183,10 @@
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>ADD_HL));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        cpu.reg.h = <span class="number">0x12</span>;
-        cpu.reg.l = <span class="number">0x34</span>;
+        cpu.reg.h = <span class="number">0xC0</span>;
+        cpu.reg.l = <span class="number">0x00</span>;
         cpu.reg.a = <span class="number">0xFF</span>;
-        mmu.set_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16, <span class="number">0x01</span>);
+        mmu.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>u16, <span class="number">0x01</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x86</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x00</span>);
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Carry));
@@ -3244,8 +3268,8 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.a = <span class="number">0xFF</span>;
-        cpu.reg.h = <span class="number">0x12</span>;
-        cpu.reg.l = <span class="number">0x34</span>;
+        cpu.reg.h = <span class="number">0xC0</span>;
+        cpu.reg.l = <span class="number">0x00</span>;
         mmu.set_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16, <span class="number">0x34</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0xBE</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0xFF</span>);
@@ -3262,9 +3286,9 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.a = <span class="number">0x34</span>;
-        cpu.reg.h = <span class="number">0x12</span>;
-        cpu.reg.l = <span class="number">0x34</span>;
-        mmu.set_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16, <span class="number">0x34</span>);
+        cpu.reg.h = <span class="number">0xC0</span>;
+        cpu.reg.l = <span class="number">0x00</span>;
+        mmu.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>u16, <span class="number">0x34</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0xBE</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x34</span>);
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Zero));
@@ -3280,9 +3304,9 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.a = <span class="number">0x10</span>;
-        cpu.reg.h = <span class="number">0x12</span>;
-        cpu.reg.l = <span class="number">0x34</span>;
-        mmu.set_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16, <span class="number">0x01</span>);
+        cpu.reg.h = <span class="number">0xC0</span>;
+        cpu.reg.l = <span class="number">0x00</span>;
+        mmu.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>u16, <span class="number">0x01</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0xBE</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x10</span>);
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Subtract));
@@ -3297,9 +3321,9 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.a = <span class="number">0x01</span>;
-        cpu.reg.h = <span class="number">0x12</span>;
-        cpu.reg.l = <span class="number">0x34</span>;
-        mmu.set_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16, <span class="number">0x10</span>);
+        cpu.reg.h = <span class="number">0xC0</span>;
+        cpu.reg.l = <span class="number">0x00</span>;
+        mmu.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>usize, <span class="number">0x10</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0xBE</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x01</span>);
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Subtract));
@@ -3354,10 +3378,11 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.sp = <span class="number">0xFFFE</span>;
-        mmu.set_word(<span class="number">0x01 </span><span class="kw">as </span>u8, <span class="number">0x1234</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_word(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x1234</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0xCD</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.sp, <span class="number">0xFFFC</span>);
-        <span class="macro">assert_eq!</span>(mmu.get_word(cpu.reg.sp), <span class="number">0x0003</span>);
+        <span class="macro">assert_eq!</span>(mmu.get_word(cpu.reg.sp), <span class="number">0xC003</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0x1234</span>);
     }
 
@@ -3368,7 +3393,8 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.a = <span class="number">0x12</span>;
-        mmu.set_byte(<span class="number">0x01 </span><span class="kw">as </span>u16, <span class="number">0x34</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>u16, <span class="number">0x34</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0xE0</span>));
         <span class="macro">assert_eq!</span>(mmu.get_byte(<span class="number">0xFF34 </span><span class="kw">as </span>u16), <span class="number">0x12</span>);
     }
@@ -3392,9 +3418,10 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.a = <span class="number">0x12</span>;
-        mmu.set_word(<span class="number">0x01 </span><span class="kw">as </span>u8, <span class="number">0x1234</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_word(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0xC123</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0xEA</span>));
-        <span class="macro">assert_eq!</span>(mmu.get_byte(<span class="number">0x1234 </span><span class="kw">as </span>u16), <span class="number">0x12</span>);
+        <span class="macro">assert_eq!</span>(mmu.get_byte(<span class="number">0xC123 </span><span class="kw">as </span>u16), <span class="number">0x12</span>);
     }
 
     <span class="attr">#[test]
@@ -3403,8 +3430,9 @@
         <span class="macro">assert!</span>(instruction == <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LDH_A_N));
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
-        mmu.set_byte(<span class="number">0x01 </span><span class="kw">as </span>u16, <span class="number">0x34</span>);
-        mmu.set_byte(<span class="number">0xFF34 </span><span class="kw">as </span>u16, <span class="number">0x12</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x34</span>);
+        mmu.set_byte(<span class="number">0xFF34 </span><span class="kw">as </span>usize, <span class="number">0x12</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0xF0</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x12</span>);
     }
@@ -3416,10 +3444,10 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.a = <span class="number">0xFF</span>;
-        mmu.set_byte(<span class="number">0x01 </span><span class="kw">as </span>u16, <span class="number">0x00</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x00</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0xFE</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0xFF</span>);
-        <span class="macro">assert_eq!</span>(mmu.get_byte(<span class="number">0x01 </span><span class="kw">as </span>u16), <span class="number">0x00</span>);
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Subtract));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::HalfCarry));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Carry));
@@ -3432,10 +3460,10 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.a = <span class="number">0x00</span>;
-        mmu.set_byte(<span class="number">0x01 </span><span class="kw">as </span>u16, <span class="number">0x00</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x00</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0xFE</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x00</span>);
-        <span class="macro">assert_eq!</span>(mmu.get_byte(<span class="number">0x01 </span><span class="kw">as </span>u16), <span class="number">0x00</span>);
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Zero));
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Subtract));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::HalfCarry));
@@ -3449,10 +3477,10 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.a = <span class="number">0x01</span>;
-        mmu.set_byte(<span class="number">0x01 </span><span class="kw">as </span>u16, <span class="number">0x1F</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x1F</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0xFE</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x01</span>);
-        <span class="macro">assert_eq!</span>(mmu.get_byte(<span class="number">0x01 </span><span class="kw">as </span>u16), <span class="number">0x1F</span>);
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Subtract));
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::HalfCarry));
     }
@@ -3464,10 +3492,10 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.a = <span class="number">0x00</span>;
-        mmu.set_byte(<span class="number">0x01 </span><span class="kw">as </span>u16, <span class="number">0x01</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x01</span>);
         (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0xFE</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x00</span>);
-        <span class="macro">assert_eq!</span>(mmu.get_byte(<span class="number">0x01 </span><span class="kw">as </span>u16), <span class="number">0x01</span>);
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Subtract));
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Carry));
     }

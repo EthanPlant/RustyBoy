@@ -505,7 +505,6 @@
 <a href="#505" id="505">505</a>
 <a href="#506" id="506">506</a>
 <a href="#507" id="507">507</a>
-<a href="#508" id="508">508</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::cpu::Cpu;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::registers::Flag;
 <span class="kw">use </span><span class="kw">crate</span>::mmu::Memory;
@@ -699,8 +698,8 @@
     </span><span class="kw">fn </span>test_get_op8() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
-        mem.set_byte(<span class="number">0x0000 </span><span class="kw">as </span>u16, <span class="number">0x01</span>);
-        cpu.reg.pc = <span class="number">0x0000</span>;
+        mem.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>u16, <span class="number">0x01</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
         <span class="kw">let </span>op = get_op8(<span class="kw-2">&amp;</span>cpu, <span class="kw-2">&amp;</span>mem, <span class="number">0</span>);
         <span class="macro">assert_eq!</span>(op, <span class="number">0x01</span>);
     }
@@ -709,8 +708,8 @@
     </span><span class="kw">fn </span>test_get_op16() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
-        mem.set_word(<span class="number">0x0001 </span><span class="kw">as </span>u16, <span class="number">0x0102</span>);
-        cpu.reg.pc = <span class="number">0x0000</span>;
+        mem.set_word(<span class="number">0xC001 </span><span class="kw">as </span>u16, <span class="number">0x0102</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
         <span class="kw">let </span>op = get_op16(<span class="kw-2">&amp;</span>cpu, <span class="kw-2">&amp;</span>mem);
         <span class="macro">assert_eq!</span>(op, <span class="number">0x0102</span>);
     }
@@ -719,9 +718,9 @@
     </span><span class="kw">fn </span>test_get_hl() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
-        mem.set_byte(<span class="number">0x0000 </span><span class="kw">as </span>u16, <span class="number">0x01</span>);
-        cpu.reg.pc = <span class="number">0x0000</span>;
-        cpu.reg.set_hl(<span class="number">0x0000</span>);
+        mem.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>u16, <span class="number">0x01</span>);
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        cpu.reg.set_hl(<span class="number">0xC000</span>);
         <span class="kw">let </span>op = get_hl(<span class="kw-2">&amp;</span>cpu, <span class="kw-2">&amp;</span>mem);
         <span class="macro">assert_eq!</span>(op, <span class="number">0x01</span>);
     }
@@ -730,10 +729,9 @@
     </span><span class="kw">fn </span>test_set_hl() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
-        cpu.reg.pc = <span class="number">0x0000</span>;
-        cpu.reg.set_hl(<span class="number">0x0000</span>);
+        cpu.reg.set_hl(<span class="number">0xC000</span>);
         set_hl(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mem, <span class="number">0x01</span>);
-        <span class="macro">assert_eq!</span>(mem.get_byte(<span class="number">0x0000 </span><span class="kw">as </span>u16), <span class="number">0x01</span>);
+        <span class="macro">assert_eq!</span>(mem.get_byte(<span class="number">0xC000 </span><span class="kw">as </span>u16), <span class="number">0x01</span>);
     }
 
     <span class="attr">#[test]
@@ -765,10 +763,10 @@
     </span><span class="kw">fn </span>test_call() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
-        cpu.reg.pc = <span class="number">0x0000</span>;
+        cpu.reg.pc = <span class="number">0xC000</span>;
         cpu.reg.sp = <span class="number">0xFFFE</span>;
-        mem.set_byte(<span class="number">0x0001 </span><span class="kw">as </span>u16, <span class="number">0x02</span>);
-        mem.set_byte(<span class="number">0x0002 </span><span class="kw">as </span>u16, <span class="number">0x01</span>);
+        mem.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x02</span>);
+        mem.set_byte(<span class="number">0xC002 </span><span class="kw">as </span>usize, <span class="number">0x01</span>);
         call(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mem);
         <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0x0102</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.sp, <span class="number">0xFFFC</span>);
@@ -780,10 +778,10 @@
     </span><span class="kw">fn </span>test_jr() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
-        mem.set_byte(<span class="number">0x000B </span><span class="kw">as </span>u16, <span class="number">0xFB</span>);
-        cpu.reg.pc = <span class="number">0x000A</span>;
+        mem.set_byte(<span class="number">0xC00B </span><span class="kw">as </span>u16, <span class="number">0xFB</span>);
+        cpu.reg.pc = <span class="number">0xC00A</span>;
         jr(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mem);
-        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0x0007</span>);
+        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0xC007</span>);
     }
 
     <span class="attr">#[test]
