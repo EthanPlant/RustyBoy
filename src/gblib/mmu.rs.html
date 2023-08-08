@@ -88,6 +88,11 @@
 <a href="#88" id="88">88</a>
 <a href="#89" id="89">89</a>
 <a href="#90" id="90">90</a>
+<a href="#91" id="91">91</a>
+<a href="#92" id="92">92</a>
+<a href="#93" id="93">93</a>
+<a href="#94" id="94">94</a>
+<a href="#95" id="95">95</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// The MMU (Memory Management Unit) is responsible for managing the gameboy&#39;s memory
 </span><span class="kw">pub struct </span>Memory {
     <span class="doccomment">/// The gameboy&#39;s memory represented as a 64 K byte array
@@ -96,12 +101,17 @@
 
 <span class="kw">impl </span>Memory {
     <span class="kw">pub fn </span>new_with_rom(rom_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
-        <span class="kw">let </span><span class="kw-2">mut </span>mem = <span class="macro">vec!</span>[<span class="number">0</span>; <span class="number">0x10000</span>];
+        <span class="kw">let </span><span class="kw-2">mut </span>mem = <span class="macro">vec!</span>[<span class="number">0xFF</span>; <span class="number">0x10000</span>];
         <span class="kw">let </span>rom_data = std::fs::read(rom_name).expect(<span class="string">&quot;Failed to open ROM file&quot;</span>);
         <span class="kw">for </span>(i, b) <span class="kw">in </span>rom_data.iter().enumerate() {
             mem[i] = <span class="kw-2">*</span>b;
         }
-        Memory { mem: mem }
+        mem[<span class="number">0xFF44</span>] = <span class="number">0x90</span>; <span class="comment">// Stub the LY register to 144 to simulate being in VBlank
+        // Data for the Nintendo logo so bootrom doesn&#39;t lock up
+        </span><span class="kw">let </span>logo: [u8; <span class="number">48</span>] = [<span class="number">0xce</span>, <span class="number">0xed</span>, <span class="number">0x66</span>, <span class="number">0x66</span>, <span class="number">0xcc</span>, <span class="number">0x0d</span>, <span class="number">0x00</span>, <span class="number">0x0b</span>, <span class="number">0x03</span>, <span class="number">0x73</span>, <span class="number">0x00</span>, <span class="number">0x83</span>, <span class="number">0x00</span>, <span class="number">0x0c</span>, <span class="number">0x00</span>, <span class="number">0x0d</span>, <span class="number">0x00</span>, <span class="number">0x08</span>, <span class="number">0x11</span>, <span class="number">0x1f</span>, <span class="number">0x88</span>, <span class="number">0x89</span>, <span class="number">0x00</span>, <span class="number">0x0e</span>, <span class="number">0xdc</span>, <span class="number">0xcc</span>, <span class="number">0x6e</span>, <span class="number">0xe6</span>, <span class="number">0xdd</span>, <span class="number">0xdd</span>, <span class="number">0xd9</span>, <span class="number">0x99</span>, <span class="number">0xbb</span>, <span class="number">0xbb</span>, <span class="number">0x67</span>, <span class="number">0x63</span>, <span class="number">0x6e</span>, <span class="number">0x0e</span>, <span class="number">0xec</span>, <span class="number">0xcc</span>, <span class="number">0xdd</span>, <span class="number">0xdc</span>, <span class="number">0x99</span>, <span class="number">0x9f</span>, <span class="number">0xbb</span>, <span class="number">0xb9</span>, <span class="number">0x33</span>, <span class="number">0x3e</span>];
+        mem[<span class="number">0x104</span>..<span class="number">0x134</span>].copy_from_slice(<span class="kw-2">&amp;</span>logo);
+        mem[<span class="number">0x014D</span>] = <span class="number">0x00</span>; <span class="comment">// Set the checksum to 0x00 to pass the bootrom checksum check
+        </span>Memory { mem: mem }
     }
 
     <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
