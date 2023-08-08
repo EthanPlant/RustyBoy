@@ -95,12 +95,13 @@
 <a href="#95" id="95">95</a>
 <a href="#96" id="96">96</a>
 <a href="#97" id="97">97</a>
+<a href="#98" id="98">98</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::cpu::Cpu;
 <span class="kw">use </span><span class="kw">crate</span>::mmu::Memory;
 
-<span class="kw">pub mod </span>instructions;
 <span class="kw">pub mod </span>cb_instructions;
 <span class="kw">mod </span>functions;
+<span class="kw">pub mod </span>instructions;
 
 <span class="attr">#[derive(Debug, PartialEq)]
 </span><span class="kw">pub enum </span>InstructionType {
@@ -113,7 +114,7 @@
 </span><span class="attr">#[derive(Debug, PartialEq)]
 </span><span class="kw">pub enum </span>OpCode {
     Regular(u8),
-    CB(u8)
+    CB(u8),
 }
 
 <span class="doccomment">/// Information about an instructions
@@ -143,7 +144,6 @@
 </span><span class="kw">mod </span>tests {
     <span class="kw">use super</span>::<span class="kw-2">*</span>;
 
-
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_get_instruction_by_opcode() {
         <span class="kw">let </span>nop = Instruction {
@@ -151,14 +151,15 @@
             clock_cycles: <span class="number">4</span>,
             clock_cycles_condition: <span class="prelude-val">None</span>,
             description: <span class="string">&quot;NOP&quot;</span>,
-            handler: |<span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
-                InstructionType::None
-            }
+            handler: |<span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| InstructionType::None,
         };
         <span class="kw">let </span>instruction = get_instruction_by_opcode(<span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x00</span>));
         <span class="macro">assert_eq!</span>(instruction.unwrap().clock_cycles, nop.clock_cycles);
         <span class="macro">assert_eq!</span>(instruction.unwrap().length, nop.length);
-        <span class="macro">assert_eq!</span>(instruction.unwrap().clock_cycles_condition, nop.clock_cycles_condition);
+        <span class="macro">assert_eq!</span>(
+            instruction.unwrap().clock_cycles_condition,
+            nop.clock_cycles_condition
+        );
         <span class="macro">assert_eq!</span>(instruction.unwrap().description, nop.description);
     }
 
@@ -175,14 +176,15 @@
             clock_cycles: <span class="number">8</span>,
             clock_cycles_condition: <span class="prelude-val">None</span>,
             description: <span class="string">&quot;RL C&quot;</span>,
-            handler: |<span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
-                InstructionType::None
-            }
+            handler: |<span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| InstructionType::None,
         };
         <span class="kw">let </span>instruction = get_instruction_by_opcode(<span class="kw-2">&amp;</span>OpCode::CB(<span class="number">0x11</span>));
         <span class="macro">assert_eq!</span>(instruction.unwrap().clock_cycles, rl_c.clock_cycles);
         <span class="macro">assert_eq!</span>(instruction.unwrap().length, rl_c.length);
-        <span class="macro">assert_eq!</span>(instruction.unwrap().clock_cycles_condition, rl_c.clock_cycles_condition);
+        <span class="macro">assert_eq!</span>(
+            instruction.unwrap().clock_cycles_condition,
+            rl_c.clock_cycles_condition
+        );
         <span class="macro">assert_eq!</span>(instruction.unwrap().description, rl_c.description);
     }
 
@@ -191,4 +193,5 @@
         <span class="kw">let </span>instruction = get_instruction_by_opcode(<span class="kw-2">&amp;</span>OpCode::CB(<span class="number">0x00</span>));
         <span class="macro">assert_eq!</span>(instruction, <span class="prelude-val">None</span>);
     }
-}</code></pre></div></section></main></body></html>
+}
+</code></pre></div></section></main></body></html>

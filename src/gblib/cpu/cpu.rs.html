@@ -169,13 +169,17 @@
 <a href="#169" id="169">169</a>
 <a href="#170" id="170">170</a>
 <a href="#171" id="171">171</a>
+<a href="#172" id="172">172</a>
+<a href="#173" id="173">173</a>
+<a href="#174" id="174">174</a>
+<a href="#175" id="175">175</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::instructions;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::instructions::{Instruction, InstructionType, OpCode};
 <span class="kw">use </span><span class="kw">crate</span>::cpu::registers::Registers;
 <span class="kw">use </span><span class="kw">crate</span>::mmu::Memory;
 
 <span class="doccomment">/// Emulation of the Gameboy CPU
-</span><span class="kw">pub struct </span>Cpu&lt;&gt; {
+</span><span class="kw">pub struct </span>Cpu {
     <span class="doccomment">/// The CPU registers
     </span><span class="kw">pub </span>reg: Registers,
 }
@@ -183,7 +187,7 @@
 <span class="kw">impl </span>Cpu {
     <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>registers = Registers::new();
-        Cpu { reg: registers}
+        Cpu { reg: registers }
     }
 
     <span class="doccomment">/// Step through the emulator
@@ -203,18 +207,22 @@
                         value, <span class="self">self</span>.reg.pc,
                     ),
                 };
-
             }
         };
 
         <span class="macro">println!</span>(<span class="string">&quot;A: {:02X} F: {:02X} B: {:02X} C: {:02X} D: {:02X} E: {:02X} H: {:02X} L: {:02X} SP: {:02X} PC: 00:{:04X} ({:02X} {:02X} {:02X} {:02X})&quot;</span>,
         <span class="self">self</span>.reg.a, <span class="self">self</span>.reg.f, <span class="self">self</span>.reg.b, <span class="self">self</span>.reg.c, <span class="self">self</span>.reg.d, <span class="self">self</span>.reg.e, <span class="self">self</span>.reg.h, <span class="self">self</span>.reg.l, <span class="self">self</span>.reg.sp, <span class="self">self</span>.reg.pc, mmu.get_byte(<span class="self">self</span>.reg.pc), mmu.get_byte(<span class="self">self</span>.reg.pc + <span class="number">1</span>), mmu.get_byte(<span class="self">self</span>.reg.pc + <span class="number">2</span>), mmu.get_byte(<span class="self">self</span>.reg.pc + <span class="number">3</span>));
-        
+
         <span class="self">self</span>.execute_instruction(mmu, instruction, <span class="kw-2">&amp;</span>op_code)
     }
 
     <span class="doccomment">/// Execute an instruction
-    </span><span class="kw">fn </span>execute_instruction(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mmu: <span class="kw-2">&amp;mut </span>Memory, instruction: <span class="kw-2">&amp;</span>Instruction, op_code: <span class="kw-2">&amp;</span>OpCode) {
+    </span><span class="kw">fn </span>execute_instruction(
+        <span class="kw-2">&amp;mut </span><span class="self">self</span>,
+        mmu: <span class="kw-2">&amp;mut </span>Memory,
+        instruction: <span class="kw-2">&amp;</span>Instruction,
+        op_code: <span class="kw-2">&amp;</span>OpCode,
+    ) {
         <span class="kw">let </span>result = (instruction.handler)(<span class="self">self</span>, mmu, op_code);
         <span class="comment">// Update the program counter
         </span><span class="kw">match </span>result {
@@ -339,4 +347,5 @@
         mmu.set_byte(<span class="number">1 </span><span class="kw">as </span>u8, <span class="number">0x00</span>);
         cpu.step(<span class="kw-2">&amp;mut </span>mmu);
     }
-}</code></pre></div></section></main></body></html>
+}
+</code></pre></div></section></main></body></html>

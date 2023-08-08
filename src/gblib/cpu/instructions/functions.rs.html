@@ -506,12 +506,11 @@
 <a href="#506" id="506">506</a>
 <a href="#507" id="507">507</a>
 <a href="#508" id="508">508</a>
-<a href="#509" id="509">509</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::cpu::Cpu;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::registers::Flag;
 <span class="kw">use </span><span class="kw">crate</span>::mmu::Memory;
 
-<span class="doccomment">/// Get the n&#39;th 8 bit instruction operand 
+<span class="doccomment">/// Get the n&#39;th 8 bit instruction operand
 </span><span class="kw">pub fn </span>get_op8(cpu: <span class="kw-2">&amp;</span>Cpu, mmu: <span class="kw-2">&amp;</span>Memory, n: u8) -&gt; u8 {
     mmu.get_byte(cpu.reg.pc + n <span class="kw">as </span>u16)
 }
@@ -598,7 +597,6 @@
     }
     cpu.reg.set_flag(Flag::Subtract);
 }
-
 
 <span class="doccomment">/// Decrement a byte.
 /// Sets the zero flag if the result is zero.
@@ -1015,4 +1013,5 @@
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::HalfCarry));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Carry));
     }
-}</code></pre></div></section></main></body></html>
+}
+</code></pre></div></section></main></body></html>

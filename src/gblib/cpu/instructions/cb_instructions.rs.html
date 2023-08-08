@@ -115,7 +115,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.c = functions::rl(cpu, cpu.reg.c);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x7C - BIT 7 H
@@ -127,7 +127,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         functions::bit(cpu, cpu.reg.h, <span class="number">7</span>);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// Get a CB instruction by opcode
@@ -135,8 +135,8 @@
     <span class="kw">match </span>op_code {
         <span class="number">0x11 </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>RL_C),
         <span class="number">0x7C </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>BIT_7_H),
-        <span class="kw">_ </span>=&gt; <span class="prelude-val">None
-    </span>}
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+    }
 }
 
 <span class="attr">#[cfg(test)]
@@ -205,4 +205,5 @@
         <span class="kw">let </span>instruction = get_instruction(<span class="kw-2">&amp;</span><span class="number">0x00</span>);
         <span class="macro">assert_eq!</span>(instruction, <span class="prelude-val">None</span>);
     }
-}</code></pre></div></section></main></body></html>
+}
+</code></pre></div></section></main></body></html>

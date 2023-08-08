@@ -1738,9 +1738,6 @@
 <a href="#1738" id="1738">1738</a>
 <a href="#1739" id="1739">1739</a>
 <a href="#1740" id="1740">1740</a>
-<a href="#1741" id="1741">1741</a>
-<a href="#1742" id="1742">1742</a>
-<a href="#1743" id="1743">1743</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::cpu::Cpu;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::instructions::{functions, Instruction, InstructionType, OpCode};
 <span class="kw">use </span><span class="kw">crate</span>::cpu::registers::Flag;
@@ -1752,9 +1749,7 @@
     clock_cycles: <span class="number">4</span>,
     clock_cycles_condition: <span class="prelude-val">None</span>,
     description: <span class="string">&quot;NOP&quot;</span>,
-    handler: |<span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
-        InstructionType::None
-    }
+    handler: |<span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| InstructionType::None,
 };
 
 <span class="doccomment">/// 0x04 - INC B
@@ -1766,7 +1761,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.b = functions::inc(cpu, cpu.reg.b);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x05 - DEC B
@@ -1778,7 +1773,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.b = functions::dec(cpu, cpu.reg.b);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x06 - LD B, n
@@ -1790,7 +1785,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.b = functions::get_op8(cpu, mmu, <span class="number">1</span>);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x0C - INC C
@@ -1802,7 +1797,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.c = functions::inc(cpu, cpu.reg.c);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x0D - DEC C
@@ -1814,7 +1809,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.c = functions::dec(cpu, cpu.reg.c);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x0E - LD C, n
@@ -1826,7 +1821,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.c = functions::get_op8(cpu, mmu, <span class="number">1</span>);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x11 - LD DE, nn
@@ -1838,7 +1833,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.set_de(functions::get_op16(cpu, mmu));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x13 - INC DE
@@ -1850,7 +1845,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.set_de(cpu.reg.de().wrapping_add(<span class="number">1</span>));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x15 - DEC D
@@ -1862,7 +1857,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.d = functions::dec(cpu, cpu.reg.d);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x16 - LD D, n
@@ -1874,7 +1869,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.d = functions::get_op8(cpu, mmu, <span class="number">1</span>);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x17 - RLA
@@ -1888,7 +1883,7 @@
         <span class="comment">// Unlike normal RL operations, RLA always clears the zero flag
         </span>cpu.reg.clear_flag(Flag::Zero);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x18 - JR n
@@ -1900,7 +1895,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         functions::jr(cpu, mmu);
         InstructionType::Jumped
-    }
+    },
 };
 
 <span class="doccomment">/// 0x1A - LD A, (DE)
@@ -1912,7 +1907,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.a = mmu.get_byte(cpu.reg.de());
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x1D - DEC E
@@ -1924,7 +1919,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.e = functions::dec(cpu, cpu.reg.e);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x1E - LD E, n
@@ -1936,7 +1931,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.e = functions::get_op8(cpu, mmu, <span class="number">1</span>);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x20 - JR NZ, n
@@ -1948,10 +1943,10 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         <span class="kw">if </span>!cpu.reg.check_flag(Flag::Zero) {
             functions::jr(cpu, mmu);
-            <span class="kw">return </span>InstructionType::Jumped
+            <span class="kw">return </span>InstructionType::Jumped;
         }
         InstructionType::None
-    }
+    },
 };
 
 <span class="doccomment">/// 0x21 - LD HL, nn
@@ -1963,7 +1958,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.set_hl(functions::get_op16(cpu, mmu));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x22 - LD (HL+), A
@@ -1976,7 +1971,7 @@
         functions::set_hl(cpu, mmu, cpu.reg.a);
         cpu.reg.set_hl(cpu.reg.hl().wrapping_add(<span class="number">1</span>));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x23 - INC HL
@@ -1988,7 +1983,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.set_hl(cpu.reg.hl().wrapping_add(<span class="number">1</span>));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x24 - INC H
@@ -2000,7 +1995,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.h = functions::inc(cpu, cpu.reg.h);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x28 - JR Z, n
@@ -2012,10 +2007,10 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         <span class="kw">if </span>cpu.reg.check_flag(Flag::Zero) {
             functions::jr(cpu, mmu);
-            <span class="kw">return </span>InstructionType::Jumped
+            <span class="kw">return </span>InstructionType::Jumped;
         }
         InstructionType::None
-    }
+    },
 };
 
 <span class="doccomment">/// 0x2E - LD L, n
@@ -2027,7 +2022,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.l = functions::get_op8(cpu, mmu, <span class="number">1</span>);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x31 - LD SP, nn
@@ -2039,7 +2034,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.sp = functions::get_op16(cpu, mmu);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x32 - LD (HL-), A
@@ -2052,7 +2047,7 @@
         functions::set_hl(cpu, mmu, cpu.reg.a);
         cpu.reg.set_hl(cpu.reg.hl().wrapping_sub(<span class="number">1</span>));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x3D - DEC A
@@ -2064,7 +2059,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.a = functions::dec(cpu, cpu.reg.a);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x3E - LD A, n
@@ -2076,7 +2071,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.a = functions::get_op8(cpu, mmu, <span class="number">1</span>);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x4F - LD C, A
@@ -2088,7 +2083,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.c = cpu.reg.a;
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x57 - LD D, A
@@ -2100,7 +2095,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.d = cpu.reg.a;
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x67 - LD H, A
@@ -2112,7 +2107,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.h = cpu.reg.a;
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x77 - LD (HL), A
@@ -2124,9 +2119,8 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         functions::set_hl(cpu, mmu, cpu.reg.a);
         InstructionType::ActionTaken
-    }
+    },
 };
-
 
 <span class="doccomment">/// 0x78 - LD A, B
 </span><span class="kw">const </span>LD_A_B: Instruction = Instruction {
@@ -2137,7 +2131,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.a = cpu.reg.b;
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x7B - LD A, E
@@ -2149,7 +2143,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.a = cpu.reg.e;
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x7C - LD A, H
@@ -2161,7 +2155,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.a = cpu.reg.h;
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x7D - LD A, L
@@ -2173,7 +2167,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.a = cpu.reg.l;
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x86 - ADD (HL)
@@ -2185,7 +2179,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         functions::add(cpu, functions::get_hl(cpu, mmu));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0x90 - SUB B
@@ -2197,7 +2191,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         functions::sub(cpu, cpu.reg.b);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0xAF - XOR A
@@ -2209,7 +2203,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         functions::xor_bytes(cpu, cpu.reg.a, cpu.reg.a);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0xBE - CP (HL)
@@ -2221,7 +2215,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         functions::cp(cpu, functions::get_hl(cpu, mmu));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0xC1 - POP BC
@@ -2234,7 +2228,7 @@
         <span class="kw">let </span>val = functions::pop(cpu, mmu);
         cpu.reg.set_bc(val);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0xC5 - PUSH BC
@@ -2246,7 +2240,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         functions::push(cpu, mmu, cpu.reg.bc());
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0xC9 - RET
@@ -2258,7 +2252,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.pc = functions::pop(cpu, mmu);
         InstructionType::Jumped
-    }
+    },
 };
 
 <span class="doccomment">/// 0xCD - CALL nn
@@ -2270,7 +2264,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         functions::call(cpu, mmu);
         InstructionType::Jumped
-    }
+    },
 };
 
 <span class="doccomment">/// 0xE0 - LDH (n), A
@@ -2282,7 +2276,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         mmu.set_byte(<span class="number">0xFF00 </span>+ functions::get_op8(cpu, mmu, <span class="number">1</span>) <span class="kw">as </span>u16, cpu.reg.a);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0xE2 - LD (C), A
@@ -2294,7 +2288,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         mmu.set_byte(<span class="number">0xFF00 </span>+ cpu.reg.c <span class="kw">as </span>u16, cpu.reg.a);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0xEA - LD (nn), A
@@ -2306,7 +2300,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         mmu.set_byte(functions::get_op16(cpu, mmu), cpu.reg.a);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0xF0 - LDH A, (n)
@@ -2318,7 +2312,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.a = mmu.get_byte(<span class="number">0xFF00 </span>+ functions::get_op8(cpu, mmu, <span class="number">1</span>) <span class="kw">as </span>u16);
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// 0xFE - CP A, n
@@ -2330,7 +2324,7 @@
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         functions::cp(cpu, functions::get_op8(cpu, mmu, <span class="number">1</span>));
         InstructionType::ActionTaken
-    }
+    },
 };
 
 <span class="doccomment">/// Get an instruction by opcode
@@ -2361,7 +2355,7 @@
         <span class="number">0x24 </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>INC_H),
         <span class="number">0x28 </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>JR_Z_N),
         <span class="number">0x2E </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LD_L_N),
-        
+
         <span class="number">0x31 </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LD_SP_NN),
         <span class="number">0x32 </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LD_HL_DEC_A),
         <span class="number">0x3D </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>DEC_A),
@@ -2399,8 +2393,8 @@
         <span class="number">0xF0 </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LDH_A_N),
         <span class="number">0xFE </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>CP_A_N),
 
-        <span class="kw">_ </span>=&gt; <span class="prelude-val">None
-    </span>}
+        <span class="kw">_ </span>=&gt; <span class="prelude-val">None</span>,
+    }
 }
 
 <span class="attr">#[cfg(test)]
@@ -2797,7 +2791,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.pc = <span class="number">0x000A</span>;
         mmu.set_byte(<span class="number">0x000B </span><span class="kw">as </span>u16, <span class="number">0xFB</span>);
-        <span class="kw">let </span>t= (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x20</span>));
+        <span class="kw">let </span>t = (instruction.unwrap().handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x20</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0x0007</span>);
         <span class="macro">assert!</span>(t == InstructionType::Jumped)
     }
@@ -2867,7 +2861,7 @@
         <span class="macro">assert_eq!</span>(cpu.reg.h, <span class="number">0x00</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.l, <span class="number">0x00</span>);
     }
-    
+
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_get_instruction_inc_h() {
         <span class="kw">let </span>instruction = get_instruction(<span class="kw-2">&amp;</span><span class="number">0x24</span>);
@@ -3483,4 +3477,5 @@
         <span class="kw">let </span>instruction = get_instruction(<span class="kw-2">&amp;</span><span class="number">0xD3</span>);
         <span class="macro">assert_eq!</span>(instruction, <span class="prelude-val">None</span>);
     }
-}</code></pre></div></section></main></body></html>
+}
+</code></pre></div></section></main></body></html>
