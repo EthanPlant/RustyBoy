@@ -2250,6 +2250,20 @@ mod tests {
     }
 
     #[test]
+    pub fn test_ld_a_l() {
+        let mut cpu = Cpu::new();
+        cpu.reg.l = 0x02;
+
+        let expected_cpu = Cpu {
+            reg: Registers { a: 0x02, ..cpu.reg },
+            ..cpu
+        };
+
+        (&LD_A_L.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x7D));
+        assert_eq!(cpu, expected_cpu);
+    }
+
+    #[test]
     pub fn test_get_instruction_add_hl() {
         let instruction = get_instruction(&0x86);
         assert_eq!(instruction.unwrap(), &ADD_HL);
