@@ -2857,6 +2857,20 @@
 <a href="#2857" id="2857">2857</a>
 <a href="#2858" id="2858">2858</a>
 <a href="#2859" id="2859">2859</a>
+<a href="#2860" id="2860">2860</a>
+<a href="#2861" id="2861">2861</a>
+<a href="#2862" id="2862">2862</a>
+<a href="#2863" id="2863">2863</a>
+<a href="#2864" id="2864">2864</a>
+<a href="#2865" id="2865">2865</a>
+<a href="#2866" id="2866">2866</a>
+<a href="#2867" id="2867">2867</a>
+<a href="#2868" id="2868">2868</a>
+<a href="#2869" id="2869">2869</a>
+<a href="#2870" id="2870">2870</a>
+<a href="#2871" id="2871">2871</a>
+<a href="#2872" id="2872">2872</a>
+<a href="#2873" id="2873">2873</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::cpu::Cpu;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::instructions::{functions, Instruction, InstructionType, OpCode};
 <span class="kw">use </span><span class="kw">crate</span>::cpu::registers::Flag;
@@ -5106,6 +5120,20 @@
         <span class="macro">assert_eq!</span>(instruction.unwrap(), <span class="kw-2">&amp;</span>LD_A_L);
         <span class="macro">assert_eq!</span>(instruction.unwrap().length, <span class="number">1</span>);
         <span class="macro">assert_eq!</span>(instruction.unwrap().clock_cycles, <span class="number">4</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">pub fn </span>test_ld_a_l() {
+        <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
+        cpu.reg.l = <span class="number">0x02</span>;
+
+        <span class="kw">let </span>expected_cpu = Cpu {
+            reg: Registers { a: <span class="number">0x02</span>, ..cpu.reg },
+            ..cpu
+        };
+
+        (<span class="kw-2">&amp;</span>LD_A_L.handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>Memory::new(), <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x7D</span>));
+        <span class="macro">assert_eq!</span>(cpu, expected_cpu);
     }
 
     <span class="attr">#[test]
