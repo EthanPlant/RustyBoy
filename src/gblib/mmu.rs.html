@@ -136,6 +136,8 @@
 <a href="#136" id="136">136</a>
 <a href="#137" id="137">137</a>
 <a href="#138" id="138">138</a>
+<a href="#139" id="139">139</a>
+<a href="#140" id="140">140</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cartridge::Cartridge;
 
 <span class="comment">// TODO Proper memory mapping
@@ -151,19 +153,21 @@
 }
 
 <span class="kw">impl </span>Memory {
-    <span class="kw">pub fn </span>new_with_rom(rom_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
+    <span class="doccomment">/// Create a new empty Memory
+    </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
+        Memory {
+            mem: <span class="macro">vec!</span>[<span class="number">0</span>; <span class="number">0x10000</span>],
+            cart: Cartridge::new(),
+        }
+    }
+
+    <span class="doccomment">/// Create a new Memory with a ROM file
+    </span><span class="kw">pub fn </span>new_with_rom(rom_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>mem = <span class="macro">vec!</span>[<span class="number">0xFF</span>; <span class="number">0x10000</span>];
         <span class="kw">let </span>cart = Cartridge::new_from_rom(rom_name);
         Memory {
             mem: mem,
             cart: cart,
-        }
-    }
-
-    <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
-        Memory {
-            mem: <span class="macro">vec!</span>[<span class="number">0</span>; <span class="number">0x10000</span>],
-            cart: Cartridge::new(),
         }
     }
 
