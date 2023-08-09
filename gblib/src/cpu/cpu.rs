@@ -10,6 +10,7 @@ pub struct Cpu {
 }
 
 impl Cpu {
+    /// Create a new CPU
     pub fn new() -> Self {
         let mut registers = Registers::new();
         registers.pc = 0x0100;
@@ -50,7 +51,7 @@ impl Cpu {
         op_code: &OpCode,
     ) {
         let result = (instruction.handler)(self, mmu, op_code);
-        // Update the program counter
+        // Update the program counter based on the instruction length and type
         match result {
             InstructionType::Jumped => {}
             _ => {

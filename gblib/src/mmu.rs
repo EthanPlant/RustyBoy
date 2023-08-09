@@ -13,19 +13,21 @@ pub struct Memory {
 }
 
 impl Memory {
+    /// Create a new empty Memory
+    pub fn new() -> Self {
+        Memory {
+            mem: vec![0; 0x10000],
+            cart: Cartridge::new(),
+        }
+    }
+
+    /// Create a new Memory with a ROM file
     pub fn new_with_rom(rom_name: &str) -> Self {
         let mem = vec![0xFF; 0x10000];
         let cart = Cartridge::new_from_rom(rom_name);
         Memory {
             mem: mem,
             cart: cart,
-        }
-    }
-
-    pub fn new() -> Self {
-        Memory {
-            mem: vec![0; 0x10000],
-            cart: Cartridge::new(),
         }
     }
 
