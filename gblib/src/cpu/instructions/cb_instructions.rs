@@ -38,67 +38,126 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::cpu::registers::Flag;
+
+    use crate::cpu::registers::{Flag, Registers};
 
     #[test]
-    fn test_get_cb_instruction_rl_c() {
+    fn test_get_instruction_rl_c() {
         let instruction = get_instruction(&0x11);
+        assert_eq!(instruction.unwrap(), &RL_C);
+        assert_eq!(instruction.unwrap().length, 2);
+        assert_eq!(instruction.unwrap().clock_cycles, 8);
+        assert_eq!(instruction.unwrap().clock_cycles_condition, None);
+    }
+
+    #[test]
+    fn test_rl_c_bit_seven() {
         let mut cpu = Cpu::new();
         cpu.reg.c = 0x80;
-        (instruction.unwrap().handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x11));
-        assert_eq!(cpu.reg.c, 0x01);
-        assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
-        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
-        assert!(cpu.reg.check_flag(Flag::Carry));
+
+        let expected_cpu = Cpu {
+            reg: Registers {
+                c: 0x00,
+                f: 0x90, // Z__C
+                ..cpu.reg
+            },
+        };
+
+        (&RL_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x11));
+        assert_eq!(cpu, expected_cpu);
     }
 
     #[test]
-    fn test_get_cb_instruction_rl_c_zero() {
-        let instruction = get_instruction(&0x11);
+    fn test_rl_c_bit_seven_clear() {
         let mut cpu = Cpu::new();
         cpu.reg.c = 0x00;
-        (instruction.unwrap().handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x11));
-        assert_eq!(cpu.reg.c, 0x00);
-        assert!(cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
-        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
-        assert!(!cpu.reg.check_flag(Flag::Carry));
+
+        let expected_cpu = Cpu {
+            reg: Registers {
+                c: 0x00,
+                f: 0x80, // ___C
+                ..cpu.reg
+            },
+        };
+
+        (&RL_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x11));
+        assert_eq!(cpu, expected_cpu);
     }
 
     #[test]
-    fn test_get_cb_instruction() {
-        let instruction = get_instruction(&0x00);
-        assert_eq!(instruction, None);
+    fn test_rl_c_bit_seven_carry() {
+        let mut cpu = Cpu::new();
+        cpu.reg.c = 0x80;
+        cpu.reg.set_flag(Flag::Carry);
+
+        let expected_cpu = Cpu {
+            reg: Registers {
+                c: 0x01,
+                f: 0x10, // ___C
+                ..cpu.reg
+            },
+        };
+
+        (&RL_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x11));
+        assert_eq!(cpu, expected_cpu);
     }
 
     #[test]
-    fn test_get_cb_instruction_bit_7_h() {
+    fn test_rl_c_bit_seven_clear_carry() {
+        let mut cpu = Cpu::new();
+        cpu.reg.c = 0x00;
+        cpu.reg.set_flag(Flag::Carry);
+
+        let expected_cpu = Cpu {
+            reg: Registers {
+                c: 0x01,
+                f: 0x00, // ____
+                ..cpu.reg
+            },
+        };
+
+        (&RL_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x11));
+        assert_eq!(cpu, expected_cpu);
+    }
+
+    #[test]
+    fn test_get_instruction_bit_7_h() {
         let instruction = get_instruction(&0x7C);
+        assert_eq!(instruction.unwrap(), &BIT_7_H);
+        assert_eq!(instruction.unwrap().length, 2);
+        assert_eq!(instruction.unwrap().clock_cycles, 8);
+        assert_eq!(instruction.unwrap().clock_cycles_condition, None);
+    }
+
+    #[test]
+    fn test_bit_7_h_one() {
         let mut cpu = Cpu::new();
         cpu.reg.h = 0x80;
-        (instruction.unwrap().handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x7C));
-        assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
-        assert!(cpu.reg.check_flag(Flag::HalfCarry));
-        assert!(!cpu.reg.check_flag(Flag::Carry));
+
+        let expected_cpu = Cpu {
+            reg: Registers {
+                f: 0x20, // __H_
+                ..cpu.reg
+            },
+        };
+
+        (&BIT_7_H.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x7C));
+        assert_eq!(cpu, expected_cpu);
     }
 
     #[test]
-    fn test_get_cb_instruction_bit_7_h_zero() {
-        let instruction = get_instruction(&0x7C);
+    fn test_bit_7_h_zero() {
         let mut cpu = Cpu::new();
         cpu.reg.h = 0x00;
-        (instruction.unwrap().handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x7C));
-        assert!(cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
-        assert!(cpu.reg.check_flag(Flag::HalfCarry));
-        assert!(!cpu.reg.check_flag(Flag::Carry));
-    }
 
-    #[test]
-    fn test_get_cb_instruction_unimplemented() {
-        let instruction = get_instruction(&0x00);
-        assert_eq!(instruction, None);
+        let expected_cpu = Cpu {
+            reg: Registers {
+                f: 0xA0, // Z_H_
+                ..cpu.reg
+            },
+        };
+
+        (&BIT_7_H.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x7C));
+        assert_eq!(cpu, expected_cpu);
     }
 }

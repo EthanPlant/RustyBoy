@@ -172,7 +172,7 @@ pub fn bit(cpu: &mut Cpu, byte: u8, bit: u8) {
 /// Clears all other flags.
 pub fn rl(cpu: &mut Cpu, byte: u8) -> u8 {
     let carry: u8 = (byte >> 7) & 1;
-    let result = byte << 7 | carry;
+    let result = (byte << 1) | cpu.reg.check_flag(Flag::Carry) as u8;
     cpu.reg.clear_all_flags();
     if result == 0 {
         cpu.reg.set_flag(Flag::Zero);
@@ -190,146 +190,192 @@ mod tests {
     #[test]
     fn test_get_op8() {
         let mut cpu = Cpu::new();
-        let mut mem = Memory::new();
-        mem.set_byte(0xC000 as u16, 0x01);
+        let mut mmu = Memory::new();
         cpu.reg.pc = 0xC000;
-        let op = get_op8(&cpu, &mem, 0);
-        assert_eq!(op, 0x01);
+        mmu.set_byte(0xC001 as usize, 0x01);
+        assert_eq!(get_op8(&cpu, &mmu, 1), 0x01);
     }
 
     #[test]
     fn test_get_op16() {
         let mut cpu = Cpu::new();
-        let mut mem = Memory::new();
-        mem.set_word(0xC001 as u16, 0x0102);
+        let mut mmu = Memory::new();
         cpu.reg.pc = 0xC000;
-        let op = get_op16(&cpu, &mem);
-        assert_eq!(op, 0x0102);
+        mmu.set_word(0xC001 as usize, 0x0201);
+        assert_eq!(get_op16(&cpu, &mmu), 0x0201);
     }
 
     #[test]
     fn test_get_hl() {
         let mut cpu = Cpu::new();
-        let mut mem = Memory::new();
-        mem.set_byte(0xC000 as u16, 0x01);
-        cpu.reg.pc = 0xC000;
-        cpu.reg.set_hl(0xC000);
-        let op = get_hl(&cpu, &mem);
-        assert_eq!(op, 0x01);
+        let mut mmu = Memory::new();
+        cpu.reg.h = 0xC0;
+        cpu.reg.l = 0x00;
+        mmu.set_byte(0xC000 as usize, 0x03);
+        assert_eq!(get_hl(&cpu, &mmu), 0x03);
     }
 
     #[test]
     fn test_set_hl() {
         let mut cpu = Cpu::new();
-        let mut mem = Memory::new();
-        cpu.reg.set_hl(0xC000);
-        set_hl(&mut cpu, &mut mem, 0x01);
-        assert_eq!(mem.get_byte(0xC000 as u16), 0x01);
+        let mut mmu = Memory::new();
+        cpu.reg.h = 0xC0;
+        cpu.reg.l = 0x00;
+        set_hl(&mut cpu, &mut mmu, 0x03);
+        assert_eq!(mmu.get_byte(0xC000 as usize), 0x03);
     }
 
     #[test]
     fn test_push() {
         let mut cpu = Cpu::new();
-        let mut mem = Memory::new();
-        cpu.reg.pc = 0x0000;
+        let mut mmu = Memory::new();
         cpu.reg.sp = 0xFFFE;
-        push(&mut cpu, &mut mem, 0x0102);
-        assert_eq!(mem.get_byte(0xFFFC as u16), 0x02);
-        assert_eq!(mem.get_byte(0xFFFD as u16), 0x01);
+        push(&mut cpu, &mut mmu, 0x0201);
+        assert_eq!(mmu.get_word(0xFFFC as usize), 0x0201);
         assert_eq!(cpu.reg.sp, 0xFFFC);
     }
 
     #[test]
     fn test_pop() {
         let mut cpu = Cpu::new();
-        let mut mem = Memory::new();
-        cpu.reg.pc = 0x0000;
+        let mut mmu = Memory::new();
         cpu.reg.sp = 0xFFFC;
-        mem.set_byte(0xFFFC as u16, 0x02);
-        mem.set_byte(0xFFFD as u16, 0x01);
-        let op = pop(&mut cpu, &mut mem);
-        assert_eq!(op, 0x0102);
+        mmu.set_word(0xFFFC as usize, 0x0201);
+        assert_eq!(pop(&mut cpu, &mut mmu), 0x0201);
         assert_eq!(cpu.reg.sp, 0xFFFE);
     }
 
     #[test]
     fn test_call() {
         let mut cpu = Cpu::new();
-        let mut mem = Memory::new();
+        let mut mmu = Memory::new();
         cpu.reg.pc = 0xC000;
         cpu.reg.sp = 0xFFFE;
-        mem.set_byte(0xC001 as usize, 0x02);
-        mem.set_byte(0xC002 as usize, 0x01);
-        call(&mut cpu, &mut mem);
-        assert_eq!(cpu.reg.pc, 0x0102);
+        mmu.set_word(0xC001 as usize, 0x0201);
+        call(&mut cpu, &mut mmu);
+        assert_eq!(cpu.reg.pc, 0x0201);
         assert_eq!(cpu.reg.sp, 0xFFFC);
-        assert_eq!(mem.get_byte(0xFFFC as u16), 0x03);
-        assert_eq!(mem.get_byte(0xFFFE as u16), 0x00);
+        assert_eq!(mmu.get_word(0xFFFC as usize), 0xC003);
     }
 
     #[test]
-    fn test_jr() {
+    fn test_jr_positive() {
         let mut cpu = Cpu::new();
-        let mut mem = Memory::new();
-        mem.set_byte(0xC00B as u16, 0xFB);
-        cpu.reg.pc = 0xC00A;
-        jr(&mut cpu, &mut mem);
-        assert_eq!(cpu.reg.pc, 0xC007);
+        let mut mmu = Memory::new();
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC001 as usize, 0x01);
+        jr(&mut cpu, &mut mmu);
+        assert_eq!(cpu.reg.pc, 0xC003);
     }
 
     #[test]
-    fn test_add() {
+    fn test_jr_negative() {
         let mut cpu = Cpu::new();
-        cpu.reg.a = 0x01;
+        let mut mmu = Memory::new();
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC001 as usize, 0xFE);
+        jr(&mut cpu, &mut mmu);
+        assert_eq!(cpu.reg.pc, 0xC000);
+    }
+
+    #[test]
+    pub fn test_add() {
+        let mut cpu = Cpu::new();
         add(&mut cpu, 0x01);
-        assert_eq!(cpu.reg.a, 0x02);
+        assert_eq!(cpu.reg.a, 0x01);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
-        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
     }
 
     #[test]
-    fn test_add_zero() {
+    pub fn test_add_zero() {
         let mut cpu = Cpu::new();
-        cpu.reg.a = 0xFF;
-        add(&mut cpu, 0x01);
+        add(&mut cpu, 0x00);
         assert_eq!(cpu.reg.a, 0x00);
         assert!(cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Subtract));
-        assert!(cpu.reg.check_flag(Flag::HalfCarry));
-        assert!(cpu.reg.check_flag(Flag::Carry));
     }
 
     #[test]
-    fn test_add_half_carry() {
+    pub fn test_add_carry() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x80;
+        add(&mut cpu, 0x81);
+        assert_eq!(cpu.reg.a, 0x01);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(cpu.reg.check_flag(Flag::Carry));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
+    }
+
+    #[test]
+    pub fn test_add_half_carry() {
         let mut cpu = Cpu::new();
         cpu.reg.a = 0x0F;
         add(&mut cpu, 0x01);
         assert_eq!(cpu.reg.a, 0x10);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
-        assert!(cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
+        assert!(cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
     }
 
     #[test]
-    fn test_add_carry() {
+    pub fn test_cp_equal() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x01;
+        cp(&mut cpu, 0x01);
+        assert_eq!(cpu.reg.a, 0x01);
+        assert!(cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(cpu.reg.check_flag(Flag::Subtract));
+    }
+
+    #[test]
+    pub fn test_cp_greater() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x0F;
+        cp(&mut cpu, 0x10);
+        assert_eq!(cpu.reg.a, 0x0F);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(cpu.reg.check_flag(Flag::Carry));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(cpu.reg.check_flag(Flag::Subtract));
+    }
+
+    #[test]
+    pub fn test_cp_less() {
         let mut cpu = Cpu::new();
         cpu.reg.a = 0xFF;
-        add(&mut cpu, 0x01);
-        assert_eq!(cpu.reg.a, 0x00);
-        assert!(cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
-        assert!(cpu.reg.check_flag(Flag::HalfCarry));
-        assert!(cpu.reg.check_flag(Flag::Carry));
+        cp(&mut cpu, 0x00);
+        assert_eq!(cpu.reg.a, 0xFF);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(cpu.reg.check_flag(Flag::Subtract));
     }
 
     #[test]
-    fn test_dec() {
+    pub fn test_cp_half_carry() {
         let mut cpu = Cpu::new();
-        let res = dec(&mut cpu, 0x02);
-        assert_eq!(res, 0x01);
+        cpu.reg.a = 0x10;
+        cp(&mut cpu, 0x01);
+        assert_eq!(cpu.reg.a, 0x10);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+        assert!(cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(cpu.reg.check_flag(Flag::Subtract));
+    }
+
+    #[test]
+    pub fn test_dec() {
+        let mut cpu = Cpu::new();
+        assert_eq!(dec(&mut cpu, 0x02), 0x01);
         assert!(!cpu.reg.check_flag(Flag::Zero));
         assert!(cpu.reg.check_flag(Flag::Subtract));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
@@ -337,10 +383,9 @@ mod tests {
     }
 
     #[test]
-    fn test_dec_zero() {
+    pub fn test_dec_zero() {
         let mut cpu = Cpu::new();
-        let res = dec(&mut cpu, 0x01);
-        assert_eq!(res, 0x00);
+        assert_eq!(dec(&mut cpu, 0x01), 0x00);
         assert!(cpu.reg.check_flag(Flag::Zero));
         assert!(cpu.reg.check_flag(Flag::Subtract));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
@@ -348,10 +393,9 @@ mod tests {
     }
 
     #[test]
-    fn test_dec_half_carry() {
+    pub fn test_dec_half_carry() {
         let mut cpu = Cpu::new();
-        let res = dec(&mut cpu, 0x10);
-        assert_eq!(res, 0x0F);
+        assert_eq!(dec(&mut cpu, 0x10), 0x0F);
         assert!(!cpu.reg.check_flag(Flag::Zero));
         assert!(cpu.reg.check_flag(Flag::Subtract));
         assert!(cpu.reg.check_flag(Flag::HalfCarry));
@@ -359,10 +403,19 @@ mod tests {
     }
 
     #[test]
-    fn test_inc() {
+    pub fn test_dec_underflow() {
         let mut cpu = Cpu::new();
-        let res = inc(&mut cpu, 0x00);
-        assert_eq!(res, 0x01);
+        assert_eq!(dec(&mut cpu, 0x00), 0xFF);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(cpu.reg.check_flag(Flag::Subtract));
+        assert!(cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_inc() {
+        let mut cpu = Cpu::new();
+        assert_eq!(inc(&mut cpu, 0x01), 0x02);
         assert!(!cpu.reg.check_flag(Flag::Zero));
         assert!(!cpu.reg.check_flag(Flag::Subtract));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
@@ -370,10 +423,9 @@ mod tests {
     }
 
     #[test]
-    fn test_inc_zero() {
+    pub fn test_inc_zero() {
         let mut cpu = Cpu::new();
-        let res = inc(&mut cpu, 0xFF);
-        assert_eq!(res, 0x00);
+        assert_eq!(inc(&mut cpu, 0xFF), 0x00);
         assert!(cpu.reg.check_flag(Flag::Zero));
         assert!(!cpu.reg.check_flag(Flag::Subtract));
         assert!(cpu.reg.check_flag(Flag::HalfCarry));
@@ -381,10 +433,9 @@ mod tests {
     }
 
     #[test]
-    fn test_inc_half_carry() {
+    pub fn test_inc_half_carry() {
         let mut cpu = Cpu::new();
-        let res = inc(&mut cpu, 0x0F);
-        assert_eq!(res, 0x10);
+        assert_eq!(inc(&mut cpu, 0x0F), 0x10);
         assert!(!cpu.reg.check_flag(Flag::Zero));
         assert!(!cpu.reg.check_flag(Flag::Subtract));
         assert!(cpu.reg.check_flag(Flag::HalfCarry));
@@ -392,116 +443,130 @@ mod tests {
     }
 
     #[test]
-    fn test_sub() {
+    pub fn test_sub() {
         let mut cpu = Cpu::new();
         cpu.reg.a = 0x02;
         sub(&mut cpu, 0x01);
         assert_eq!(cpu.reg.a, 0x01);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(cpu.reg.check_flag(Flag::Subtract));
-        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(cpu.reg.check_flag(Flag::Subtract));
     }
 
     #[test]
-    fn test_sub_zero() {
+    pub fn test_sub_zero() {
         let mut cpu = Cpu::new();
         cpu.reg.a = 0x01;
         sub(&mut cpu, 0x01);
         assert_eq!(cpu.reg.a, 0x00);
         assert!(cpu.reg.check_flag(Flag::Zero));
-        assert!(cpu.reg.check_flag(Flag::Subtract));
-        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(cpu.reg.check_flag(Flag::Subtract));
     }
 
     #[test]
-    fn test_sub_half_carry() {
+    pub fn test_sub_carry() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x7F;
+        sub(&mut cpu, 0xFF);
+        assert_eq!(cpu.reg.a, 0x80);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(cpu.reg.check_flag(Flag::Carry));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(cpu.reg.check_flag(Flag::Subtract));
+    }
+
+    #[test]
+    pub fn test_sub_half_carry() {
         let mut cpu = Cpu::new();
         cpu.reg.a = 0x10;
         sub(&mut cpu, 0x01);
         assert_eq!(cpu.reg.a, 0x0F);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(cpu.reg.check_flag(Flag::Subtract));
-        assert!(cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
-    }
-
-    #[test]
-    fn test_sub_carry() {
-        let mut cpu = Cpu::new();
-        cpu.reg.a = 0x00;
-        sub(&mut cpu, 0x01);
-        assert_eq!(cpu.reg.a, 0xFF);
-        assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(cpu.reg.check_flag(Flag::Subtract));
         assert!(cpu.reg.check_flag(Flag::HalfCarry));
-        assert!(cpu.reg.check_flag(Flag::Carry));
+        assert!(cpu.reg.check_flag(Flag::Subtract));
     }
 
     #[test]
-    fn test_xor_bytes() {
+    pub fn test_xor_bytes() {
         let mut cpu = Cpu::new();
-        cpu.reg.a = 0x0F;
-        xor_bytes(&mut cpu, 0x0F, 0x0F);
-        assert_eq!(cpu.reg.a, 0x00);
-        assert!(cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
-        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
-        assert!(!cpu.reg.check_flag(Flag::Carry));
-    }
-
-    #[test]
-    fn test_xor_bytes_not_zero() {
-        let mut cpu = Cpu::new();
-        cpu.reg.a = 0x0F;
-        xor_bytes(&mut cpu, 0x0F, 0x0E);
+        xor_bytes(&mut cpu, 0x00, 0x01);
         assert_eq!(cpu.reg.a, 0x01);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
-        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
     }
 
     #[test]
-    fn test_bit() {
+    pub fn test_xor_bytes_zero() {
         let mut cpu = Cpu::new();
-        bit(&mut cpu, 0x0F, 7);
+        xor_bytes(&mut cpu, 0x01, 0x01);
+        assert_eq!(cpu.reg.a, 0x00);
         assert!(cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
-        assert!(cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
-    }
-
-    #[test]
-    fn test_bit_not_zero() {
-        let mut cpu = Cpu::new();
-        bit(&mut cpu, 0x0F, 0);
-        assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
-        assert!(cpu.reg.check_flag(Flag::HalfCarry));
-        assert!(!cpu.reg.check_flag(Flag::Carry));
-    }
-
-    #[test]
-    fn test_rl() {
-        let mut cpu = Cpu::new();
-        let res = rl(&mut cpu, 0x80);
-        assert_eq!(res, 0x01);
-        assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
+    }
+
+    #[test]
+    pub fn test_bit_one() {
+        let mut cpu = Cpu::new();
+        bit(&mut cpu, 0x01, 0);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(cpu.reg.check_flag(Flag::HalfCarry));
+    }
+
+    #[test]
+    pub fn test_bit_zero() {
+        let mut cpu = Cpu::new();
+        bit(&mut cpu, 0x00, 0);
+        assert!(cpu.reg.check_flag(Flag::Zero));
+        assert!(cpu.reg.check_flag(Flag::HalfCarry));
+    }
+
+    #[test]
+    pub fn test_rl_bit_seven_set() {
+        let mut cpu = Cpu::new();
+        assert_eq!(rl(&mut cpu, 0x80), 0x00);
+        assert!(cpu.reg.check_flag(Flag::Zero));
         assert!(cpu.reg.check_flag(Flag::Carry));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
     }
 
     #[test]
-    fn test_rl_zero() {
+    pub fn test_rl_bit_seven_clear() {
         let mut cpu = Cpu::new();
-        let res = rl(&mut cpu, 0x00);
-        assert_eq!(res, 0x00);
+        assert_eq!(rl(&mut cpu, 0x00), 0x00);
         assert!(cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
-        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
+    }
+
+    #[test]
+    pub fn test_rl_bit_seven_set_carry_set() {
+        let mut cpu = Cpu::new();
+        cpu.reg.set_flag(Flag::Carry);
+        assert_eq!(rl(&mut cpu, 0x80), 0x01);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(cpu.reg.check_flag(Flag::Carry));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
+    }
+
+    #[test]
+    pub fn test_rl_bit_seven_clear_carry_set() {
+        let mut cpu = Cpu::new();
+        cpu.reg.set_flag(Flag::Carry);
+        assert_eq!(rl(&mut cpu, 0x00), 0x01);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
     }
 }

@@ -11,6 +11,7 @@ pub enum Flag {
 }
 
 /// The CPU registers
+#[derive(Debug, PartialEq)]
 pub struct Registers {
     pub a: u8,
     pub b: u8,
