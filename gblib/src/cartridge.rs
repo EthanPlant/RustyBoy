@@ -109,7 +109,6 @@ impl TryFrom<u8> for CartridgeType {
     }
 }
 
-
 enum RomSize {
     K32 = 0x00,
     K64 = 0x01,
@@ -238,10 +237,7 @@ impl Cartridge {
         //     panic!("Only ROM only cartridges are supported at this time");
         // }
 
-        Cartridge {
-            rom,
-            ram,
-        }
+        Cartridge { rom, ram }
     }
 
     /// Read a byte from the ROM

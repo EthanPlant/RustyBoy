@@ -16,12 +16,16 @@ impl Memory {
     pub fn new_with_rom(rom_name: &str) -> Self {
         let mem = vec![0xFF; 0x10000];
         let cart = Cartridge::new_from_rom(rom_name);
-        Memory { mem: mem, cart: cart }
+        Memory {
+            mem: mem,
+            cart: cart,
+        }
     }
 
     pub fn new() -> Self {
         Memory {
-            mem: vec![0; 0x10000], cart: Cartridge::new(),
+            mem: vec![0; 0x10000],
+            cart: Cartridge::new(),
         }
     }
 
@@ -43,9 +47,7 @@ impl Memory {
     pub fn get_word<T: Into<usize>>(&self, addr: T) -> u16 {
         let addr = addr.into();
         match addr {
-            ROM_START..=ROM_END => {
-                self.cart.read_word_from_rom(addr)
-            }
+            ROM_START..=ROM_END => self.cart.read_word_from_rom(addr),
             _ => {
                 let low = self.mem[addr];
                 let high = self.mem[addr + 1];
