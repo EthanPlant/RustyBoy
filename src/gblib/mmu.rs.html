@@ -134,6 +134,8 @@
 <a href="#134" id="134">134</a>
 <a href="#135" id="135">135</a>
 <a href="#136" id="136">136</a>
+<a href="#137" id="137">137</a>
+<a href="#138" id="138">138</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cartridge::Cartridge;
 
 <span class="comment">// TODO Proper memory mapping
@@ -152,12 +154,16 @@
     <span class="kw">pub fn </span>new_with_rom(rom_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>mem = <span class="macro">vec!</span>[<span class="number">0xFF</span>; <span class="number">0x10000</span>];
         <span class="kw">let </span>cart = Cartridge::new_from_rom(rom_name);
-        Memory { mem: mem, cart: cart }
+        Memory {
+            mem: mem,
+            cart: cart,
+        }
     }
 
     <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         Memory {
-            mem: <span class="macro">vec!</span>[<span class="number">0</span>; <span class="number">0x10000</span>], cart: Cartridge::new(),
+            mem: <span class="macro">vec!</span>[<span class="number">0</span>; <span class="number">0x10000</span>],
+            cart: Cartridge::new(),
         }
     }
 
@@ -179,9 +185,7 @@
     </span><span class="kw">pub fn </span>get_word&lt;T: Into&lt;usize&gt;&gt;(<span class="kw-2">&amp;</span><span class="self">self</span>, addr: T) -&gt; u16 {
         <span class="kw">let </span>addr = addr.into();
         <span class="kw">match </span>addr {
-            ROM_START..=ROM_END =&gt; {
-                <span class="self">self</span>.cart.read_word_from_rom(addr)
-            }
+            ROM_START..=ROM_END =&gt; <span class="self">self</span>.cart.read_word_from_rom(addr),
             <span class="kw">_ </span>=&gt; {
                 <span class="kw">let </span>low = <span class="self">self</span>.mem[addr];
                 <span class="kw">let </span>high = <span class="self">self</span>.mem[addr + <span class="number">1</span>];

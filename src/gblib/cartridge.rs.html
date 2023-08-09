@@ -296,10 +296,6 @@
 <a href="#296" id="296">296</a>
 <a href="#297" id="297">297</a>
 <a href="#298" id="298">298</a>
-<a href="#299" id="299">299</a>
-<a href="#300" id="300">300</a>
-<a href="#301" id="301">301</a>
-<a href="#302" id="302">302</a>
 </pre></div><pre class="rust"><code><span class="kw">const </span>TITLE_START_ADDR: u16 = <span class="number">0x0134</span>;
 <span class="kw">const </span>TITLE_END_ADDR: u16 = <span class="number">0x0143</span>;
 <span class="kw">const </span>CART_TYPE_ADDR: u16 = <span class="number">0x0147</span>;
@@ -410,7 +406,6 @@
         }
     }
 }
-
 
 <span class="kw">enum </span>RomSize {
     K32 = <span class="number">0x00</span>,
@@ -540,10 +535,7 @@
         //     panic!(&quot;Only ROM only cartridges are supported at this time&quot;);
         // }
 
-        </span>Cartridge {
-            rom,
-            ram,
-        }
+        </span>Cartridge { rom, ram }
     }
 
     <span class="doccomment">/// Read a byte from the ROM
@@ -601,4 +593,5 @@
         <span class="kw">let </span>cart = Cartridge::new_from_rom(<span class="string">&quot;resources/test-rom.gb&quot;</span>);
         <span class="macro">assert_eq!</span>(cart.read_word_from_rom(<span class="number">0x0100</span>), <span class="number">0xC300</span>);
     }
-}</code></pre></div></section></main></body></html>
+}
+</code></pre></div></section></main></body></html>
