@@ -110,7 +110,14 @@ impl Memory {
             UNUSED_START..=UNUSED_END => {
                 log::warn!("Attempted prohibited write to unused memory {}", addr);
             }
-            IO_START..=IO_END => self.io[addr - IO_START] = v,
+            IO_START..=IO_END => {
+                // Logging for Blargg tests
+                if addr == 0xFF02 && v == 0x81 {
+                    print!("{}", self.io[0xFF01 - IO_START] as char);
+                } else {
+                    self.io[addr - IO_START] = v;
+                }
+            }
             HRAM_START..=HRAM_END => self.hram[addr - HRAM_START] = v,
             // TODO handle interrupt enable register
             IE => (),

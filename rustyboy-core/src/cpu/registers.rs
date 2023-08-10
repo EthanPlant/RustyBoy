@@ -64,6 +64,11 @@ impl Registers {
         self.f & (flag as u8) != 0
     }
 
+    /// Get the AF register pair
+    pub fn af(&self) -> u16 {
+        ((self.a as u16) << 8) | (self.f as u16)
+    }
+
     /// Get the BC register pair
     pub fn bc(&self) -> u16 {
         ((self.b as u16) << 8) | (self.c as u16)
@@ -77,6 +82,12 @@ impl Registers {
     /// Get the HL register pair
     pub fn hl(&self) -> u16 {
         ((self.h as u16) << 8) | (self.l as u16)
+    }
+
+    /// Set the AF register pair
+    pub fn set_af(&mut self, value: u16) {
+        self.a = ((value & 0xFF00) >> 8) as u8;
+        self.f = (value & 0x00FF) as u8;
     }
 
     /// Set the BC register pair

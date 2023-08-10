@@ -51,6 +51,27 @@ pub fn jr(cpu: &mut Cpu, mmu: &mut Memory) {
     cpu.reg.pc = ((cpu.reg.pc + 2) as i16 + op as i16) as u16;
 }
 
+/// Add a byte to the A register with the carry flag
+/// Sets the zero flag if the result is zero.
+/// Sets the carry flag if the result overflows.
+/// Sets the half carry flag if the lower nibble of the A register overflows.
+/// Clears the subtract flag.
+pub fn adc(cpu: &mut Cpu, byte: u8) {
+    let carry = cpu.reg.check_flag(Flag::Carry) as u8;
+    let result = cpu.reg.a.wrapping_add(byte).wrapping_add(carry);
+    cpu.reg.clear_all_flags();
+    if result == 0 {
+        cpu.reg.set_flag(Flag::Zero);
+    }
+    if (cpu.reg.a as u16) + (byte as u16) + (carry as u16) > 0xFF {
+        cpu.reg.set_flag(Flag::Carry);
+    }
+    if (cpu.reg.a & 0x0F) + (byte & 0x0F) + carry > 0x0F {
+        cpu.reg.set_flag(Flag::HalfCarry);
+    }
+    cpu.reg.a = result;
+}
+
 /// Add a byte to the A register.
 /// Sets the zero flag if the result is zero.
 /// Sets the carry flag if the result overflows.
@@ -67,6 +88,22 @@ pub fn add(cpu: &mut Cpu, byte: u8) {
     }
     if (cpu.reg.a & 0x0F) + (byte & 0x0F) > 0x0F {
         cpu.reg.set_flag(Flag::HalfCarry);
+    }
+    cpu.reg.a = result;
+}
+
+
+/// Logical AND on a byte and the A register.
+/// Sets the zero flag if the result is zero.
+/// Sets the half carry flag.
+/// Clears all other flags.
+/// Stores the result in the A register.
+pub fn and(cpu: &mut Cpu, byte: u8) {
+    let result = cpu.reg.a & byte;
+    cpu.reg.clear_all_flags();
+    cpu.reg.set_flag(Flag::HalfCarry);
+    if result == 0 {
+        cpu.reg.set_flag(Flag::Zero);
     }
     cpu.reg.a = result;
 }
@@ -123,6 +160,19 @@ pub fn inc(cpu: &mut Cpu, byte: u8) -> u8 {
     result
 }
 
+/// Logical OR on a byte and the A register.
+/// Sets the zero flag if the result is zero.
+/// Clears all other flags.
+/// Stores the result in the A register.
+pub fn or(cpu: &mut Cpu, byte: u8) {
+    let result = cpu.reg.a | byte;
+    cpu.reg.clear_all_flags();
+    if result == 0 {
+        cpu.reg.set_flag(Flag::Zero);
+    }
+    cpu.reg.a = result;
+}
+
 /// Subtract a byte from the A register.
 /// Sets the zero flag if the result is zero.
 /// Sets the subtract flag.
@@ -173,6 +223,40 @@ pub fn bit(cpu: &mut Cpu, byte: u8, bit: u8) {
 pub fn rl(cpu: &mut Cpu, byte: u8) -> u8 {
     let carry: u8 = (byte >> 7) & 1;
     let result = (byte << 1) | cpu.reg.check_flag(Flag::Carry) as u8;
+    cpu.reg.clear_all_flags();
+    if result == 0 {
+        cpu.reg.set_flag(Flag::Zero);
+    }
+    if carry == 1 {
+        cpu.reg.set_flag(Flag::Carry);
+    }
+    result
+}
+
+/// Rotates a byte right through the carry flag.
+/// Sets the zero flag if the result is zero.
+/// Sets the carry flag to the value of bit 0.
+/// Clears all other flags.
+pub fn rr(cpu: &mut Cpu, byte: u8) -> u8 {
+    let carry: u8 = byte & 1;
+    let result = (byte >> 1) | (cpu.reg.check_flag(Flag::Carry) as u8) << 7;
+    cpu.reg.clear_all_flags();
+    if result == 0 {
+        cpu.reg.set_flag(Flag::Zero);
+    }
+    if carry == 1 {
+        cpu.reg.set_flag(Flag::Carry);
+    }
+    result
+}
+
+/// Shifts a byte left.
+/// Sets the zero flag if the result is zero.
+/// Sets the carry flag to the value of bit 0.
+/// Clears all other flags.
+pub fn srl(cpu: &mut Cpu, byte: u8) -> u8 {
+    let carry: u8 = byte & 1;
+    let result = byte >> 1;
     cpu.reg.clear_all_flags();
     if result == 0 {
         cpu.reg.set_flag(Flag::Zero);
@@ -279,6 +363,58 @@ mod tests {
     }
 
     #[test]
+    pub fn test_adc() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x01;
+        cpu.reg.set_flag(Flag::Carry);
+        adc(&mut cpu, 0x01);
+        assert_eq!(cpu.reg.a, 0x03);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_adc_zero() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x00;
+        cpu.reg.clear_flag(Flag::Carry);
+        adc(&mut cpu, 0x00);
+        assert_eq!(cpu.reg.a, 0x00);
+        assert!(cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_adc_carry() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x80;
+        cpu.reg.set_flag(Flag::Carry);
+        adc(&mut cpu, 0x80);
+        assert_eq!(cpu.reg.a, 0x01);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(cpu.reg.check_flag(Flag::Carry));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
+    }
+
+    #[test]
+    pub fn test_adc_half_carry() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x0F;
+        cpu.reg.set_flag(Flag::Carry);
+        adc(&mut cpu, 0x01);
+        assert_eq!(cpu.reg.a, 0x11);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+        assert!(cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
+    }
+
+    #[test]
     pub fn test_add() {
         let mut cpu = Cpu::new();
         cpu.reg.a = 0;
@@ -321,6 +457,30 @@ mod tests {
         add(&mut cpu, 0x01);
         assert_eq!(cpu.reg.a, 0x10);
         assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+        assert!(cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
+    }
+
+    #[test]
+    pub fn test_and() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x01;
+        and(&mut cpu, 0x02);
+        assert_eq!(cpu.reg.a, 0x00);
+        assert!(cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+        assert!(cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
+    }
+
+    #[test]
+    pub fn test_and_zero() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x00;
+        and(&mut cpu, 0x00);
+        assert_eq!(cpu.reg.a, 0x00);
+        assert!(cpu.reg.check_flag(Flag::Zero));
         assert!(!cpu.reg.check_flag(Flag::Carry));
         assert!(cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Subtract));
@@ -441,6 +601,30 @@ mod tests {
         assert!(!cpu.reg.check_flag(Flag::Zero));
         assert!(!cpu.reg.check_flag(Flag::Subtract));
         assert!(cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_or() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x01;
+        or(&mut cpu, 0x02);
+        assert_eq!(cpu.reg.a, 0x03);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_or_zero() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x00;
+        or(&mut cpu, 0x00);
+        assert_eq!(cpu.reg.a, 0x00);
+        assert!(cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
     }
 
@@ -572,5 +756,57 @@ mod tests {
         assert!(!cpu.reg.check_flag(Flag::Carry));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Subtract));
+    }
+
+    #[test]
+    pub fn test_rr_bit_zero_set() {
+        let mut cpu = Cpu::new();
+        cpu.reg.clear_flag(Flag::Carry);
+        assert_eq!(rr(&mut cpu, 0x01), 0x00);
+        assert!(cpu.reg.check_flag(Flag::Zero));
+        assert!(cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_rr_bit_zero_clear() {
+        let mut cpu = Cpu::new();
+        cpu.reg.clear_flag(Flag::Carry);
+        assert_eq!(rr(&mut cpu, 0x80), 0x40);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_rr_bit_zero_set_carry_set() {
+        let mut cpu = Cpu::new();
+        cpu.reg.set_flag(Flag::Carry);
+        assert_eq!(rr(&mut cpu, 0x01), 0x80);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_rr_bit_zero_clear_carry_set() {
+        let mut cpu = Cpu::new();
+        cpu.reg.set_flag(Flag::Carry);
+        assert_eq!(rr(&mut cpu, 0x00), 0x80);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_srl_bit_zero_set() {
+        let mut cpu = Cpu::new();
+        assert_eq!(srl(&mut cpu, 0x01), 0x00);
+        assert!(cpu.reg.check_flag(Flag::Zero));
+        assert!(cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_srl_bit_zero_clear() {
+        let mut cpu = Cpu::new();
+        assert_eq!(srl(&mut cpu, 0x00), 0x00);
+        assert!(cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
     }
 }

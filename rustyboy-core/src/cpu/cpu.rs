@@ -8,6 +8,7 @@ use crate::mmu::Memory;
 pub struct Cpu {
     /// The CPU registers
     pub reg: Registers,
+    pub interrupts_enabled: bool,
 }
 
 impl Cpu {
@@ -24,7 +25,7 @@ impl Cpu {
         registers.l = 0x4D;
         registers.sp = 0xFFFE;
         registers.pc = 0x0100;
-        Cpu { reg: registers }
+        Cpu { reg: registers, interrupts_enabled: false }
     }
 
     /// Step through the emulator
@@ -53,7 +54,7 @@ impl Cpu {
 
         self.execute_instruction(mmu, instruction, &op_code);
         // Add spacing between this and the next instruction
-        println!();
+        log::trace!("Finished executing instruction\n");
     }
 
     /// Execute an instruction
@@ -100,6 +101,7 @@ mod tests {
         assert_eq!(cpu.reg.l, 0x4D);
         assert_eq!(cpu.reg.sp, 0xFFFE);
         assert_eq!(cpu.reg.pc, 0x100);
+        assert_eq!(cpu.interrupts_enabled, false)
     }
 
     #[test]
