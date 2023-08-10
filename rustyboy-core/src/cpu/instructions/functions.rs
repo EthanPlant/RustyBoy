@@ -281,6 +281,7 @@ mod tests {
     #[test]
     pub fn test_add() {
         let mut cpu = Cpu::new();
+        cpu.reg.a = 0;
         add(&mut cpu, 0x01);
         assert_eq!(cpu.reg.a, 0x01);
         assert!(!cpu.reg.check_flag(Flag::Zero));
@@ -292,6 +293,7 @@ mod tests {
     #[test]
     pub fn test_add_zero() {
         let mut cpu = Cpu::new();
+        cpu.reg.a = 0;
         add(&mut cpu, 0x00);
         assert_eq!(cpu.reg.a, 0x00);
         assert!(cpu.reg.check_flag(Flag::Zero));
@@ -531,6 +533,7 @@ mod tests {
     #[test]
     pub fn test_rl_bit_seven_set() {
         let mut cpu = Cpu::new();
+        cpu.reg.clear_flag(Flag::Carry);
         assert_eq!(rl(&mut cpu, 0x80), 0x00);
         assert!(cpu.reg.check_flag(Flag::Zero));
         assert!(cpu.reg.check_flag(Flag::Carry));
@@ -541,6 +544,7 @@ mod tests {
     #[test]
     pub fn test_rl_bit_seven_clear() {
         let mut cpu = Cpu::new();
+        cpu.reg.clear_flag(Flag::Carry);
         assert_eq!(rl(&mut cpu, 0x00), 0x00);
         assert!(cpu.reg.check_flag(Flag::Zero));
         assert!(!cpu.reg.check_flag(Flag::Carry));

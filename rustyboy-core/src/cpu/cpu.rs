@@ -14,6 +14,15 @@ impl Cpu {
     /// Create a new CPU
     pub fn new() -> Self {
         let mut registers = Registers::new();
+        registers.a = 0x01;
+        registers.f = 0xB0;
+        registers.b = 0x00;
+        registers.c = 0x13;
+        registers.d = 0x00;
+        registers.e = 0xD8;
+        registers.h = 0x01;
+        registers.l = 0x4D;
+        registers.sp = 0xFFFE;
         registers.pc = 0x0100;
         Cpu { reg: registers }
     }
@@ -81,6 +90,15 @@ mod tests {
     #[test]
     fn test_new() {
         let cpu = Cpu::new();
+        assert_eq!(cpu.reg.a, 0x01);
+        assert_eq!(cpu.reg.f, 0xB0);
+        assert_eq!(cpu.reg.b, 0x00);
+        assert_eq!(cpu.reg.c, 0x13);
+        assert_eq!(cpu.reg.d, 0x00);
+        assert_eq!(cpu.reg.e, 0xD8);
+        assert_eq!(cpu.reg.h, 0x01);
+        assert_eq!(cpu.reg.l, 0x4D);
+        assert_eq!(cpu.reg.sp, 0xFFFE);
         assert_eq!(cpu.reg.pc, 0x100);
     }
 

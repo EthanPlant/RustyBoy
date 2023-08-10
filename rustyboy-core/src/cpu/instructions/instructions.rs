@@ -691,6 +691,7 @@ mod tests {
     pub fn test_inc_b() {
         let mut cpu = Cpu::new();
         cpu.reg.b = 0x01;
+        cpu.reg.clear_all_flags();
 
         let expected_cpu = Cpu {
             reg: Registers { b: 0x02, ..cpu.reg },
@@ -853,6 +854,7 @@ mod tests {
     pub fn test_inc_c() {
         let mut cpu = Cpu::new();
         cpu.reg.c = 0x01;
+        cpu.reg.clear_all_flags();
 
         let expected_cpu = Cpu {
             reg: Registers { c: 0x02, ..cpu.reg },
@@ -1212,6 +1214,7 @@ mod tests {
     pub fn test_rla_bit_seven_set() {
         let mut cpu = Cpu::new();
         cpu.reg.a = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
 
         let expected_cpu = Cpu {
             reg: Registers {
@@ -1249,9 +1252,14 @@ mod tests {
     pub fn test_rla_bit_seven_clear() {
         let mut cpu = Cpu::new();
         cpu.reg.a = 0x00;
+        cpu.reg.clear_flag(Flag::Carry);
 
         let expected_cpu = Cpu {
-            reg: Registers { a: 0x00, ..cpu.reg },
+            reg: Registers {
+                a: 0x00,
+                f: 0x00, // ____
+                ..cpu.reg
+            },
             ..cpu
         };
 
@@ -1506,6 +1514,7 @@ mod tests {
     pub fn test_jr_nz_n_not_zero() {
         let mut cpu = Cpu::new();
         cpu.reg.pc = 0xC000;
+        cpu.reg.clear_flag(Flag::Zero);
         let mut mmu = Memory::new();
         mmu.set_byte(0xC001 as usize, 0x02);
 
@@ -1525,6 +1534,7 @@ mod tests {
     pub fn test_jr_nz_n_not_zero_negative() {
         let mut cpu = Cpu::new();
         cpu.reg.pc = 0xC000;
+        cpu.reg.clear_flag(Flag::Zero);
         let mut mmu = Memory::new();
         mmu.set_byte(0xC001 as usize, 0xFE);
 
@@ -1720,6 +1730,7 @@ mod tests {
     pub fn test_inc_h() {
         let mut cpu = Cpu::new();
         cpu.reg.h = 0x02;
+        cpu.reg.clear_all_flags();
 
         let expected_cpu = Cpu {
             reg: Registers { h: 0x03, ..cpu.reg },
@@ -1819,6 +1830,7 @@ mod tests {
     pub fn test_jr_z_n_not_zero() {
         let mut cpu = Cpu::new();
         cpu.reg.pc = 0xC000;
+        cpu.reg.clear_flag(Flag::Zero);
         let mut mmu = Memory::new();
         mmu.set_byte(0xC001 as usize, 0x02);
 
@@ -1838,6 +1850,7 @@ mod tests {
     pub fn test_jr_z_n_not_zero_negative() {
         let mut cpu = Cpu::new();
         cpu.reg.pc = 0xC000;
+        cpu.reg.clear_flag(Flag::Zero);
         let mut mmu = Memory::new();
         mmu.set_byte(0xC001 as usize, 0xFE);
 
@@ -2279,6 +2292,7 @@ mod tests {
         cpu.reg.a = 0x01;
         cpu.reg.h = 0xC0;
         cpu.reg.l = 0x00;
+        cpu.reg.clear_all_flags();
         mmu.set_byte(0xC000 as usize, 0x02);
 
         let expected_cpu = Cpu {

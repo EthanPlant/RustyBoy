@@ -54,6 +54,7 @@ mod tests {
     fn test_rl_c_bit_seven() {
         let mut cpu = Cpu::new();
         cpu.reg.c = 0x80;
+        cpu.reg.clear_all_flags();
 
         let expected_cpu = Cpu {
             reg: Registers {
@@ -71,6 +72,7 @@ mod tests {
     fn test_rl_c_bit_seven_clear() {
         let mut cpu = Cpu::new();
         cpu.reg.c = 0x00;
+        cpu.reg.clear_all_flags();
 
         let expected_cpu = Cpu {
             reg: Registers {
