@@ -1,2 +1,2 @@
 [workspace]
-members = ["emu", "gblib"]
+members = ["rustyboy", "rustyboy-core"]
