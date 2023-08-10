@@ -5255,6 +5255,20 @@
 <a href="#5255" id="5255">5255</a>
 <a href="#5256" id="5256">5256</a>
 <a href="#5257" id="5257">5257</a>
+<a href="#5258" id="5258">5258</a>
+<a href="#5259" id="5259">5259</a>
+<a href="#5260" id="5260">5260</a>
+<a href="#5261" id="5261">5261</a>
+<a href="#5262" id="5262">5262</a>
+<a href="#5263" id="5263">5263</a>
+<a href="#5264" id="5264">5264</a>
+<a href="#5265" id="5265">5265</a>
+<a href="#5266" id="5266">5266</a>
+<a href="#5267" id="5267">5267</a>
+<a href="#5268" id="5268">5268</a>
+<a href="#5269" id="5269">5269</a>
+<a href="#5270" id="5270">5270</a>
+<a href="#5271" id="5271">5271</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::cpu::Cpu;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::instructions::{functions, Instruction, InstructionType, OpCode};
 <span class="kw">use </span><span class="kw">crate</span>::cpu::registers::Flag;
@@ -8122,7 +8136,12 @@
         mmu.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>usize, <span class="number">0x03</span>);
 
         <span class="kw">let </span>expected_cpu = Cpu {
-            reg: Registers { a: <span class="number">0x03</span>, h: <span class="number">0xC0</span>, l: <span class="number">0x01</span>, ..cpu.reg },
+            reg: Registers {
+                a: <span class="number">0x03</span>,
+                h: <span class="number">0xC0</span>,
+                l: <span class="number">0x01</span>,
+                ..cpu.reg
+            },
             ..cpu
         };
 
@@ -8140,7 +8159,12 @@
         mmu.set_byte(<span class="number">0xFFFF </span><span class="kw">as </span>usize, <span class="number">0x03</span>);
 
         <span class="kw">let </span>expected_cpu = Cpu {
-            reg: Registers { a: <span class="number">0x03</span>, h: <span class="number">0x00</span>, l: <span class="number">0x00</span>, ..cpu.reg },
+            reg: Registers {
+                a: <span class="number">0x03</span>,
+                h: <span class="number">0x00</span>,
+                l: <span class="number">0x00</span>,
+                ..cpu.reg
+            },
             ..cpu
         };
 
@@ -8157,7 +8181,12 @@
         mmu.set_byte(<span class="number">0xC0FF </span><span class="kw">as </span>usize, <span class="number">0x03</span>);
 
         <span class="kw">let </span>expected_cpu = Cpu {
-            reg: Registers { a: <span class="number">0x03</span>, h: <span class="number">0xC1</span>, l: <span class="number">0x00</span>, ..cpu.reg },
+            reg: Registers {
+                a: <span class="number">0x03</span>,
+                h: <span class="number">0xC1</span>,
+                l: <span class="number">0x00</span>,
+                ..cpu.reg
+            },
             ..cpu
         };
 
@@ -8356,7 +8385,7 @@
         (<span class="kw-2">&amp;</span>JR_NC_N.handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x30</span>));
         <span class="macro">assert_eq!</span>(cpu, expected_cpu);
     }
-    
+
     <span class="attr">#[test]
     </span><span class="kw">pub fn </span>test_jr_nc_n_carry_negative() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
@@ -8443,7 +8472,6 @@
         (<span class="kw-2">&amp;</span>LD_SP_NN.handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x31</span>));
         <span class="macro">assert_eq!</span>(cpu, expected_cpu);
     }
-    
 
     <span class="attr">#[test]
     </span><span class="kw">pub fn </span>test_get_instruction_ld_hl_dec_a() {
@@ -8691,7 +8719,7 @@
 
         (<span class="kw-2">&amp;</span>LD_C_HL.handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0x4E</span>));
         <span class="macro">assert_eq!</span>(cpu, expected_cpu);
-    }   
+    }
 
     <span class="attr">#[test]
     </span><span class="kw">pub fn </span>test_get_instruction_ld_c_a() {
@@ -10177,7 +10205,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.a = <span class="number">0x01</span>;
         cpu.reg.pc = <span class="number">0xC000</span>;
-        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x01</span>);      
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x01</span>);
 
         <span class="kw">let </span>expected_cpu = Cpu {
             reg: Registers {
@@ -10198,7 +10226,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.a = <span class="number">0x00</span>;
         cpu.reg.pc = <span class="number">0xC000</span>;
-        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x01</span>);     
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x01</span>);
 
         <span class="kw">let </span>expected_cpu = Cpu {
             reg: Registers {
@@ -10253,7 +10281,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.a = <span class="number">0x01</span>;
         cpu.reg.pc = <span class="number">0xC000</span>;
-        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x02</span>);      
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x02</span>);
 
         <span class="kw">let </span>expected_cpu = Cpu {
             reg: Registers {
@@ -10274,7 +10302,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         cpu.reg.a = <span class="number">0x01</span>;
         cpu.reg.pc = <span class="number">0xC000</span>;
-        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x01</span>);     
+        mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x01</span>);
 
         <span class="kw">let </span>expected_cpu = Cpu {
             reg: Registers {

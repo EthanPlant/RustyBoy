@@ -433,38 +433,66 @@
 <a href="#433" id="433">433</a>
 <a href="#434" id="434">434</a>
 <a href="#435" id="435">435</a>
+<a href="#436" id="436">436</a>
+<a href="#437" id="437">437</a>
+<a href="#438" id="438">438</a>
+<a href="#439" id="439">439</a>
+<a href="#440" id="440">440</a>
+<a href="#441" id="441">441</a>
+<a href="#442" id="442">442</a>
+<a href="#443" id="443">443</a>
+<a href="#444" id="444">444</a>
+<a href="#445" id="445">445</a>
+<a href="#446" id="446">446</a>
+<a href="#447" id="447">447</a>
+<a href="#448" id="448">448</a>
+<a href="#449" id="449">449</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cartridge::Cartridge;
 
 <span class="kw">const </span>ROM_START: usize = <span class="number">0x0000</span>;
 <span class="kw">const </span>ROM_END: usize = <span class="number">0x7FFF</span>;
+
 <span class="kw">const </span>VRAM_START: usize = <span class="number">0x8000</span>;
 <span class="kw">const </span>VRAM_END: usize = <span class="number">0x9FFF</span>;
+<span class="kw">const </span>VRAM_SIZE: usize = VRAM_END - VRAM_START + <span class="number">1</span>;
+
 <span class="kw">const </span>CART_RAM_START: usize = <span class="number">0xA000</span>;
 <span class="kw">const </span>CART_RAM_END: usize = <span class="number">0xBFFF</span>;
+
 <span class="kw">const </span>WRAM_START: usize = <span class="number">0xC000</span>;
 <span class="kw">const </span>WRAM_END: usize = <span class="number">0xDFFF</span>;
+<span class="kw">const </span>WRAM_SIZE: usize = WRAM_END - WRAM_START + <span class="number">1</span>;
+
 <span class="kw">const </span>ECHO_RAM_START: usize = <span class="number">0xE000</span>;
 <span class="kw">const </span>ECHO_RAM_END: usize = <span class="number">0xFDFF</span>;
+
 <span class="kw">const </span>OAM_START: usize = <span class="number">0xFE00</span>;
 <span class="kw">const </span>OAM_END: usize = <span class="number">0xFE9F</span>;
+<span class="kw">const </span>OAM_SIZE: usize = OAM_END - OAM_START + <span class="number">1</span>;
+
 <span class="kw">const </span>UNUSED_START: usize = <span class="number">0xFEA0</span>;
 <span class="kw">const </span>UNUSED_END: usize = <span class="number">0xFEFF</span>;
+
 <span class="comment">// TODO Proper memory mapped IO
 </span><span class="kw">const </span>IO_START: usize = <span class="number">0xFF00</span>;
 <span class="kw">const </span>IO_END: usize = <span class="number">0xFF7F</span>;
+<span class="kw">const </span>IO_SIZE: usize = IO_END - IO_START + <span class="number">1</span>;
+
 <span class="kw">const </span>HRAM_START: usize = <span class="number">0xFF80</span>;
 <span class="kw">const </span>HRAM_END: usize = <span class="number">0xFFFE</span>;
+<span class="kw">const </span>HRAM_SIZE: usize = HRAM_END - HRAM_START + <span class="number">1</span>;
+
 <span class="kw">const </span>IE: usize = <span class="number">0xFFFF</span>;
 
 <span class="doccomment">/// The MMU (Memory Management Unit) is responsible for managing the gameboy&#39;s memory
 </span><span class="kw">pub struct </span>Memory {
     <span class="doccomment">/// The cartridge&#39;s data
     </span>cart: Cartridge,
-    vram: [u8; VRAM_END - VRAM_START],
-    wram: [u8; WRAM_END - WRAM_START],
-    oam: [u8; OAM_END - OAM_START],
-    io: [u8; IO_END - IO_START],
-    hram: [u8; HRAM_END - HRAM_START],
+    vram: [u8; VRAM_SIZE],
+    wram: [u8; WRAM_SIZE],
+    oam: [u8; OAM_SIZE],
+    io: [u8; IO_SIZE],
+    hram: [u8; HRAM_SIZE],
 }
 
 <span class="kw">impl </span>Memory {
@@ -472,11 +500,11 @@
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         Memory {
             cart: Cartridge::new(),
-            vram: [<span class="number">0xFF</span>; VRAM_END - VRAM_START],
-            wram: [<span class="number">0xFF</span>; WRAM_END - WRAM_START],
-            oam: [<span class="number">0xFF</span>; OAM_END - OAM_START],
-            io: [<span class="number">0xFF</span>; IO_END - IO_START],
-            hram: [<span class="number">0xFF</span>; HRAM_END - HRAM_START],
+            vram: [<span class="number">0xFF</span>; VRAM_SIZE],
+            wram: [<span class="number">0xFF</span>; WRAM_SIZE],
+            oam: [<span class="number">0xFF</span>; OAM_SIZE],
+            io: [<span class="number">0xFF</span>; IO_SIZE],
+            hram: [<span class="number">0xFF</span>; HRAM_SIZE],
         }
     }
 
@@ -487,11 +515,11 @@
         io[<span class="number">0x44</span>] = <span class="number">0x90</span>; <span class="comment">// Stub LY to 0x90 (144) to simulate VBlank
         </span>Memory {
             cart: cart,
-            vram: [<span class="number">0xFF</span>; VRAM_END - VRAM_START],
-            wram: [<span class="number">0xFF</span>; WRAM_END - WRAM_START],
-            oam: [<span class="number">0xFF</span>; OAM_END - OAM_START],
-            io: [<span class="number">0xFF</span>; IO_END - IO_START],
-            hram: [<span class="number">0xFF</span>; HRAM_END - HRAM_START],
+            vram: [<span class="number">0xFF</span>; VRAM_SIZE],
+            wram: [<span class="number">0xFF</span>; WRAM_SIZE],
+            oam: [<span class="number">0xFF</span>; OAM_SIZE],
+            io: [<span class="number">0xFF</span>; IO_SIZE],
+            hram: [<span class="number">0xFF</span>; HRAM_SIZE],
         }
     }
 
