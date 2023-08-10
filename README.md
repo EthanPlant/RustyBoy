@@ -5,8 +5,8 @@
 
 A Gameboy emulator written in Rust. It is currently WIP. The end goal at the moment is to get the first generation Pokemon games playable. This project was mostly written for fun and as a learning opportunity and so an emphasis is placed on clean code and usability over cycle accuracy. 
 
-## Running RustyGB
-`./rustygb --rom <ROM>`
+## Running RustyBoy
+`./rustyboy --rom <ROM>`
 
 ## Project Structure
 RustyBoy is split up into two seperate Rust crates in order to keep the emulator itself seperate from any frontend implementation. All code pertaining to the emulation itself is found in `rustboy-core`, while the frontend is contained within `rustyboy`.
