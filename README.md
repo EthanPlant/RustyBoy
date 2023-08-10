@@ -1,7 +1,7 @@
 # RustyBoy
 
-[![codecov](https://codecov.io/gh/EthanPlant/Rusty-GB/branch/main/graph/badge.svg?token=AXDXVSM1SA)](https://codecov.io/gh/EthanPlant/Rusty-GB)
-![Tests](https://github.com/EthanPlant/Rusty-GB/actions/workflows/test.yml/badge.svg)
+[![codecov](https://codecov.io/gh/EthanPlant/RustyBoy/branch/main/graph/badge.svg?token=AXDXVSM1SA)](https://codecov.io/gh/EthanPlant/RustyBoy)
+![Tests](https://github.com/EthanPlant/RustyBoy/actions/workflows/test.yml/badge.svg)
 
 A Gameboy emulator written in Rust. It is currently WIP. The end goal at the moment is to get the first generation Pokemon games playable. This project was mostly written for fun and as a learning opportunity and so an emphasis is placed on clean code and usability over cycle accuracy. 
 
