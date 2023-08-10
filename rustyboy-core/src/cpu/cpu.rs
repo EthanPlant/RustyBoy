@@ -20,6 +20,9 @@ impl Cpu {
 
     /// Step through the emulator
     pub fn step(&mut self, mmu: &mut Memory) {
+        log::trace!("A:{:02X} F:{:02X} B:{:02X} C:{:02X} D:{:02X} E:{:02X} H:{:02X} L:{:02X} SP:{:02X} PC: {:04X} ({:02X} {:02X} {:02X} {:02X})",
+        self.reg.a, self.reg.f, self.reg.b, self.reg.c, self.reg.d, self.reg.e, self.reg.h, self.reg.l, self.reg.sp, self.reg.pc, mmu.get_byte(self.reg.pc), mmu.get_byte(self.reg.pc + 1), mmu.get_byte(self.reg.pc + 2), mmu.get_byte(self.reg.pc + 3));
+
         let op_code = self.read_opcode(mmu);
 
         let instruction = match instructions::get_instruction_by_opcode(&op_code) {
@@ -37,11 +40,11 @@ impl Cpu {
                 };
             }
         };
+        log::trace!("Executing instruction: {}", instruction.description);
 
-        println!("A: {:02X} F: {:02X} B: {:02X} C: {:02X} D: {:02X} E: {:02X} H: {:02X} L: {:02X} SP: {:02X} PC: 00:{:04X} ({:02X} {:02X} {:02X} {:02X})",
-        self.reg.a, self.reg.f, self.reg.b, self.reg.c, self.reg.d, self.reg.e, self.reg.h, self.reg.l, self.reg.sp, self.reg.pc, mmu.get_byte(self.reg.pc), mmu.get_byte(self.reg.pc + 1), mmu.get_byte(self.reg.pc + 2), mmu.get_byte(self.reg.pc + 3));
-
-        self.execute_instruction(mmu, instruction, &op_code)
+        self.execute_instruction(mmu, instruction, &op_code);
+        // Add spacing between this and the next instruction
+        println!();
     }
 
     /// Execute an instruction

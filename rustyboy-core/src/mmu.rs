@@ -91,13 +91,16 @@ impl Memory {
     /// Writes a byte to the memory address space
     pub fn set_byte<T: Into<usize>>(&mut self, addr: T, v: u8) {
         let addr = addr.into();
-        log::trace!("Writing {:02X} to {:04X}, replacing {:02X}", v, addr, self.get_byte(addr));
+        log::trace!(
+            "Writing {:02X} to {:04X}, replacing {:02X}",
+            v,
+            addr,
+            self.get_byte(addr)
+        );
         match addr {
             ROM_START..=ROM_END => self.cart.write_byte_to_rom(addr, v),
             VRAM_START..=VRAM_END => self.vram[addr - VRAM_START] = v,
-            CART_RAM_START..=CART_RAM_END => {
-                self.cart.write_byte_to_ram(addr - CART_RAM_START, v)
-            }
+            CART_RAM_START..=CART_RAM_END => self.cart.write_byte_to_ram(addr - CART_RAM_START, v),
             WRAM_START..=WRAM_END => self.wram[addr - WRAM_START] = v,
             ECHO_RAM_START..=ECHO_RAM_END => {
                 log::warn!("Attempted prohibited write to echo RAM {}", addr);

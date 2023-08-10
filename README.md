@@ -14,6 +14,11 @@ RustyBoy is split up into two seperate Rust crates in order to keep the emulator
 ## Tests
 RustyBoy is developed with a comprehensive test suite to ensure correctness and avoid regression. These tests are ran on every commit, and can be ran automaticall with `cargo test`
 
+## Logging
+RustyBoy uses `env-logger` to output logs. By default `INFO`, `WARN`, and `ERROR` logs will be shown. The `RUST_LOG` environment variable can be set to modify the log level.
+
+Setting `RUST_LOG` to `trace` will cause RustyBoy to output all logs (this will flood the console with a lot of text), setting `RUST_LOG` to `off` can be used to disable logging entirely if desired. For more information on possible log settings see the [env-logger](https://docs.rs/env_logger/latest/env_logger/#enabling-logging) documentation.
+
 ## Building
 After cloning the repository, simply run `cargo build` in the workspace directory.
 

@@ -226,11 +226,11 @@ impl Cartridge {
         let ram_size = RamSize::try_from(rom[RAM_SIZE_ADDR as usize]).unwrap();
         let ram = vec![0; ram_size as usize];
 
-        println!("Loaded ROM from {}", rom_name);
-        println!("Title: {}", Self::get_title(&rom));
-        println!("Cartridge Type: {}", cart_type);
-        println!("ROM Size: {}", rom_size);
-        println!("RAM Size: {}", ram_size);
+        log::info!("Loaded ROM from {}", rom_name);
+        log::debug!("Title: {}", Self::get_title(&rom));
+        log::debug!("Cartridge Type: {}", cart_type);
+        log::debug!("ROM Size: {}", rom_size);
+        log::debug!("RAM Size: {}\n", ram_size);
 
         // Temporarily need to disable this check to get blargg tests to boot
         // if cart_type != CartridgeType::RomOnly {
@@ -252,7 +252,11 @@ impl Cartridge {
 
     /// Write a byte to the ROM
     pub fn write_byte_to_rom(&mut self, addr: usize, v: u8) {
-        log::warn!("Attempted write to ROM at {:04X} with value {:02X}", addr, v);
+        log::warn!(
+            "Attempted write to ROM at {:04X} with value {:02X}",
+            addr,
+            v
+        );
     }
 
     /// Write a byte to the RAM
