@@ -25,7 +25,8 @@ After cloning the repository, simply run `cargo build` in the workspace director
     - [ ] Pass the boot ROM
     - [ ] Pass all Blargg test ROMs
 - [ ] Memory
-    - [ ] Proper memory map
+    - [x] Proper memory map
+    - [ ] Memory mapped IO
     - [ ] OAM DMA
 - [ ] Timer
 - [ ] Cartridges

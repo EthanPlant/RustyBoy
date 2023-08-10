@@ -214,7 +214,7 @@ impl Cartridge {
     pub fn new() -> Self {
         Cartridge {
             rom: vec![0xFF; 0x8000],
-            ram: vec![],
+            ram: vec![0xFF; 0x2000],
         }
     }
 
@@ -245,11 +245,19 @@ impl Cartridge {
         self.rom[addr]
     }
 
-    /// Read a word from the ROM
-    pub fn read_word_from_rom(&self, addr: usize) -> u16 {
-        let low = self.rom[addr];
-        let high = self.rom[addr + 1];
-        ((high as u16) << 8) | (low as u16)
+    /// Read a byte from the RAM
+    pub fn read_byte_from_ram(&self, addr: usize) -> u8 {
+        self.ram[addr]
+    }
+
+    /// Write a byte to the ROM
+    pub fn write_byte_to_rom(&mut self, addr: usize, v: u8) {
+        log::warn!("Attempted write to ROM at {:04X} with value {:02X}", addr, v);
+    }
+
+    /// Write a byte to the RAM
+    pub fn write_byte_to_ram(&mut self, addr: usize, v: u8) {
+        self.ram[addr] = v;
     }
 
     /// Get the title of the ROM from the header
@@ -274,7 +282,7 @@ mod tests {
     fn test_new() {
         let cart = Cartridge::new();
         assert_eq!(cart.rom.len(), 0x8000);
-        assert_eq!(cart.ram.len(), 0);
+        assert_eq!(cart.ram.len(), 0x2000);
     }
 
     #[test]
@@ -286,13 +294,31 @@ mod tests {
 
     #[test]
     fn test_read_byte_from_rom() {
-        let cart = Cartridge::new_from_rom("resources/test-rom.gb");
+        let mut cart = Cartridge::new();
+        cart.rom[0x0101] = 0xC3;
         assert_eq!(cart.read_byte_from_rom(0x0101), 0xC3);
     }
 
     #[test]
-    fn test_read_word_from_rom() {
-        let cart = Cartridge::new_from_rom("resources/test-rom.gb");
-        assert_eq!(cart.read_word_from_rom(0x0100), 0xC300);
+    fn test_read_byte_from_ram() {
+        let mut cart = Cartridge::new();
+        cart.ram = vec![0x01];
+        assert_eq!(cart.read_byte_from_ram(0x0000), 0x01);
+    }
+
+    #[test]
+    fn test_write_byte_to_rom() {
+        let mut cart = Cartridge::new();
+        cart.rom[0x0101] = 0xC3;
+        cart.write_byte_to_rom(0x0101, 0x00);
+        assert_eq!(cart.read_byte_from_rom(0x0101), 0xC3);
+    }
+
+    #[test]
+    fn test_write_byte_to_ram() {
+        let mut cart = Cartridge::new();
+        cart.ram = vec![0x00];
+        cart.write_byte_to_ram(0x0000, 0x01);
+        assert_eq!(cart.read_byte_from_ram(0x0000), 0x01);
     }
 }
