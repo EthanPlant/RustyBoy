@@ -322,6 +322,10 @@
 <a href="#322" id="322">322</a>
 <a href="#323" id="323">323</a>
 <a href="#324" id="324">324</a>
+<a href="#325" id="325">325</a>
+<a href="#326" id="326">326</a>
+<a href="#327" id="327">327</a>
+<a href="#328" id="328">328</a>
 </pre></div><pre class="rust"><code><span class="kw">const </span>TITLE_START_ADDR: u16 = <span class="number">0x0134</span>;
 <span class="kw">const </span>TITLE_END_ADDR: u16 = <span class="number">0x0143</span>;
 <span class="kw">const </span>CART_TYPE_ADDR: u16 = <span class="number">0x0147</span>;
@@ -550,11 +554,11 @@
         <span class="kw">let </span>ram_size = RamSize::try_from(rom[RAM_SIZE_ADDR <span class="kw">as </span>usize]).unwrap();
         <span class="kw">let </span>ram = <span class="macro">vec!</span>[<span class="number">0</span>; ram_size <span class="kw">as </span>usize];
 
-        <span class="macro">println!</span>(<span class="string">&quot;Loaded ROM from {}&quot;</span>, rom_name);
-        <span class="macro">println!</span>(<span class="string">&quot;Title: {}&quot;</span>, <span class="self">Self</span>::get_title(<span class="kw-2">&amp;</span>rom));
-        <span class="macro">println!</span>(<span class="string">&quot;Cartridge Type: {}&quot;</span>, cart_type);
-        <span class="macro">println!</span>(<span class="string">&quot;ROM Size: {}&quot;</span>, rom_size);
-        <span class="macro">println!</span>(<span class="string">&quot;RAM Size: {}&quot;</span>, ram_size);
+        <span class="macro">log::info!</span>(<span class="string">&quot;Loaded ROM from {}&quot;</span>, rom_name);
+        <span class="macro">log::debug!</span>(<span class="string">&quot;Title: {}&quot;</span>, <span class="self">Self</span>::get_title(<span class="kw-2">&amp;</span>rom));
+        <span class="macro">log::debug!</span>(<span class="string">&quot;Cartridge Type: {}&quot;</span>, cart_type);
+        <span class="macro">log::debug!</span>(<span class="string">&quot;ROM Size: {}&quot;</span>, rom_size);
+        <span class="macro">log::debug!</span>(<span class="string">&quot;RAM Size: {}\n&quot;</span>, ram_size);
 
         <span class="comment">// Temporarily need to disable this check to get blargg tests to boot
         // if cart_type != CartridgeType::RomOnly {
@@ -576,7 +580,11 @@
 
     <span class="doccomment">/// Write a byte to the ROM
     </span><span class="kw">pub fn </span>write_byte_to_rom(<span class="kw-2">&amp;mut </span><span class="self">self</span>, addr: usize, v: u8) {
-        <span class="macro">log::warn!</span>(<span class="string">&quot;Attempted write to ROM at {:04X} with value {:02X}&quot;</span>, addr, v);
+        <span class="macro">log::warn!</span>(
+            <span class="string">&quot;Attempted write to ROM at {:04X} with value {:02X}&quot;</span>,
+            addr,
+            v
+        );
     }
 
     <span class="doccomment">/// Write a byte to the RAM

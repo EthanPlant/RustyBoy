@@ -423,6 +423,9 @@
 <a href="#423" id="423">423</a>
 <a href="#424" id="424">424</a>
 <a href="#425" id="425">425</a>
+<a href="#426" id="426">426</a>
+<a href="#427" id="427">427</a>
+<a href="#428" id="428">428</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cartridge::Cartridge;
 
 <span class="kw">const </span>ROM_START: usize = <span class="number">0x0000</span>;
@@ -516,13 +519,16 @@
     <span class="doccomment">/// Writes a byte to the memory address space
     </span><span class="kw">pub fn </span>set_byte&lt;T: Into&lt;usize&gt;&gt;(<span class="kw-2">&amp;mut </span><span class="self">self</span>, addr: T, v: u8) {
         <span class="kw">let </span>addr = addr.into();
-        <span class="macro">log::trace!</span>(<span class="string">&quot;Writing {:02X} to {:04X}, replacing {:02X}&quot;</span>, v, addr, <span class="self">self</span>.get_byte(addr));
+        <span class="macro">log::trace!</span>(
+            <span class="string">&quot;Writing {:02X} to {:04X}, replacing {:02X}&quot;</span>,
+            v,
+            addr,
+            <span class="self">self</span>.get_byte(addr)
+        );
         <span class="kw">match </span>addr {
             ROM_START..=ROM_END =&gt; <span class="self">self</span>.cart.write_byte_to_rom(addr, v),
             VRAM_START..=VRAM_END =&gt; <span class="self">self</span>.vram[addr - VRAM_START] = v,
-            CART_RAM_START..=CART_RAM_END =&gt; {
-                <span class="self">self</span>.cart.write_byte_to_ram(addr - CART_RAM_START, v)
-            }
+            CART_RAM_START..=CART_RAM_END =&gt; <span class="self">self</span>.cart.write_byte_to_ram(addr - CART_RAM_START, v),
             WRAM_START..=WRAM_END =&gt; <span class="self">self</span>.wram[addr - WRAM_START] = v,
             ECHO_RAM_START..=ECHO_RAM_END =&gt; {
                 <span class="macro">log::warn!</span>(<span class="string">&quot;Attempted prohibited write to echo RAM {}&quot;</span>, addr);

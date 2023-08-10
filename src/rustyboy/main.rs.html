@@ -16,7 +16,13 @@
 <a href="#16" id="16">16</a>
 <a href="#17" id="17">17</a>
 <a href="#18" id="18">18</a>
+<a href="#19" id="19">19</a>
+<a href="#20" id="20">20</a>
+<a href="#21" id="21">21</a>
+<a href="#22" id="22">22</a>
+<a href="#23" id="23">23</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>clap::Parser;
+<span class="kw">use </span>env_logger::Env;
 
 <span class="kw">use </span>rustyboy_core::gameboy::Gameboy;
 
@@ -29,6 +35,10 @@
 
 <span class="kw">fn </span>main() {
     <span class="kw">let </span>args = Args::parse();
+
+    <span class="comment">// If no log level is specified, default to info or above
+    </span>env_logger::Builder::from_env(Env::default().default_filter_or(<span class="string">&quot;info&quot;</span>)).init();
+
     <span class="kw">let </span><span class="kw-2">mut </span>gb = Gameboy::new(<span class="kw-2">&amp;</span>args.rom);
     <span class="kw">loop </span>{
         gb.step();

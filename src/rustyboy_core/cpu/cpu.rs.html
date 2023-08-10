@@ -181,6 +181,9 @@
 <a href="#181" id="181">181</a>
 <a href="#182" id="182">182</a>
 <a href="#183" id="183">183</a>
+<a href="#184" id="184">184</a>
+<a href="#185" id="185">185</a>
+<a href="#186" id="186">186</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::instructions;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::instructions::{Instruction, InstructionType, OpCode};
 <span class="kw">use </span><span class="kw">crate</span>::cpu::registers::Registers;
@@ -203,6 +206,9 @@
 
     <span class="doccomment">/// Step through the emulator
     </span><span class="kw">pub fn </span>step(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mmu: <span class="kw-2">&amp;mut </span>Memory) {
+        <span class="macro">log::trace!</span>(<span class="string">&quot;A:{:02X} F:{:02X} B:{:02X} C:{:02X} D:{:02X} E:{:02X} H:{:02X} L:{:02X} SP:{:02X} PC: {:04X} ({:02X} {:02X} {:02X} {:02X})&quot;</span>,
+        <span class="self">self</span>.reg.a, <span class="self">self</span>.reg.f, <span class="self">self</span>.reg.b, <span class="self">self</span>.reg.c, <span class="self">self</span>.reg.d, <span class="self">self</span>.reg.e, <span class="self">self</span>.reg.h, <span class="self">self</span>.reg.l, <span class="self">self</span>.reg.sp, <span class="self">self</span>.reg.pc, mmu.get_byte(<span class="self">self</span>.reg.pc), mmu.get_byte(<span class="self">self</span>.reg.pc + <span class="number">1</span>), mmu.get_byte(<span class="self">self</span>.reg.pc + <span class="number">2</span>), mmu.get_byte(<span class="self">self</span>.reg.pc + <span class="number">3</span>));
+
         <span class="kw">let </span>op_code = <span class="self">self</span>.read_opcode(mmu);
 
         <span class="kw">let </span>instruction = <span class="kw">match </span>instructions::get_instruction_by_opcode(<span class="kw-2">&amp;</span>op_code) {
@@ -220,11 +226,11 @@
                 };
             }
         };
+        <span class="macro">log::trace!</span>(<span class="string">&quot;Executing instruction: {}&quot;</span>, instruction.description);
 
-        <span class="macro">println!</span>(<span class="string">&quot;A: {:02X} F: {:02X} B: {:02X} C: {:02X} D: {:02X} E: {:02X} H: {:02X} L: {:02X} SP: {:02X} PC: 00:{:04X} ({:02X} {:02X} {:02X} {:02X})&quot;</span>,
-        <span class="self">self</span>.reg.a, <span class="self">self</span>.reg.f, <span class="self">self</span>.reg.b, <span class="self">self</span>.reg.c, <span class="self">self</span>.reg.d, <span class="self">self</span>.reg.e, <span class="self">self</span>.reg.h, <span class="self">self</span>.reg.l, <span class="self">self</span>.reg.sp, <span class="self">self</span>.reg.pc, mmu.get_byte(<span class="self">self</span>.reg.pc), mmu.get_byte(<span class="self">self</span>.reg.pc + <span class="number">1</span>), mmu.get_byte(<span class="self">self</span>.reg.pc + <span class="number">2</span>), mmu.get_byte(<span class="self">self</span>.reg.pc + <span class="number">3</span>));
-
-        <span class="self">self</span>.execute_instruction(mmu, instruction, <span class="kw-2">&amp;</span>op_code)
+        <span class="self">self</span>.execute_instruction(mmu, instruction, <span class="kw-2">&amp;</span>op_code);
+        <span class="comment">// Add spacing between this and the next instruction
+        </span><span class="macro">println!</span>();
     }
 
     <span class="doccomment">/// Execute an instruction
