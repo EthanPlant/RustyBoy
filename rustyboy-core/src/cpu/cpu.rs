@@ -4,7 +4,7 @@ use crate::cpu::registers::Registers;
 use crate::mmu::Memory;
 
 /// Emulation of the Gameboy CPU
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Cpu {
     /// The CPU registers
     pub reg: Registers,

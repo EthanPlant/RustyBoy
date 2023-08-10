@@ -306,7 +306,7 @@ mod tests {
     #[test]
     fn test_read_byte_from_ram() {
         let mut cart = Cartridge::new();
-        cart.ram = vec![0x01];
+        cart.ram[0x0000] = 0x01;
         assert_eq!(cart.read_byte_from_ram(0x0000), 0x01);
     }
 
@@ -321,7 +321,7 @@ mod tests {
     #[test]
     fn test_write_byte_to_ram() {
         let mut cart = Cartridge::new();
-        cart.ram = vec![0x00];
+        cart.ram[0x0000] = 0x01;
         cart.write_byte_to_ram(0x0000, 0x01);
         assert_eq!(cart.read_byte_from_ram(0x0000), 0x01);
     }

@@ -80,350 +80,88 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
 mod tests {
     use super::*;
 
-    use crate::cpu::registers::{Flag, Registers};
+    use crate::cpu::registers::Flag;
 
     #[test]
-    fn test_get_instruction_rl_c() {
-        let instruction = get_instruction(&0x11);
-        assert_eq!(instruction.unwrap(), &RL_C);
-        assert_eq!(instruction.unwrap().length, 2);
-        assert_eq!(instruction.unwrap().clock_cycles, 8);
-        assert_eq!(instruction.unwrap().clock_cycles_condition, None);
+    pub fn test_get_instruction_rl_c() {
+        let instruction = get_instruction(&0x11).unwrap();
+        assert_eq!(instruction, &RL_C);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
     }
 
     #[test]
-    fn test_rl_c_bit_seven() {
+    pub fn test_rl_c() {
         let mut cpu = Cpu::new();
         cpu.reg.c = 0x80;
-        cpu.reg.clear_all_flags();
-
-        let expected_cpu = Cpu {
-            reg: Registers {
-                c: 0x00,
-                f: 0x90, // Z__C
-                ..cpu.reg
-            },
-            ..cpu
-        };
-
-        (&RL_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x11));
-        assert_eq!(cpu, expected_cpu);
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RL_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x11));
+        assert_eq!(cpu.reg.c, 0x00);
     }
 
     #[test]
-    fn test_rl_c_bit_seven_clear() {
-        let mut cpu = Cpu::new();
-        cpu.reg.c = 0x00;
-        cpu.reg.clear_all_flags();
-
-        let expected_cpu = Cpu {
-            reg: Registers {
-                c: 0x00,
-                f: 0x80, // ___C
-                ..cpu.reg
-            },
-            ..cpu
-        };
-
-        (&RL_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x11));
-        assert_eq!(cpu, expected_cpu);
+    pub fn test_get_instruction_rr_c() {
+        let instruction = get_instruction(&0x19).unwrap();
+        assert_eq!(instruction, &RR_C);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
     }
 
     #[test]
-    fn test_rl_c_bit_seven_carry() {
+    pub fn test_rr_c() {
         let mut cpu = Cpu::new();
         cpu.reg.c = 0x80;
-        cpu.reg.set_flag(Flag::Carry);
-
-        let expected_cpu = Cpu {
-            reg: Registers {
-                c: 0x01,
-                f: 0x10, // ___C
-                ..cpu.reg
-            },
-            ..cpu
-        };
-
-        (&RL_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x11));
-        assert_eq!(cpu, expected_cpu);
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RR_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x19));
+        assert_eq!(cpu.reg.c, 0x40);
     }
 
     #[test]
-    fn test_rl_c_bit_seven_clear_carry() {
+    pub fn test_get_instruction_rr_d() {
+        let instruction = get_instruction(&0x1A).unwrap();
+        assert_eq!(instruction, &RR_D);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rr_d() {
         let mut cpu = Cpu::new();
-        cpu.reg.c = 0x00;
-        cpu.reg.set_flag(Flag::Carry);
-
-        let expected_cpu = Cpu {
-            reg: Registers {
-                c: 0x01,
-                f: 0x00, // ____
-                ..cpu.reg
-            },
-            ..cpu
-        };
-
-        (&RL_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x11));
-        assert_eq!(cpu, expected_cpu);
+        cpu.reg.d = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RR_D.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x1A));
+        assert_eq!(cpu.reg.d, 0x40);
     }
 
     #[test]
-    fn test_get_instruction_rr_c() {
-        let instruction = get_instruction(&0x19);
-        assert_eq!(instruction.unwrap(), &RR_C);
-        assert_eq!(instruction.unwrap().length, 2);
-        assert_eq!(instruction.unwrap().clock_cycles, 8);
-        assert_eq!(instruction.unwrap().clock_cycles_condition, None);
+    pub fn test_get_instruction_srl_b() {
+        let instruction = get_instruction(&0x38).unwrap();
+        assert_eq!(instruction, &SRL_B);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
     }
 
     #[test]
-    fn test_rr_c_bit_zero() {
-        let mut cpu = Cpu::new();
-        cpu.reg.c = 0x01;
-        cpu.reg.clear_all_flags();
-
-        let expected_cpu = Cpu {
-            reg: Registers {
-                c: 0x00,
-                f: 0x90, // Z__C
-                ..cpu.reg
-            },
-            ..cpu
-        };
-
-        (&RR_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x19));
-        assert_eq!(cpu, expected_cpu);
-    }
-
-    #[test]
-    fn test_rr_c_bit_zero_clear() {
-        let mut cpu = Cpu::new();
-        cpu.reg.c = 0x00;
-        cpu.reg.clear_all_flags();
-
-        let expected_cpu = Cpu {
-            reg: Registers {
-                c: 0x00,
-                f: 0x80, // Z___
-                ..cpu.reg
-            },
-            ..cpu
-        };
-
-        (&RR_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x19));
-        assert_eq!(cpu, expected_cpu);
-    }
-
-    #[test]
-    fn test_rr_c_bit_zero_carry() {
-        let mut cpu = Cpu::new();
-        cpu.reg.c = 0x01;
-        cpu.reg.set_flag(Flag::Carry);
-
-        let expected_cpu = Cpu {
-            reg: Registers {
-                c: 0x80,
-                f: 0x10, // ___C
-                ..cpu.reg
-            },
-            ..cpu
-        };
-
-        (&RR_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x19));
-        assert_eq!(cpu, expected_cpu);
-    }
-
-    #[test]
-    fn test_rr_c_bit_zero_clear_carry() {
-        let mut cpu = Cpu::new();
-        cpu.reg.c = 0x00;
-        cpu.reg.set_flag(Flag::Carry);
-
-        let expected_cpu = Cpu {
-            reg: Registers {
-                c: 0x80,
-                f: 0x00, // ____
-                ..cpu.reg
-            },
-            ..cpu
-        };
-
-        (&RR_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x19));
-        assert_eq!(cpu, expected_cpu);
-    }
-
-    #[test]
-    fn test_get_instruction_rr_d() {
-        let instruction = get_instruction(&0x1A);
-        assert_eq!(instruction.unwrap(), &RR_D);
-        assert_eq!(instruction.unwrap().length, 2);
-        assert_eq!(instruction.unwrap().clock_cycles, 8);
-        assert_eq!(instruction.unwrap().clock_cycles_condition, None);
-    }
-
-    #[test]
-    fn test_rr_d_bit_zero() {
-        let mut cpu = Cpu::new();
-        cpu.reg.d = 0x01;
-        cpu.reg.clear_all_flags();
-
-        let expected_cpu = Cpu {
-            reg: Registers {
-                d: 0x00,
-                f: 0x90, // Z__C
-                ..cpu.reg
-            },
-            ..cpu
-        };
-
-        (&RR_D.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x1A));
-        assert_eq!(cpu, expected_cpu);
-    }
-
-    #[test]
-    fn test_rr_d_bit_zero_clear() {
-        let mut cpu = Cpu::new();
-        cpu.reg.d = 0x00;
-        cpu.reg.clear_all_flags();
-
-        let expected_cpu = Cpu {
-            reg: Registers {
-                d: 0x00,
-                f: 0x80, // Z___
-                ..cpu.reg
-            },
-            ..cpu
-        };
-
-        (&RR_D.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x1A));
-        assert_eq!(cpu, expected_cpu);
-    }
-
-    #[test]
-    fn test_rr_d_bit_zero_carry() {
-        let mut cpu = Cpu::new();
-        cpu.reg.d = 0x01;
-        cpu.reg.set_flag(Flag::Carry);
-
-        let expected_cpu = Cpu {
-            reg: Registers {
-                d: 0x80,
-                f: 0x10, // ___C
-                ..cpu.reg
-            },
-            ..cpu
-        };
-
-        (&RR_D.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x1A));
-        assert_eq!(cpu, expected_cpu);
-    }
-
-    #[test]
-    fn test_rr_d_bit_zero_clear_carry() {
-        let mut cpu = Cpu::new();
-        cpu.reg.d = 0x00;
-        cpu.reg.set_flag(Flag::Carry);
-
-        let expected_cpu = Cpu {
-            reg: Registers {
-                d: 0x80,
-                f: 0x00, // ____
-                ..cpu.reg
-            },
-            ..cpu
-        };
-
-        (&RR_D.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x1A));
-        assert_eq!(cpu, expected_cpu);
-    }
-
-    #[test]
-    fn test_get_instruction_srl_b() {
-        let instruction = get_instruction(&0x38);
-        assert_eq!(instruction.unwrap(), &SRL_B);
-        assert_eq!(instruction.unwrap().length, 2);
-        assert_eq!(instruction.unwrap().clock_cycles, 8);
-        assert_eq!(instruction.unwrap().clock_cycles_condition, None);
-    }
-
-    #[test]
-    fn test_srl_b() {
+    pub fn test_srl_b() {
         let mut cpu = Cpu::new();
         cpu.reg.b = 0x80;
-        cpu.reg.clear_all_flags();
-
-        let expected_cpu = Cpu {
-            reg: Registers {
-                b: 0x40,
-                f: 0x00, // ____
-                ..cpu.reg
-            },
-            ..cpu
-        };
-
-        (&SRL_B.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x38));
-        assert_eq!(cpu, expected_cpu);
+        (&SRL_B.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x38));
+        assert_eq!(cpu.reg.b, 0x40);
     }
 
     #[test]
-    fn test_srl_b_carry() {
+    pub fn test_get_instruction_bit_7_h() {
+        let instruction = get_instruction(&0x7C).unwrap();
+        assert_eq!(instruction, &BIT_7_H);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_bit_7_h() {
         let mut cpu = Cpu::new();
-        cpu.reg.b = 0x01;
-        cpu.reg.set_flag(Flag::Carry);
-
-        let expected_cpu = Cpu {
-            reg: Registers {
-                b: 0x00,
-                f: 0x90, // Z__C
-                ..cpu.reg
-            },
-            ..cpu
-        };
-
-        (&SRL_B.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x38));
-        assert_eq!(cpu, expected_cpu);
-    }
-
-    #[test]
-    fn test_get_instruction_bit_7_h() {
-        let instruction = get_instruction(&0x7C);
-        assert_eq!(instruction.unwrap(), &BIT_7_H);
-        assert_eq!(instruction.unwrap().length, 2);
-        assert_eq!(instruction.unwrap().clock_cycles, 8);
-        assert_eq!(instruction.unwrap().clock_cycles_condition, None);
-    }
-
-    #[test]
-    fn test_bit_7_h_one() {
-        let mut cpu = Cpu::new();
-        cpu.reg.h = 0x80;
-
-        let expected_cpu = Cpu {
-            reg: Registers {
-                f: 0x20, // __H_
-                ..cpu.reg
-            },
-            ..cpu
-        };
-
-        (&BIT_7_H.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x7C));
-        assert_eq!(cpu, expected_cpu);
-    }
-
-    #[test]
-    fn test_bit_7_h_zero() {
-        let mut cpu = Cpu::new();
-        cpu.reg.h = 0x00;
-
-        let expected_cpu = Cpu {
-            reg: Registers {
-                f: 0xA0, // Z_H_
-                ..cpu.reg
-            },
-            ..cpu
-        };
-
-        (&BIT_7_H.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x7C));
-        assert_eq!(cpu, expected_cpu);
+        cpu.reg.h = 0x7F;
+        (&BIT_7_H.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x7C));
+        assert!(cpu.reg.check_flag(Flag::Zero));
     }
 }

@@ -11,7 +11,7 @@ pub enum Flag {
 }
 
 /// The CPU registers
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Registers {
     pub a: u8,
     pub b: u8,
@@ -202,6 +202,14 @@ mod tests {
     }
 
     #[test]
+    fn test_af() {
+        let mut regs = Registers::new();
+        regs.a = 0x12;
+        regs.f = 0x34;
+        assert_eq!(regs.af(), 0x1234);
+    }
+
+    #[test]
     fn test_bc() {
         let mut regs = Registers::new();
         regs.b = 0x12;
@@ -223,6 +231,14 @@ mod tests {
         regs.h = 0x12;
         regs.l = 0x34;
         assert_eq!(regs.hl(), 0x1234);
+    }
+
+    #[test]
+    fn test_set_af() {
+        let mut regs = Registers::new();
+        regs.set_af(0x1234);
+        assert_eq!(regs.a, 0x12);
+        assert_eq!(regs.f, 0x34);
     }
 
     #[test]
