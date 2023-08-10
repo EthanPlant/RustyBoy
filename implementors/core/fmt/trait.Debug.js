@@ -1,4 +1,4 @@
 (function() {var implementors = {
-"emu":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.71.1/core/fmt/trait.Debug.html\" title=\"trait core::fmt::Debug\">Debug</a> for <a class=\"struct\" href=\"emu/struct.Args.html\" title=\"struct emu::Args\">Args</a>"]],
-"gblib":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.71.1/core/fmt/trait.Debug.html\" title=\"trait core::fmt::Debug\">Debug</a> for <a class=\"struct\" href=\"gblib/cpu/cpu/struct.Cpu.html\" title=\"struct gblib::cpu::cpu::Cpu\">Cpu</a>"]]
+"rustyboy":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.71.1/core/fmt/trait.Debug.html\" title=\"trait core::fmt::Debug\">Debug</a> for <a class=\"struct\" href=\"rustyboy/struct.Args.html\" title=\"struct rustyboy::Args\">Args</a>"]],
+"rustyboy_core":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.71.1/core/fmt/trait.Debug.html\" title=\"trait core::fmt::Debug\">Debug</a> for <a class=\"struct\" href=\"rustyboy_core/cpu/cpu/struct.Cpu.html\" title=\"struct rustyboy_core::cpu::cpu::Cpu\">Cpu</a>"]]
 };if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

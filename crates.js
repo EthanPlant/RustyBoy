@@ -1,1 +1,1 @@
-window.ALL_CRATES = ["emu","gblib"];
+window.ALL_CRATES = ["rustyboy","rustyboy_core"];
