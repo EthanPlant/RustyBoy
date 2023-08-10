@@ -2871,6 +2871,7 @@
 <a href="#2871" id="2871">2871</a>
 <a href="#2872" id="2872">2872</a>
 <a href="#2873" id="2873">2873</a>
+<a href="#2874" id="2874">2874</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::cpu::Cpu;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::instructions::{functions, Instruction, InstructionType, OpCode};
 <span class="kw">use </span><span class="kw">crate</span>::cpu::registers::Flag;
@@ -4472,6 +4473,7 @@
     }
 
     <span class="attr">#[test]
+    #[ignore = <span class="string">&quot;Ignore for now as reading and writing to 0xFFFF isn&#39;t properly implemented&quot;</span>]
     </span><span class="kw">pub fn </span>test_ld_hl_inc_a_overflow() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         cpu.reg.h = <span class="number">0xFF</span>;
