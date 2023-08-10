@@ -249,6 +249,22 @@
 <a href="#249" id="249">249</a>
 <a href="#250" id="250">250</a>
 <a href="#251" id="251">251</a>
+<a href="#252" id="252">252</a>
+<a href="#253" id="253">253</a>
+<a href="#254" id="254">254</a>
+<a href="#255" id="255">255</a>
+<a href="#256" id="256">256</a>
+<a href="#257" id="257">257</a>
+<a href="#258" id="258">258</a>
+<a href="#259" id="259">259</a>
+<a href="#260" id="260">260</a>
+<a href="#261" id="261">261</a>
+<a href="#262" id="262">262</a>
+<a href="#263" id="263">263</a>
+<a href="#264" id="264">264</a>
+<a href="#265" id="265">265</a>
+<a href="#266" id="266">266</a>
+<a href="#267" id="267">267</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// The CPU flags
 </span><span class="kw">pub enum </span>Flag {
     <span class="doccomment">/// Set when an arithmetic operation results in a zero value
@@ -262,7 +278,7 @@
 }
 
 <span class="doccomment">/// The CPU registers
-</span><span class="attr">#[derive(Debug, PartialEq)]
+</span><span class="attr">#[derive(Clone, Debug, PartialEq)]
 </span><span class="kw">pub struct </span>Registers {
     <span class="kw">pub </span>a: u8,
     <span class="kw">pub </span>b: u8,
@@ -453,6 +469,14 @@
     }
 
     <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_af() {
+        <span class="kw">let </span><span class="kw-2">mut </span>regs = Registers::new();
+        regs.a = <span class="number">0x12</span>;
+        regs.f = <span class="number">0x34</span>;
+        <span class="macro">assert_eq!</span>(regs.af(), <span class="number">0x1234</span>);
+    }
+
+    <span class="attr">#[test]
     </span><span class="kw">fn </span>test_bc() {
         <span class="kw">let </span><span class="kw-2">mut </span>regs = Registers::new();
         regs.b = <span class="number">0x12</span>;
@@ -474,6 +498,14 @@
         regs.h = <span class="number">0x12</span>;
         regs.l = <span class="number">0x34</span>;
         <span class="macro">assert_eq!</span>(regs.hl(), <span class="number">0x1234</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_set_af() {
+        <span class="kw">let </span><span class="kw-2">mut </span>regs = Registers::new();
+        regs.set_af(<span class="number">0x1234</span>);
+        <span class="macro">assert_eq!</span>(regs.a, <span class="number">0x12</span>);
+        <span class="macro">assert_eq!</span>(regs.f, <span class="number">0x34</span>);
     }
 
     <span class="attr">#[test]

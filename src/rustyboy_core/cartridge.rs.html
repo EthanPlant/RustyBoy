@@ -634,7 +634,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_read_byte_from_ram() {
         <span class="kw">let </span><span class="kw-2">mut </span>cart = Cartridge::new();
-        cart.ram = <span class="macro">vec!</span>[<span class="number">0x01</span>];
+        cart.ram[<span class="number">0x0000</span>] = <span class="number">0x01</span>;
         <span class="macro">assert_eq!</span>(cart.read_byte_from_ram(<span class="number">0x0000</span>), <span class="number">0x01</span>);
     }
 
@@ -649,7 +649,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_write_byte_to_ram() {
         <span class="kw">let </span><span class="kw-2">mut </span>cart = Cartridge::new();
-        cart.ram = <span class="macro">vec!</span>[<span class="number">0x00</span>];
+        cart.ram[<span class="number">0x0000</span>] = <span class="number">0x01</span>;
         cart.write_byte_to_ram(<span class="number">0x0000</span>, <span class="number">0x01</span>);
         <span class="macro">assert_eq!</span>(cart.read_byte_from_ram(<span class="number">0x0000</span>), <span class="number">0x01</span>);
     }

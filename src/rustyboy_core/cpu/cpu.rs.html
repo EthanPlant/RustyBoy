@@ -213,7 +213,7 @@
 <span class="kw">use </span><span class="kw">crate</span>::mmu::Memory;
 
 <span class="doccomment">/// Emulation of the Gameboy CPU
-</span><span class="attr">#[derive(Debug, PartialEq)]
+</span><span class="attr">#[derive(Clone, Debug, PartialEq)]
 </span><span class="kw">pub struct </span>Cpu {
     <span class="doccomment">/// The CPU registers
     </span><span class="kw">pub </span>reg: Registers,
