@@ -426,6 +426,13 @@
 <a href="#426" id="426">426</a>
 <a href="#427" id="427">427</a>
 <a href="#428" id="428">428</a>
+<a href="#429" id="429">429</a>
+<a href="#430" id="430">430</a>
+<a href="#431" id="431">431</a>
+<a href="#432" id="432">432</a>
+<a href="#433" id="433">433</a>
+<a href="#434" id="434">434</a>
+<a href="#435" id="435">435</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cartridge::Cartridge;
 
 <span class="kw">const </span>ROM_START: usize = <span class="number">0x0000</span>;
@@ -538,7 +545,14 @@
             UNUSED_START..=UNUSED_END =&gt; {
                 <span class="macro">log::warn!</span>(<span class="string">&quot;Attempted prohibited write to unused memory {}&quot;</span>, addr);
             }
-            IO_START..=IO_END =&gt; <span class="self">self</span>.io[addr - IO_START] = v,
+            IO_START..=IO_END =&gt; {
+                <span class="comment">// Logging for Blargg tests
+                </span><span class="kw">if </span>addr == <span class="number">0xFF02 </span>&amp;&amp; v == <span class="number">0x81 </span>{
+                    <span class="macro">print!</span>(<span class="string">&quot;{}&quot;</span>, <span class="self">self</span>.io[<span class="number">0xFF01 </span>- IO_START] <span class="kw">as </span>char);
+                } <span class="kw">else </span>{
+                    <span class="self">self</span>.io[addr - IO_START] = v;
+                }
+            }
             HRAM_START..=HRAM_END =&gt; <span class="self">self</span>.hram[addr - HRAM_START] = v,
             <span class="comment">// TODO handle interrupt enable register
             </span>IE =&gt; (),

@@ -202,6 +202,8 @@
 <a href="#202" id="202">202</a>
 <a href="#203" id="203">203</a>
 <a href="#204" id="204">204</a>
+<a href="#205" id="205">205</a>
+<a href="#206" id="206">206</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::instructions;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::instructions::{Instruction, InstructionType, OpCode};
 <span class="kw">use </span><span class="kw">crate</span>::cpu::registers::Registers;
@@ -212,6 +214,7 @@
 </span><span class="kw">pub struct </span>Cpu {
     <span class="doccomment">/// The CPU registers
     </span><span class="kw">pub </span>reg: Registers,
+    <span class="kw">pub </span>interrupts_enabled: bool,
 }
 
 <span class="kw">impl </span>Cpu {
@@ -228,7 +231,7 @@
         registers.l = <span class="number">0x4D</span>;
         registers.sp = <span class="number">0xFFFE</span>;
         registers.pc = <span class="number">0x0100</span>;
-        Cpu { reg: registers }
+        Cpu { reg: registers, interrupts_enabled: <span class="bool-val">false </span>}
     }
 
     <span class="doccomment">/// Step through the emulator
@@ -257,7 +260,7 @@
 
         <span class="self">self</span>.execute_instruction(mmu, instruction, <span class="kw-2">&amp;</span>op_code);
         <span class="comment">// Add spacing between this and the next instruction
-        </span><span class="macro">println!</span>();
+        </span><span class="macro">log::trace!</span>(<span class="string">&quot;Finished executing instruction\n&quot;</span>);
     }
 
     <span class="doccomment">/// Execute an instruction
@@ -304,6 +307,7 @@
         <span class="macro">assert_eq!</span>(cpu.reg.l, <span class="number">0x4D</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.sp, <span class="number">0xFFFE</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0x100</span>);
+        <span class="macro">assert_eq!</span>(cpu.interrupts_enabled, <span class="bool-val">false</span>)
     }
 
     <span class="attr">#[test]
