@@ -3,13 +3,13 @@ on:
   push:
     branches: [main]
     paths:
-      - "emu/**"
-      - "gblib/**"
+      - "rustboy/**"
+      - "rustyboy-core/**"
   pull_request:
     branches: [main]
     paths:
-      - "emu/**"
-      - "gblib/**"
+      - "rustyboy/**"
+      - "rustyboy-core/**"
   workflow_dispatch:
 
 jobs:
