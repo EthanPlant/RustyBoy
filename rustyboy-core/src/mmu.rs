@@ -2,34 +2,48 @@ use crate::cartridge::Cartridge;
 
 const ROM_START: usize = 0x0000;
 const ROM_END: usize = 0x7FFF;
+
 const VRAM_START: usize = 0x8000;
 const VRAM_END: usize = 0x9FFF;
+const VRAM_SIZE: usize = VRAM_END - VRAM_START + 1;
+
 const CART_RAM_START: usize = 0xA000;
 const CART_RAM_END: usize = 0xBFFF;
+
 const WRAM_START: usize = 0xC000;
 const WRAM_END: usize = 0xDFFF;
+const WRAM_SIZE: usize = WRAM_END - WRAM_START + 1;
+
 const ECHO_RAM_START: usize = 0xE000;
 const ECHO_RAM_END: usize = 0xFDFF;
+
 const OAM_START: usize = 0xFE00;
 const OAM_END: usize = 0xFE9F;
+const OAM_SIZE: usize = OAM_END - OAM_START + 1;
+
 const UNUSED_START: usize = 0xFEA0;
 const UNUSED_END: usize = 0xFEFF;
+
 // TODO Proper memory mapped IO
 const IO_START: usize = 0xFF00;
 const IO_END: usize = 0xFF7F;
+const IO_SIZE: usize = IO_END - IO_START + 1;
+
 const HRAM_START: usize = 0xFF80;
 const HRAM_END: usize = 0xFFFE;
+const HRAM_SIZE: usize = HRAM_END - HRAM_START + 1;
+
 const IE: usize = 0xFFFF;
 
 /// The MMU (Memory Management Unit) is responsible for managing the gameboy's memory
 pub struct Memory {
     /// The cartridge's data
     cart: Cartridge,
-    vram: [u8; VRAM_END - VRAM_START],
-    wram: [u8; WRAM_END - WRAM_START],
-    oam: [u8; OAM_END - OAM_START],
-    io: [u8; IO_END - IO_START],
-    hram: [u8; HRAM_END - HRAM_START],
+    vram: [u8; VRAM_SIZE],
+    wram: [u8; WRAM_SIZE],
+    oam: [u8; OAM_SIZE],
+    io: [u8; IO_SIZE],
+    hram: [u8; HRAM_SIZE],
 }
 
 impl Memory {
@@ -37,11 +51,11 @@ impl Memory {
     pub fn new() -> Self {
         Memory {
             cart: Cartridge::new(),
-            vram: [0xFF; VRAM_END - VRAM_START],
-            wram: [0xFF; WRAM_END - WRAM_START],
-            oam: [0xFF; OAM_END - OAM_START],
-            io: [0xFF; IO_END - IO_START],
-            hram: [0xFF; HRAM_END - HRAM_START],
+            vram: [0xFF; VRAM_SIZE],
+            wram: [0xFF; WRAM_SIZE],
+            oam: [0xFF; OAM_SIZE],
+            io: [0xFF; IO_SIZE],
+            hram: [0xFF; HRAM_SIZE],
         }
     }
 
@@ -52,11 +66,11 @@ impl Memory {
         io[0x44] = 0x90; // Stub LY to 0x90 (144) to simulate VBlank
         Memory {
             cart: cart,
-            vram: [0xFF; VRAM_END - VRAM_START],
-            wram: [0xFF; WRAM_END - WRAM_START],
-            oam: [0xFF; OAM_END - OAM_START],
-            io: [0xFF; IO_END - IO_START],
-            hram: [0xFF; HRAM_END - HRAM_START],
+            vram: [0xFF; VRAM_SIZE],
+            wram: [0xFF; WRAM_SIZE],
+            oam: [0xFF; OAM_SIZE],
+            io: [0xFF; IO_SIZE],
+            hram: [0xFF; HRAM_SIZE],
         }
     }
 

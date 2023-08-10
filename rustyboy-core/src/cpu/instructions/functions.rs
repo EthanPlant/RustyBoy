@@ -92,7 +92,6 @@ pub fn add(cpu: &mut Cpu, byte: u8) {
     cpu.reg.a = result;
 }
 
-
 /// Logical AND on a byte and the A register.
 /// Sets the zero flag if the result is zero.
 /// Sets the half carry flag.

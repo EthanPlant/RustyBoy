@@ -25,7 +25,10 @@ impl Cpu {
         registers.l = 0x4D;
         registers.sp = 0xFFFE;
         registers.pc = 0x0100;
-        Cpu { reg: registers, interrupts_enabled: false }
+        Cpu {
+            reg: registers,
+            interrupts_enabled: false,
+        }
     }
 
     /// Step through the emulator

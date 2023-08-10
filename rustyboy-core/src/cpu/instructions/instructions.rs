@@ -2865,7 +2865,12 @@ mod tests {
         mmu.set_byte(0xC000 as usize, 0x03);
 
         let expected_cpu = Cpu {
-            reg: Registers { a: 0x03, h: 0xC0, l: 0x01, ..cpu.reg },
+            reg: Registers {
+                a: 0x03,
+                h: 0xC0,
+                l: 0x01,
+                ..cpu.reg
+            },
             ..cpu
         };
 
@@ -2883,7 +2888,12 @@ mod tests {
         mmu.set_byte(0xFFFF as usize, 0x03);
 
         let expected_cpu = Cpu {
-            reg: Registers { a: 0x03, h: 0x00, l: 0x00, ..cpu.reg },
+            reg: Registers {
+                a: 0x03,
+                h: 0x00,
+                l: 0x00,
+                ..cpu.reg
+            },
             ..cpu
         };
 
@@ -2900,7 +2910,12 @@ mod tests {
         mmu.set_byte(0xC0FF as usize, 0x03);
 
         let expected_cpu = Cpu {
-            reg: Registers { a: 0x03, h: 0xC1, l: 0x00, ..cpu.reg },
+            reg: Registers {
+                a: 0x03,
+                h: 0xC1,
+                l: 0x00,
+                ..cpu.reg
+            },
             ..cpu
         };
 
@@ -3099,7 +3114,7 @@ mod tests {
         (&JR_NC_N.handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x30));
         assert_eq!(cpu, expected_cpu);
     }
-    
+
     #[test]
     pub fn test_jr_nc_n_carry_negative() {
         let mut cpu = Cpu::new();
@@ -3186,7 +3201,6 @@ mod tests {
         (&LD_SP_NN.handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x31));
         assert_eq!(cpu, expected_cpu);
     }
-    
 
     #[test]
     pub fn test_get_instruction_ld_hl_dec_a() {
@@ -3434,7 +3448,7 @@ mod tests {
 
         (&LD_C_HL.handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x4E));
         assert_eq!(cpu, expected_cpu);
-    }   
+    }
 
     #[test]
     pub fn test_get_instruction_ld_c_a() {
@@ -4920,7 +4934,7 @@ mod tests {
         let mut mmu = Memory::new();
         cpu.reg.a = 0x01;
         cpu.reg.pc = 0xC000;
-        mmu.set_byte(0xC001 as usize, 0x01);      
+        mmu.set_byte(0xC001 as usize, 0x01);
 
         let expected_cpu = Cpu {
             reg: Registers {
@@ -4941,7 +4955,7 @@ mod tests {
         let mut mmu = Memory::new();
         cpu.reg.a = 0x00;
         cpu.reg.pc = 0xC000;
-        mmu.set_byte(0xC001 as usize, 0x01);     
+        mmu.set_byte(0xC001 as usize, 0x01);
 
         let expected_cpu = Cpu {
             reg: Registers {
@@ -4996,7 +5010,7 @@ mod tests {
         let mut mmu = Memory::new();
         cpu.reg.a = 0x01;
         cpu.reg.pc = 0xC000;
-        mmu.set_byte(0xC001 as usize, 0x02);      
+        mmu.set_byte(0xC001 as usize, 0x02);
 
         let expected_cpu = Cpu {
             reg: Registers {
@@ -5017,7 +5031,7 @@ mod tests {
         let mut mmu = Memory::new();
         cpu.reg.a = 0x01;
         cpu.reg.pc = 0xC000;
-        mmu.set_byte(0xC001 as usize, 0x01);     
+        mmu.set_byte(0xC001 as usize, 0x01);
 
         let expected_cpu = Cpu {
             reg: Registers {
