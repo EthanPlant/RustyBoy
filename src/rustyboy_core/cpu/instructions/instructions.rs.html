@@ -2872,6 +2872,20 @@
 <a href="#2872" id="2872">2872</a>
 <a href="#2873" id="2873">2873</a>
 <a href="#2874" id="2874">2874</a>
+<a href="#2875" id="2875">2875</a>
+<a href="#2876" id="2876">2876</a>
+<a href="#2877" id="2877">2877</a>
+<a href="#2878" id="2878">2878</a>
+<a href="#2879" id="2879">2879</a>
+<a href="#2880" id="2880">2880</a>
+<a href="#2881" id="2881">2881</a>
+<a href="#2882" id="2882">2882</a>
+<a href="#2883" id="2883">2883</a>
+<a href="#2884" id="2884">2884</a>
+<a href="#2885" id="2885">2885</a>
+<a href="#2886" id="2886">2886</a>
+<a href="#2887" id="2887">2887</a>
+<a href="#2888" id="2888">2888</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::cpu::Cpu;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::instructions::{functions, Instruction, InstructionType, OpCode};
 <span class="kw">use </span><span class="kw">crate</span>::cpu::registers::Flag;
@@ -3565,6 +3579,7 @@
     </span><span class="kw">pub fn </span>test_inc_b() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         cpu.reg.b = <span class="number">0x01</span>;
+        cpu.reg.clear_all_flags();
 
         <span class="kw">let </span>expected_cpu = Cpu {
             reg: Registers { b: <span class="number">0x02</span>, ..cpu.reg },
@@ -3727,6 +3742,7 @@
     </span><span class="kw">pub fn </span>test_inc_c() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         cpu.reg.c = <span class="number">0x01</span>;
+        cpu.reg.clear_all_flags();
 
         <span class="kw">let </span>expected_cpu = Cpu {
             reg: Registers { c: <span class="number">0x02</span>, ..cpu.reg },
@@ -4086,6 +4102,7 @@
     </span><span class="kw">pub fn </span>test_rla_bit_seven_set() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         cpu.reg.a = <span class="number">0x80</span>;
+        cpu.reg.clear_flag(Flag::Carry);
 
         <span class="kw">let </span>expected_cpu = Cpu {
             reg: Registers {
@@ -4123,9 +4140,14 @@
     </span><span class="kw">pub fn </span>test_rla_bit_seven_clear() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         cpu.reg.a = <span class="number">0x00</span>;
+        cpu.reg.clear_flag(Flag::Carry);
 
         <span class="kw">let </span>expected_cpu = Cpu {
-            reg: Registers { a: <span class="number">0x00</span>, ..cpu.reg },
+            reg: Registers {
+                a: <span class="number">0x00</span>,
+                f: <span class="number">0x00</span>, <span class="comment">// ____
+                </span>..cpu.reg
+            },
             ..cpu
         };
 
@@ -4380,6 +4402,7 @@
     </span><span class="kw">pub fn </span>test_jr_nz_n_not_zero() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         cpu.reg.pc = <span class="number">0xC000</span>;
+        cpu.reg.clear_flag(Flag::Zero);
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x02</span>);
 
@@ -4399,6 +4422,7 @@
     </span><span class="kw">pub fn </span>test_jr_nz_n_not_zero_negative() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         cpu.reg.pc = <span class="number">0xC000</span>;
+        cpu.reg.clear_flag(Flag::Zero);
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0xFE</span>);
 
@@ -4594,6 +4618,7 @@
     </span><span class="kw">pub fn </span>test_inc_h() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         cpu.reg.h = <span class="number">0x02</span>;
+        cpu.reg.clear_all_flags();
 
         <span class="kw">let </span>expected_cpu = Cpu {
             reg: Registers { h: <span class="number">0x03</span>, ..cpu.reg },
@@ -4693,6 +4718,7 @@
     </span><span class="kw">pub fn </span>test_jr_z_n_not_zero() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         cpu.reg.pc = <span class="number">0xC000</span>;
+        cpu.reg.clear_flag(Flag::Zero);
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0x02</span>);
 
@@ -4712,6 +4738,7 @@
     </span><span class="kw">pub fn </span>test_jr_z_n_not_zero_negative() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         cpu.reg.pc = <span class="number">0xC000</span>;
+        cpu.reg.clear_flag(Flag::Zero);
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
         mmu.set_byte(<span class="number">0xC001 </span><span class="kw">as </span>usize, <span class="number">0xFE</span>);
 
@@ -5153,6 +5180,7 @@
         cpu.reg.a = <span class="number">0x01</span>;
         cpu.reg.h = <span class="number">0xC0</span>;
         cpu.reg.l = <span class="number">0x00</span>;
+        cpu.reg.clear_all_flags();
         mmu.set_byte(<span class="number">0xC000 </span><span class="kw">as </span>usize, <span class="number">0x02</span>);
 
         <span class="kw">let </span>expected_cpu = Cpu {

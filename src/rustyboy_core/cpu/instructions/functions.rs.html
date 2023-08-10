@@ -570,6 +570,10 @@
 <a href="#570" id="570">570</a>
 <a href="#571" id="571">571</a>
 <a href="#572" id="572">572</a>
+<a href="#573" id="573">573</a>
+<a href="#574" id="574">574</a>
+<a href="#575" id="575">575</a>
+<a href="#576" id="576">576</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::cpu::Cpu;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::registers::Flag;
 <span class="kw">use </span><span class="kw">crate</span>::mmu::Memory;
@@ -853,6 +857,7 @@
     <span class="attr">#[test]
     </span><span class="kw">pub fn </span>test_add() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
+        cpu.reg.a = <span class="number">0</span>;
         add(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x01</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x01</span>);
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Zero));
@@ -864,6 +869,7 @@
     <span class="attr">#[test]
     </span><span class="kw">pub fn </span>test_add_zero() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
+        cpu.reg.a = <span class="number">0</span>;
         add(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x00</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x00</span>);
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Zero));
@@ -1103,6 +1109,7 @@
     <span class="attr">#[test]
     </span><span class="kw">pub fn </span>test_rl_bit_seven_set() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
+        cpu.reg.clear_flag(Flag::Carry);
         <span class="macro">assert_eq!</span>(rl(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x80</span>), <span class="number">0x00</span>);
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Zero));
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Carry));
@@ -1113,6 +1120,7 @@
     <span class="attr">#[test]
     </span><span class="kw">pub fn </span>test_rl_bit_seven_clear() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
+        cpu.reg.clear_flag(Flag::Carry);
         <span class="macro">assert_eq!</span>(rl(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x00</span>), <span class="number">0x00</span>);
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Zero));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Carry));
