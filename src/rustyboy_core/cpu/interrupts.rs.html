@@ -148,6 +148,16 @@
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
+<a href="#151" id="151">151</a>
+<a href="#152" id="152">152</a>
+<a href="#153" id="153">153</a>
+<a href="#154" id="154">154</a>
+<a href="#155" id="155">155</a>
+<a href="#156" id="156">156</a>
+<a href="#157" id="157">157</a>
+<a href="#158" id="158">158</a>
+<a href="#159" id="159">159</a>
+<a href="#160" id="160">160</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::cpu::Cpu;
 <span class="kw">use </span><span class="kw">crate</span>::mmu::Memory;
 
@@ -161,7 +171,7 @@
 <span class="kw">const </span>JOYPAD_ISR: u16 = <span class="number">0x0060</span>;
 
 <span class="doccomment">/// The types of interrupts the Gameboy can handle
-</span><span class="attr">#[derive(Copy, Clone)]
+</span><span class="attr">#[derive(Copy, Clone, Debug)]
 </span><span class="kw">pub enum </span>Interrupt {
     VBlank = <span class="number">0x01</span>,
     LcdStat = <span class="number">0x02</span>,
@@ -198,6 +208,14 @@
     }
 }
 
+<span class="doccomment">/// Check if there are any pending interrupts
+</span><span class="kw">pub fn </span>pending_interrupt(mmu: <span class="kw-2">&amp;</span>Memory) -&gt; bool {
+    <span class="kw">let </span>interrupt_flag = mmu.get_byte(INTERRUPT_FLAG_ADDR);
+    <span class="kw">let </span>interrupt_enable = mmu.get_byte(INTERRUPT_ENABLE_ADDR);
+
+    (interrupt_flag &amp; interrupt_enable) != <span class="number">0
+</span>}
+
 <span class="doccomment">/// Handle all interrupts
 </span><span class="kw">pub fn </span>handle_interrupts(cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory) -&gt; <span class="prelude-ty">Option</span>&lt;u8&gt; {
     <span class="kw">if </span>handle_interrupt(cpu, mmu, <span class="kw-2">&amp;</span>Interrupt::VBlank, VBLANK_ISR) {
@@ -228,6 +246,8 @@
     <span class="kw">if </span>!mmu.interrupts.interrupt_fired(interrupt) {
         <span class="kw">return </span><span class="bool-val">false</span>;
     }
+
+    <span class="macro">log::trace!</span>(<span class="string">&quot;Handling {:?} interrupt&quot;</span>, interrupt);
 
     cpu.ime = <span class="bool-val">false</span>;
     cpu.reg.sp -= <span class="number">2</span>;
