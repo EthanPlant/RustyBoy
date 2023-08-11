@@ -24,6 +24,18 @@ const LD_BC_NN: Instruction = Instruction {
     },
 };
 
+/// 0x02 - LD (BC), A
+const LD_BC_A: Instruction = Instruction {
+    length: 1,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "LD (BC) A",
+    handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
+        mmu.set_byte(cpu.reg.bc(), cpu.reg.a);
+        InstructionType::ActionTaken
+    },
+};
+
 /// 0x03 - INC BC
 const INC_BC: Instruction = Instruction {
     length: 1,
@@ -107,6 +119,18 @@ const ADD_HL_BC: Instruction = Instruction {
     description: "ADD HL BC",
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         functions::add16(cpu, cpu.reg.bc());
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x0A - LD A, (BC)
+const LD_A_BC: Instruction = Instruction {
+    length: 1,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "LD A (BC)",
+    handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
+        cpu.reg.a = mmu.get_byte(cpu.reg.bc());
         InstructionType::ActionTaken
     },
 };
@@ -611,6 +635,19 @@ const INC_SP: Instruction = Instruction {
     },
 };
 
+/// 0x34 - INC (HL)
+const INC_HL_PTR: Instruction = Instruction {
+    length: 1,
+    clock_cycles: 12,
+    clock_cycles_condition: None,
+    description: "INC (HL)",
+    handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
+        let value = functions::inc(cpu, mmu.get_byte(cpu.reg.hl()));
+        mmu.set_byte(cpu.reg.hl(), value);
+        InstructionType::ActionTaken
+    },
+};
+
 /// 0x35 - DEC (HL)
 const DEC_HL_PTR: Instruction = Instruction {
     length: 1,
@@ -673,6 +710,19 @@ const ADD_HL_SP: Instruction = Instruction {
     description: "ADD HL SP",
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         functions::add16(cpu, cpu.reg.sp);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x3A - LD A, (HL-)
+const LD_A_HL_DEC: Instruction = Instruction {
+    length: 1,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "LD A (HL-)",
+    handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
+        cpu.reg.a = mmu.get_byte(cpu.reg.hl());
+        cpu.reg.set_hl(cpu.reg.hl().wrapping_sub(1));
         InstructionType::ActionTaken
     },
 };
@@ -2927,6 +2977,7 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
     match op_code {
         0x00 => Some(&NOP),
         0x01 => Some(&LD_BC_NN),
+        0x02 => Some(&LD_BC_A),
         0x03 => Some(&INC_BC),
         0x04 => Some(&INC_B),
         0x05 => Some(&DEC_B),
@@ -2934,6 +2985,7 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
         0x07 => Some(&RLCA),
         0x08 => Some(&LD_NN_SP),
         0x09 => Some(&ADD_HL_BC),
+        0x0A => Some(&LD_A_BC),
         0x0B => Some(&DEC_BC),
         0x0C => Some(&INC_C),
         0x0D => Some(&DEC_C),
@@ -2977,11 +3029,13 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
         0x31 => Some(&LD_SP_NN),
         0x32 => Some(&LD_HL_DEC_A),
         0x33 => Some(&INC_SP),
+        0x34 => Some(&INC_HL_PTR),
         0x35 => Some(&DEC_HL_PTR),
         0x36 => Some(&LD_HL_N),
         0x37 => Some(&SCF),
         0x38 => Some(&JR_C_N),
         0x39 => Some(&ADD_HL_SP),
+        0x3A => Some(&LD_A_HL_DEC),
         0x3B => Some(&DEC_SP),
         0x3C => Some(&INC_A),
         0x3D => Some(&DEC_A),
@@ -3222,6 +3276,23 @@ mod tests {
     }
 
     #[test]
+    pub fn test_get_instruction_ld_bc_a() {
+        let instruction = get_instruction(&0x02).unwrap();
+        assert_eq!(instruction, &LD_BC_A);
+        assert_eq!(instruction.length, 1);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_ld_bc_a() {
+        let mut cpu = Cpu::new();
+        cpu.reg.set_bc(0x0000);
+        cpu.reg.a = 0x01;
+        (&LD_BC_A.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x02));
+        assert_eq!(cpu.reg.a, 0x01);
+    }
+
+    #[test]
     pub fn test_get_instruction_inc_bc() {
         let instruction = get_instruction(&0x03).unwrap();
         assert_eq!(instruction, &INC_BC);
@@ -3337,6 +3408,24 @@ mod tests {
         cpu.reg.set_bc(0x0001);
         (&ADD_HL_BC.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x09));
         assert_eq!(cpu.reg.hl(), 0x0001);
+    }
+
+    #[test]
+    pub fn test_get_instruction_ld_a_bc() {
+        let instruction = get_instruction(&0x0A).unwrap();
+        assert_eq!(instruction, &LD_A_BC);
+        assert_eq!(instruction.length, 1);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_ld_a_bc() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        cpu.reg.set_bc(0xC000);
+        mmu.set_byte(0xC000 as usize, 0x01);
+        (&LD_A_BC.handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x0A));
+        assert_eq!(cpu.reg.a, 0x01);
     }
 
     #[test]
@@ -4139,6 +4228,25 @@ mod tests {
     }
 
     #[test]
+    pub fn test_get_instruction_ld_a_hl_dec() {
+        let instruction = get_instruction(&0x3A).unwrap();
+        assert_eq!(instruction, &LD_A_HL_DEC);
+        assert_eq!(instruction.length, 1);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_ld_a_hl_dec() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        cpu.reg.set_hl(0xC000);
+        mmu.set_byte(0xC000 as usize, 0x01);
+        (&LD_A_HL_DEC.handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x3A));
+        assert_eq!(cpu.reg.hl(), 0xBFFF);
+        assert_eq!(cpu.reg.a, 0x01);
+    }
+
+    #[test]
     pub fn test_get_instruction_dec_sp() {
         let instruction = get_instruction(&0x3B).unwrap();
         assert_eq!(instruction, &DEC_SP);
@@ -4219,6 +4327,24 @@ mod tests {
         cpu.reg.sp = 0xFFFF;
         (&INC_SP.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x33));
         assert_eq!(cpu.reg.sp, 0x0000);
+    }
+
+    #[test]
+    pub fn test_get_instruction_inc_hl_ptr() {
+        let instruction = get_instruction(&0x34).unwrap();
+        assert_eq!(instruction, &INC_HL_PTR);
+        assert_eq!(instruction.length, 1);
+        assert_eq!(instruction.clock_cycles, 12);
+    }
+
+    #[test]
+    pub fn test_inc_hl_ptr() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        cpu.reg.set_hl(0xC000);
+        mmu.set_byte(0xC000 as usize, 0x00);
+        (&INC_HL_PTR.handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x34));
+        assert_eq!(mmu.get_byte(0xC000 as usize), 0x01);
     }
 
     #[test]
