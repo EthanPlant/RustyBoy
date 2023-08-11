@@ -237,8 +237,6 @@
 <a href="#237" id="237">237</a>
 <a href="#238" id="238">238</a>
 <a href="#239" id="239">239</a>
-<a href="#240" id="240">240</a>
-<a href="#241" id="241">241</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::instructions::{get_instruction_by_opcode, Instruction, InstructionType, OpCode};
 <span class="kw">use </span><span class="kw">crate</span>::cpu::interrupts::handle_interrupts;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::registers::Registers;
@@ -252,7 +250,7 @@
     <span class="doccomment">/// Interrupt Master Enable
     </span><span class="kw">pub </span>ime: bool,
     <span class="doccomment">/// Boolean to track if EI was called to emulate EI delay
-    </span><span class="kw">pub </span>ei: bool, 
+    </span><span class="kw">pub </span>ei: bool,
 }
 
 <span class="kw">impl </span>Cpu {
@@ -318,7 +316,7 @@
                 <span class="prelude-val">Some</span>(cycles) =&gt; {
                     <span class="self">self</span>.ime = <span class="bool-val">false</span>;
                     <span class="kw">return </span>cycles;
-                },
+                }
                 <span class="kw">_ </span>=&gt; {
                     <span class="kw">return </span><span class="number">0</span>;
                 }
@@ -335,7 +333,7 @@
     </span>}
 
     <span class="doccomment">/// Execute an instruction
-    </span><span class="kw">fn </span>execute_instruction (
+    </span><span class="kw">fn </span>execute_instruction(
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         mmu: <span class="kw-2">&amp;mut </span>Memory,
         instruction: <span class="kw-2">&amp;</span>Instruction,
@@ -344,16 +342,14 @@
         <span class="kw">let </span>result = (instruction.handler)(<span class="self">self</span>, mmu, op_code);
         <span class="comment">// Update the program counter based on the instruction length and type
         </span><span class="kw">match </span>result {
-            InstructionType::Jumped =&gt; {
-                <span class="kw">match </span>instruction.clock_cycles_condition {
-                    <span class="prelude-val">Some</span>(cycles) =&gt; {
-                        <span class="kw">return </span>cycles;
-                    }
-                    <span class="kw">_ </span>=&gt; {
-                        <span class="kw">return </span>instruction.clock_cycles;
-                    }
+            InstructionType::Jumped =&gt; <span class="kw">match </span>instruction.clock_cycles_condition {
+                <span class="prelude-val">Some</span>(cycles) =&gt; {
+                    <span class="kw">return </span>cycles;
                 }
-            }
+                <span class="kw">_ </span>=&gt; {
+                    <span class="kw">return </span>instruction.clock_cycles;
+                }
+            },
             <span class="kw">_ </span>=&gt; {
                 <span class="self">self</span>.reg.pc += instruction.length;
                 <span class="kw">return </span>instruction.clock_cycles;

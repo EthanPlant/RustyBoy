@@ -148,8 +148,6 @@
 <a href="#148" id="148">148</a>
 <a href="#149" id="149">149</a>
 <a href="#150" id="150">150</a>
-<a href="#151" id="151">151</a>
-<a href="#152" id="152">152</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::cpu::Cpu;
 <span class="kw">use </span><span class="kw">crate</span>::mmu::Memory;
 
@@ -195,7 +193,7 @@
     <span class="kw">pub fn </span>interrupt_fired(<span class="kw-2">&amp;</span><span class="self">self</span>, interrupt: <span class="kw-2">&amp;</span>Interrupt) -&gt; bool {
         <span class="kw">let </span>interrupt_value = <span class="kw-2">*</span>interrupt <span class="kw">as </span>u8;
 
-        <span class="self">self</span>.requested_interrupts &amp; interrupt_value == interrupt_value 
+        <span class="self">self</span>.requested_interrupts &amp; interrupt_value == interrupt_value
             &amp;&amp; <span class="self">self</span>.enabled_interrupts &amp; interrupt_value == interrupt_value
     }
 }
@@ -218,7 +216,6 @@
         <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="number">12</span>);
     }
 
-
     <span class="kw">if </span>handle_interrupt(cpu, mmu, <span class="kw-2">&amp;</span>Interrupt::Serial, SERIAL_ISR) {
         <span class="kw">return </span><span class="prelude-val">Some</span>(<span class="number">12</span>);
     }
@@ -239,7 +236,6 @@
     mmu.interrupts.clear_interrupt(interrupt);
     <span class="bool-val">true
 </span>}
-
 
 <span class="attr">#[cfg(test)]
 </span><span class="kw">mod </span>tests {
@@ -301,4 +297,5 @@
         <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0x0100</span>);
         <span class="macro">assert_eq!</span>(mmu.interrupts.requested_interrupts, <span class="number">0x00</span>);
     }
-}</code></pre></div></section></main></body></html>
+}
+</code></pre></div></section></main></body></html>
