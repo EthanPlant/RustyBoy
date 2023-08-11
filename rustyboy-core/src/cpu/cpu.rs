@@ -36,12 +36,16 @@ impl Cpu {
     }
 
     /// Step through the emulator
-    pub fn step(&mut self, mmu: &mut Memory) {
+    /// Returns the number of cycles used
+    pub fn step(&mut self, mmu: &mut Memory) -> u8 {
         log::trace!("A:{:02X} F:{:02X} B:{:02X} C:{:02X} D:{:02X} E:{:02X} H:{:02X} L:{:02X} SP:{:02X} PC: {:04X} ({:02X} {:02X} {:02X} {:02X})",
         self.reg.a, self.reg.f, self.reg.b, self.reg.c, self.reg.d, self.reg.e, self.reg.h, self.reg.l, self.reg.sp, self.reg.pc, mmu.get_byte(self.reg.pc), mmu.get_byte(self.reg.pc + 1), mmu.get_byte(self.reg.pc + 2), mmu.get_byte(self.reg.pc + 3));
 
         // Process any interrupts before executing the next instruction
-        self.check_interrupts(mmu);
+        let cycles_used = self.check_interrupts(mmu);
+        if cycles_used != 0 {
+            return cycles_used;
+        }
 
         let op_code = self.read_opcode(mmu);
 
@@ -62,19 +66,21 @@ impl Cpu {
         };
         log::trace!("Executing instruction: {}", instruction.description);
 
-        self.execute_instruction(mmu, instruction, &op_code);
-        // Add spacing between this and the next instruction
-        log::trace!("Finished executing instruction\n");
+        return self.execute_instruction(mmu, instruction, &op_code);
     }
 
     /// Handle interrupts
-    fn check_interrupts(&mut self, mmu: &mut Memory) {
+    /// Returns the number of cycles used to handle an interrupt if one occured
+    fn check_interrupts(&mut self, mmu: &mut Memory) -> u8 {
         if self.ime {
             match handle_interrupts(self, mmu) {
-                Some(_) => {
-                    self.ime = false
+                Some(cycles) => {
+                    self.ime = false;
+                    return cycles;
                 },
-                _ => (),
+                _ => {
+                    return 0;
+                }
             }
         } else {
             if self.ei {
@@ -83,21 +89,33 @@ impl Cpu {
                 self.ei = false;
             }
         }
+
+        0
     }
 
     /// Execute an instruction
-    fn execute_instruction(
+    fn execute_instruction (
         &mut self,
         mmu: &mut Memory,
         instruction: &Instruction,
         op_code: &OpCode,
-    ) {
+    ) -> u8 {
         let result = (instruction.handler)(self, mmu, op_code);
         // Update the program counter based on the instruction length and type
         match result {
-            InstructionType::Jumped => {}
+            InstructionType::Jumped => {
+                match instruction.clock_cycles_condition {
+                    Some(cycles) => {
+                        return cycles;
+                    }
+                    _ => {
+                        return instruction.clock_cycles;
+                    }
+                }
+            }
             _ => {
                 self.reg.pc += instruction.length;
+                return instruction.clock_cycles;
             }
         }
     }

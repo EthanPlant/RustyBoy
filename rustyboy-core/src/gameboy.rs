@@ -1,9 +1,11 @@
 use crate::cpu::cpu::Cpu;
 use crate::mmu::Memory;
+use crate::sysclock::Clock;
 
 pub struct Gameboy {
     mmu: Memory,
     cpu: Cpu,
+    clock: Clock,
 }
 
 impl Gameboy {
@@ -11,12 +13,13 @@ impl Gameboy {
     pub fn new(rom_name: &str) -> Self {
         let mmu = Memory::new_with_rom(rom_name);
         let cpu: Cpu = Cpu::new();
-        Self { cpu, mmu }
+        let clock = Clock::new();
+        Self { cpu, mmu, clock }
     }
 
     /// Step through the emulation
     pub fn step(&mut self) {
-        self.cpu.step(&mut self.mmu);
+        self.clock.cycle(self.cpu.step(&mut self.mmu));
     }
 }
 
