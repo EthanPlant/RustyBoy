@@ -221,6 +221,24 @@
 <a href="#221" id="221">221</a>
 <a href="#222" id="222">222</a>
 <a href="#223" id="223">223</a>
+<a href="#224" id="224">224</a>
+<a href="#225" id="225">225</a>
+<a href="#226" id="226">226</a>
+<a href="#227" id="227">227</a>
+<a href="#228" id="228">228</a>
+<a href="#229" id="229">229</a>
+<a href="#230" id="230">230</a>
+<a href="#231" id="231">231</a>
+<a href="#232" id="232">232</a>
+<a href="#233" id="233">233</a>
+<a href="#234" id="234">234</a>
+<a href="#235" id="235">235</a>
+<a href="#236" id="236">236</a>
+<a href="#237" id="237">237</a>
+<a href="#238" id="238">238</a>
+<a href="#239" id="239">239</a>
+<a href="#240" id="240">240</a>
+<a href="#241" id="241">241</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::instructions::{get_instruction_by_opcode, Instruction, InstructionType, OpCode};
 <span class="kw">use </span><span class="kw">crate</span>::cpu::interrupts::handle_interrupts;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::registers::Registers;
@@ -259,12 +277,16 @@
     }
 
     <span class="doccomment">/// Step through the emulator
-    </span><span class="kw">pub fn </span>step(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mmu: <span class="kw-2">&amp;mut </span>Memory) {
+    /// Returns the number of cycles used
+    </span><span class="kw">pub fn </span>step(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mmu: <span class="kw-2">&amp;mut </span>Memory) -&gt; u8 {
         <span class="macro">log::trace!</span>(<span class="string">&quot;A:{:02X} F:{:02X} B:{:02X} C:{:02X} D:{:02X} E:{:02X} H:{:02X} L:{:02X} SP:{:02X} PC: {:04X} ({:02X} {:02X} {:02X} {:02X})&quot;</span>,
         <span class="self">self</span>.reg.a, <span class="self">self</span>.reg.f, <span class="self">self</span>.reg.b, <span class="self">self</span>.reg.c, <span class="self">self</span>.reg.d, <span class="self">self</span>.reg.e, <span class="self">self</span>.reg.h, <span class="self">self</span>.reg.l, <span class="self">self</span>.reg.sp, <span class="self">self</span>.reg.pc, mmu.get_byte(<span class="self">self</span>.reg.pc), mmu.get_byte(<span class="self">self</span>.reg.pc + <span class="number">1</span>), mmu.get_byte(<span class="self">self</span>.reg.pc + <span class="number">2</span>), mmu.get_byte(<span class="self">self</span>.reg.pc + <span class="number">3</span>));
 
         <span class="comment">// Process any interrupts before executing the next instruction
-        </span><span class="self">self</span>.check_interrupts(mmu);
+        </span><span class="kw">let </span>cycles_used = <span class="self">self</span>.check_interrupts(mmu);
+        <span class="kw">if </span>cycles_used != <span class="number">0 </span>{
+            <span class="kw">return </span>cycles_used;
+        }
 
         <span class="kw">let </span>op_code = <span class="self">self</span>.read_opcode(mmu);
 
@@ -285,19 +307,21 @@
         };
         <span class="macro">log::trace!</span>(<span class="string">&quot;Executing instruction: {}&quot;</span>, instruction.description);
 
-        <span class="self">self</span>.execute_instruction(mmu, instruction, <span class="kw-2">&amp;</span>op_code);
-        <span class="comment">// Add spacing between this and the next instruction
-        </span><span class="macro">log::trace!</span>(<span class="string">&quot;Finished executing instruction\n&quot;</span>);
+        <span class="kw">return </span><span class="self">self</span>.execute_instruction(mmu, instruction, <span class="kw-2">&amp;</span>op_code);
     }
 
     <span class="doccomment">/// Handle interrupts
-    </span><span class="kw">fn </span>check_interrupts(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mmu: <span class="kw-2">&amp;mut </span>Memory) {
+    /// Returns the number of cycles used to handle an interrupt if one occured
+    </span><span class="kw">fn </span>check_interrupts(<span class="kw-2">&amp;mut </span><span class="self">self</span>, mmu: <span class="kw-2">&amp;mut </span>Memory) -&gt; u8 {
         <span class="kw">if </span><span class="self">self</span>.ime {
             <span class="kw">match </span>handle_interrupts(<span class="self">self</span>, mmu) {
-                <span class="prelude-val">Some</span>(<span class="kw">_</span>) =&gt; {
-                    <span class="self">self</span>.ime = <span class="bool-val">false
-                </span>},
-                <span class="kw">_ </span>=&gt; (),
+                <span class="prelude-val">Some</span>(cycles) =&gt; {
+                    <span class="self">self</span>.ime = <span class="bool-val">false</span>;
+                    <span class="kw">return </span>cycles;
+                },
+                <span class="kw">_ </span>=&gt; {
+                    <span class="kw">return </span><span class="number">0</span>;
+                }
             }
         } <span class="kw">else </span>{
             <span class="kw">if </span><span class="self">self</span>.ei {
@@ -306,21 +330,33 @@
                 <span class="self">self</span>.ei = <span class="bool-val">false</span>;
             }
         }
-    }
+
+        <span class="number">0
+    </span>}
 
     <span class="doccomment">/// Execute an instruction
-    </span><span class="kw">fn </span>execute_instruction(
+    </span><span class="kw">fn </span>execute_instruction (
         <span class="kw-2">&amp;mut </span><span class="self">self</span>,
         mmu: <span class="kw-2">&amp;mut </span>Memory,
         instruction: <span class="kw-2">&amp;</span>Instruction,
         op_code: <span class="kw-2">&amp;</span>OpCode,
-    ) {
+    ) -&gt; u8 {
         <span class="kw">let </span>result = (instruction.handler)(<span class="self">self</span>, mmu, op_code);
         <span class="comment">// Update the program counter based on the instruction length and type
         </span><span class="kw">match </span>result {
-            InstructionType::Jumped =&gt; {}
+            InstructionType::Jumped =&gt; {
+                <span class="kw">match </span>instruction.clock_cycles_condition {
+                    <span class="prelude-val">Some</span>(cycles) =&gt; {
+                        <span class="kw">return </span>cycles;
+                    }
+                    <span class="kw">_ </span>=&gt; {
+                        <span class="kw">return </span>instruction.clock_cycles;
+                    }
+                }
+            }
             <span class="kw">_ </span>=&gt; {
                 <span class="self">self</span>.reg.pc += instruction.length;
+                <span class="kw">return </span>instruction.clock_cycles;
             }
         }
     }

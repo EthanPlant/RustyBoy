@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"mod":["cartridge","cpu","gameboy","mmu"]};
+window.SIDEBAR_ITEMS = {"mod":["cartridge","cpu","gameboy","mmu","sysclock"]};
