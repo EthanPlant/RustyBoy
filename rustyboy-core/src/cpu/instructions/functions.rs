@@ -44,6 +44,12 @@ pub fn call(cpu: &mut Cpu, mmu: &mut Memory) {
     cpu.reg.pc = addr;
 }
 
+/// Similar to call but to a specifc vector.
+pub fn rst(cpu: &mut Cpu, mmu: &mut Memory, vec: u16) {
+    push(cpu, mmu, cpu.reg.pc + 1);
+    cpu.reg.pc = vec;
+}
+
 /// Jump relative to the next instruction.
 /// The operand is treated as a signed byte, added to the memory address of the next instruction.
 pub fn jr(cpu: &mut Cpu, mmu: &mut Memory) {
@@ -414,6 +420,18 @@ mod tests {
     }
 
     #[test]
+    pub fn test_rst() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        cpu.reg.sp = 0xFFFE;
+        cpu.reg.pc = 0xC000;
+        rst(&mut cpu, &mut mmu, 0x0000);
+        assert_eq!(cpu.reg.sp, 0xFFFC);
+        assert_eq!(cpu.reg.pc, 0x0000);
+        assert_eq!(mmu.get_word(0xFFFC as usize), 0xC001);
+    }
+
+    #[test]
     pub fn test_jr_positive() {
         let mut cpu = Cpu::new();
         let mut mmu = Memory::new();
@@ -745,7 +763,7 @@ mod tests {
         sbc(&mut cpu, 0x01);
         assert!(cpu.reg.check_flag(Flag::Carry));
     }
-    
+
     #[test]
     pub fn test_sub_zero() {
         let mut cpu = Cpu::new();

@@ -35,7 +35,7 @@ After cloning the repository, simply run `cargo build` in the workspace director
         - [x] 04-op r,imm
         - [x] 05-op rp
         - [x] 06-ld r,r
-        - [ ] 07-jr,jp,call,ret,rst
+        - [x] 07-jr,jp,call,ret,rst
         - [x] 08-misc instrs
         - [ ] 09-op r,r
         - [x] 10-bit ops
