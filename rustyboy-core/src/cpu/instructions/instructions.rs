@@ -85,6 +85,30 @@ const LD_NN_SP: Instruction = Instruction {
     },
 };
 
+/// 0x09 - ADD HL, BC
+const ADD_HL_BC: Instruction = Instruction {
+    length: 1,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "ADD HL BC",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        functions::add16(cpu, cpu.reg.bc());
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x0B - DEC BC
+const DEC_BC: Instruction = Instruction {
+    length: 1,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "DEC BC",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.set_bc(cpu.reg.bc().wrapping_sub(1));
+        InstructionType::ActionTaken
+    },
+};
+
 /// 0x0C - INC C
 const INC_C: Instruction = Instruction {
     length: 1,
@@ -216,6 +240,18 @@ const JR_N: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         functions::jr(cpu, mmu);
         InstructionType::Jumped
+    },
+};
+
+/// 0x19 - ADD HL, DE
+const ADD_HL_DE: Instruction = Instruction {
+    length: 1,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "ADD HL DE",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        functions::add16(cpu, cpu.reg.de());
+        InstructionType::ActionTaken
     },
 };
 
@@ -417,6 +453,18 @@ const LD_A_HL_INC: Instruction = Instruction {
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         cpu.reg.a = mmu.get_byte(cpu.reg.hl());
         cpu.reg.set_hl(cpu.reg.hl().wrapping_add(1));
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x2B - DEC HL
+const DEC_HL: Instruction = Instruction {
+    length: 1,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "DEC HL",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.set_hl(cpu.reg.hl().wrapping_sub(1));
         InstructionType::ActionTaken
     },
 };
@@ -1836,6 +1884,8 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
         0x05 => Some(&DEC_B),
         0x06 => Some(&LD_B_N),
         0x08 => Some(&LD_NN_SP),
+        0x09 => Some(&ADD_HL_BC),
+        0x0B => Some(&DEC_BC),
         0x0C => Some(&INC_C),
         0x0D => Some(&DEC_C),
         0x0E => Some(&LD_C_N),
@@ -1847,6 +1897,7 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
         0x16 => Some(&LD_D_N),
         0x17 => Some(&RLA),
         0x18 => Some(&JR_N),
+        0x19 => Some(&ADD_HL_DE),
         0x1A => Some(&LD_A_DE),
         0x1B => Some(&DEC_DE),
         0x1C => Some(&INC_E),
@@ -1864,6 +1915,7 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
         0x28 => Some(&JR_Z_N),
         0x29 => Some(&ADD_HL_HL),
         0x2A => Some(&LD_A_HL_INC),
+        0x2B => Some(&DEC_HL),
         0x2C => Some(&INC_L),
         0x2D => Some(&DEC_L),
         0x2E => Some(&LD_L_N),
@@ -2122,6 +2174,47 @@ mod tests {
     }
 
     #[test]
+    pub fn test_get_instruction_add_hl_bc() {
+        let instruction = get_instruction(&0x09).unwrap();
+        assert_eq!(instruction, &ADD_HL_BC);
+        assert_eq!(instruction.length, 1);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_add_hl_bc() {
+        let mut cpu = Cpu::new();
+        cpu.reg.set_hl(0x0000);
+        cpu.reg.set_bc(0x0001);
+        (&ADD_HL_BC.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x09));
+        assert_eq!(cpu.reg.hl(), 0x0001);
+    }
+
+    #[test]
+    pub fn test_get_instruction_dec_bc() {
+        let instruction = get_instruction(&0x0B).unwrap();
+        assert_eq!(instruction, &DEC_BC);
+        assert_eq!(instruction.length, 1);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_dec_bc() {
+        let mut cpu = Cpu::new();
+        cpu.reg.set_bc(0x0001);
+        (&DEC_BC.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x0B));
+        assert_eq!(cpu.reg.bc(), 0x0000);
+    }
+
+    #[test]
+    pub fn test_dec_bc_underflow() {
+        let mut cpu = Cpu::new();
+        cpu.reg.set_bc(0x0000);
+        (&DEC_BC.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x0B));
+        assert_eq!(cpu.reg.bc(), 0xFFFF);
+    }
+
+    #[test]
     pub fn test_get_instruction_inc_c() {
         let instruction = get_instruction(&0x0C).unwrap();
         assert_eq!(instruction, &INC_C);
@@ -2307,6 +2400,23 @@ mod tests {
         mmu.set_byte(0xC00B as usize, 0xFB);
         (&JR_N.handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x18));
         assert_eq!(cpu.reg.pc, 0xC007);
+    }
+
+    #[test]
+    pub fn test_get_instruction_add_hl_de() {
+        let instruction = get_instruction(&0x19).unwrap();
+        assert_eq!(instruction, &ADD_HL_DE);
+        assert_eq!(instruction.length, 1);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_add_hl_de() {
+        let mut cpu = Cpu::new();
+        cpu.reg.set_hl(0x0000);
+        cpu.reg.set_de(0x0001);
+        (&ADD_HL_DE.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x19));
+        assert_eq!(cpu.reg.hl(), 0x0001);
     }
 
     #[test]
@@ -2613,6 +2723,30 @@ mod tests {
         (&LD_A_HL_INC.handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x2A));
         assert_eq!(cpu.reg.hl(), 0xC001);
         assert_eq!(cpu.reg.a, 0x01);
+    }
+
+    #[test]
+    pub fn test_get_instruction_dec_hl() {
+        let instruction = get_instruction(&0x2B).unwrap();
+        assert_eq!(instruction, &DEC_HL);
+        assert_eq!(instruction.length, 1);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_dec_hl() {
+        let mut cpu = Cpu::new();
+        cpu.reg.set_hl(0x0001);
+        (&DEC_HL.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x2B));
+        assert_eq!(cpu.reg.hl(), 0x0000);
+    }
+
+    #[test]
+    pub fn test_dec_hl_underflow() {
+        let mut cpu = Cpu::new();
+        cpu.reg.set_hl(0x0000);
+        (&DEC_HL.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x2B));
+        assert_eq!(cpu.reg.hl(), 0xFFFF);
     }
 
     #[test]
