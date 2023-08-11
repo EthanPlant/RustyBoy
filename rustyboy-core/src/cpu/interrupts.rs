@@ -11,7 +11,7 @@ const SERIAL_ISR: u16 = 0x0058;
 const JOYPAD_ISR: u16 = 0x0060;
 
 /// The types of interrupts the Gameboy can handle
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum Interrupt {
     VBlank = 0x01,
     LcdStat = 0x02,
@@ -48,6 +48,14 @@ impl InterruptState {
     }
 }
 
+/// Check if there are any pending interrupts
+pub fn pending_interrupt(mmu: &Memory) -> bool {
+    let interrupt_flag = mmu.get_byte(INTERRUPT_FLAG_ADDR);
+    let interrupt_enable = mmu.get_byte(INTERRUPT_ENABLE_ADDR);
+
+    (interrupt_flag & interrupt_enable) != 0
+}
+
 /// Handle all interrupts
 pub fn handle_interrupts(cpu: &mut Cpu, mmu: &mut Memory) -> Option<u8> {
     if handle_interrupt(cpu, mmu, &Interrupt::VBlank, VBLANK_ISR) {
@@ -78,6 +86,8 @@ fn handle_interrupt(cpu: &mut Cpu, mmu: &mut Memory, interrupt: &Interrupt, isr_
     if !mmu.interrupts.interrupt_fired(interrupt) {
         return false;
     }
+
+    log::trace!("Handling {:?} interrupt", interrupt);
 
     cpu.ime = false;
     cpu.reg.sp -= 2;

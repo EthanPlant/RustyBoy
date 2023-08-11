@@ -1,5 +1,5 @@
 use crate::cpu::instructions::{get_instruction_by_opcode, Instruction, InstructionType, OpCode};
-use crate::cpu::interrupts::handle_interrupts;
+use crate::cpu::interrupts::{handle_interrupts, pending_interrupt};
 use crate::cpu::registers::Registers;
 use crate::mmu::Memory;
 
@@ -12,6 +12,8 @@ pub struct Cpu {
     pub ime: bool,
     /// Boolean to track if EI was called to emulate EI delay
     pub ei: bool,
+    /// Boolean to track if the CPU is halted
+    pub halted: bool,
 }
 
 impl Cpu {
@@ -32,6 +34,7 @@ impl Cpu {
             reg: registers,
             ime: false,
             ei: false,
+            halted: false,
         }
     }
 
@@ -64,6 +67,22 @@ impl Cpu {
                 };
             }
         };
+
+        if self.halted && pending_interrupt(mmu) {
+            self.halted = false;
+            if !self.ime {
+                // HALT bug
+                // If interrupts are disabled but there's a pending interrupt, HALT ends
+                // but the PC isn't incremented
+                self.reg.pc -= 1;
+            }
+        }
+
+        // If we're halted and there are no pending interrupts, exit early
+        if self.halted {
+            return 4;
+        }
+
         log::trace!("Executing instruction: {}", instruction.description);
 
         return self.execute_instruction(mmu, instruction, &op_code);

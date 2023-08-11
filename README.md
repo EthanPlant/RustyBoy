@@ -28,18 +28,7 @@ After cloning the repository, simply run `cargo build` in the workspace director
     - [ ] Implement instructions
     - [x] Interrupts
     - [x] Pass the boot ROM
-    - [ ] Pass all Blargg test ROMs
-        - [x] 01-special
-        - [ ] 02-interrupts
-        - [x] 03-op sp,hl
-        - [x] 04-op r,imm
-        - [x] 05-op rp
-        - [x] 06-ld r,r
-        - [x] 07-jr,jp,call,ret,rst
-        - [x] 08-misc instrs
-        - [x] 09-op r,r
-        - [x] 10-bit ops
-        - [x] 11-op a,(hl)
+    - [x] Pass all Blargg test ROMs
 - [ ] Memory
     - [x] Proper memory map
     - [ ] Memory mapped IO
@@ -74,12 +63,14 @@ After cloning the repository, simply run `cargo build` in the workspace director
     - [ ] Speed up
     - [ ] Debugger
 
-## Working ROMs
-- [x] Gameboy boot ROM
-- [ ] Blargg tests
+## Working Games
 - [ ] Tetris
 - [ ] Dr. Mario
 - [ ] Link's Awakening
 - [ ] Kirby's Dream Land
 - [ ] Super Mario Land
 - [ ] Pokemon Red/Blue
+
+## Working Test ROMs
+- [x] Gameboy boot ROM
+- [x] Blargg cpu_instrs

@@ -1441,6 +1441,19 @@ const LD_HL_L: Instruction = Instruction {
     },
 };
 
+/// 0x76 - HALT
+const HALT: Instruction = Instruction {
+    length: 1,
+    clock_cycles: 4,
+    clock_cycles_condition: None,
+    description: "HALT",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        log::trace!("HALT");
+        cpu.halted = true;
+        InstructionType::ActionTaken
+    },
+};
+
 /// 0x77 - LD (HL), A
 const LD_HL_A: Instruction = Instruction {
     length: 1,
@@ -3111,6 +3124,7 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
         0x73 => Some(&LD_HL_E),
         0x74 => Some(&LD_HL_H),
         0x75 => Some(&LD_HL_L),
+        0x76 => Some(&HALT),
         0x77 => Some(&LD_HL_A),
         0x78 => Some(&LD_A_B),
         0x79 => Some(&LD_A_C),
@@ -5324,6 +5338,23 @@ mod tests {
         cpu.reg.set_hl(0xC000);
         (&LD_HL_L.handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x75));
         assert_eq!(mmu.get_byte(0xC000 as usize), 0x00);
+    }
+
+    #[test]
+    pub fn test_get_instruction_halt() {
+        let instruction = get_instruction(&0x76).unwrap();
+        assert_eq!(instruction, &HALT);
+        assert_eq!(instruction.length, 1);
+        assert_eq!(instruction.clock_cycles, 4);
+    }
+
+    #[test]
+    pub fn test_halt() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        cpu.reg.set_hl(0xC000);
+        (&HALT.handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x76));
+        assert_eq!(cpu.halted, true);
     }
 
     #[test]
