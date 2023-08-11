@@ -32,7 +32,7 @@ After cloning the repository, simply run `cargo build` in the workspace director
         - [ ] 01-special
         - [ ] 02-interrupts
         - [ ] 03-op sp,hl
-        - [ ] 04-op r,imm
+        - [x] 04-op r,imm
         - [x] 05-op rp
         - [x] 06-ld r,r
         - [ ] 07-jr,jp,call,ret,rst
