@@ -62,7 +62,7 @@ impl Memory {
     /// Create a new Memory with a ROM file
     pub fn new_with_rom(rom_name: &str) -> Self {
         let cart = Cartridge::new_from_rom(rom_name);
-        let mut io: [u8; IO_END - IO_START] = [0xFF; IO_END - IO_START];
+        let mut io: [u8; IO_SIZE] = [0xFF; IO_SIZE];
         io[0x44] = 0x90; // Stub LY to 0x90 (144) to simulate VBlank
         Memory {
             cart: cart,
