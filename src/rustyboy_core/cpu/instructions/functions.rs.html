@@ -941,6 +941,24 @@
 <a href="#941" id="941">941</a>
 <a href="#942" id="942">942</a>
 <a href="#943" id="943">943</a>
+<a href="#944" id="944">944</a>
+<a href="#945" id="945">945</a>
+<a href="#946" id="946">946</a>
+<a href="#947" id="947">947</a>
+<a href="#948" id="948">948</a>
+<a href="#949" id="949">949</a>
+<a href="#950" id="950">950</a>
+<a href="#951" id="951">951</a>
+<a href="#952" id="952">952</a>
+<a href="#953" id="953">953</a>
+<a href="#954" id="954">954</a>
+<a href="#955" id="955">955</a>
+<a href="#956" id="956">956</a>
+<a href="#957" id="957">957</a>
+<a href="#958" id="958">958</a>
+<a href="#959" id="959">959</a>
+<a href="#960" id="960">960</a>
+<a href="#961" id="961">961</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::cpu::Cpu;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::registers::Flag;
 <span class="kw">use </span><span class="kw">crate</span>::mmu::Memory;
@@ -985,6 +1003,12 @@
     <span class="kw">let </span>addr = get_op16(cpu, mmu);
     push(cpu, mmu, cpu.reg.pc + <span class="number">3</span>);
     cpu.reg.pc = addr;
+}
+
+<span class="doccomment">/// Similar to call but to a specifc vector.
+</span><span class="kw">pub fn </span>rst(cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, vec: u16) {
+    push(cpu, mmu, cpu.reg.pc + <span class="number">1</span>);
+    cpu.reg.pc = vec;
 }
 
 <span class="doccomment">/// Jump relative to the next instruction.
@@ -1357,6 +1381,18 @@
     }
 
     <span class="attr">#[test]
+    </span><span class="kw">pub fn </span>test_rst() {
+        <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
+        <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
+        cpu.reg.sp = <span class="number">0xFFFE</span>;
+        cpu.reg.pc = <span class="number">0xC000</span>;
+        rst(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="number">0x0000</span>);
+        <span class="macro">assert_eq!</span>(cpu.reg.sp, <span class="number">0xFFFC</span>);
+        <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0x0000</span>);
+        <span class="macro">assert_eq!</span>(mmu.get_word(<span class="number">0xFFFC </span><span class="kw">as </span>usize), <span class="number">0xC001</span>);
+    }
+
+    <span class="attr">#[test]
     </span><span class="kw">pub fn </span>test_jr_positive() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="kw">let </span><span class="kw-2">mut </span>mmu = Memory::new();
@@ -1688,7 +1724,7 @@
         sbc(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x01</span>);
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Carry));
     }
-    
+
     <span class="attr">#[test]
     </span><span class="kw">pub fn </span>test_sub_zero() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
