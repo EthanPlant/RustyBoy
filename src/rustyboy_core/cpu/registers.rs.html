@@ -265,6 +265,16 @@
 <a href="#265" id="265">265</a>
 <a href="#266" id="266">266</a>
 <a href="#267" id="267">267</a>
+<a href="#268" id="268">268</a>
+<a href="#269" id="269">269</a>
+<a href="#270" id="270">270</a>
+<a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
 </pre></div><pre class="rust"><code><span class="doccomment">/// The CPU flags
 </span><span class="kw">pub enum </span>Flag {
     <span class="doccomment">/// Set when an arithmetic operation results in a zero value
@@ -352,9 +362,11 @@
     }
 
     <span class="doccomment">/// Set the AF register pair
+    /// Ensure that the lower four bytes of the F register are zero
     </span><span class="kw">pub fn </span>set_af(<span class="kw-2">&amp;mut </span><span class="self">self</span>, value: u16) {
         <span class="self">self</span>.a = ((value &amp; <span class="number">0xFF00</span>) &gt;&gt; <span class="number">8</span>) <span class="kw">as </span>u8;
         <span class="self">self</span>.f = (value &amp; <span class="number">0x00FF</span>) <span class="kw">as </span>u8;
+        <span class="self">self</span>.f &amp;= <span class="number">0xF0</span>;
     }
 
     <span class="doccomment">/// Set the BC register pair
@@ -503,9 +515,17 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_set_af() {
         <span class="kw">let </span><span class="kw-2">mut </span>regs = Registers::new();
+        regs.set_af(<span class="number">0x1230</span>);
+        <span class="macro">assert_eq!</span>(regs.a, <span class="number">0x12</span>);
+        <span class="macro">assert_eq!</span>(regs.f, <span class="number">0x30</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">fn </span>test_set_af_f_lower_nibble_non_zero() {
+        <span class="kw">let </span><span class="kw-2">mut </span>regs = Registers::new();
         regs.set_af(<span class="number">0x1234</span>);
         <span class="macro">assert_eq!</span>(regs.a, <span class="number">0x12</span>);
-        <span class="macro">assert_eq!</span>(regs.f, <span class="number">0x34</span>);
+        <span class="macro">assert_eq!</span>(regs.f, <span class="number">0x30</span>);
     }
 
     <span class="attr">#[test]
