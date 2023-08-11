@@ -90,12 +90,6 @@
 <a href="#90" id="90">90</a>
 <a href="#91" id="91">91</a>
 <a href="#92" id="92">92</a>
-<a href="#93" id="93">93</a>
-<a href="#94" id="94">94</a>
-<a href="#95" id="95">95</a>
-<a href="#96" id="96">96</a>
-<a href="#97" id="97">97</a>
-<a href="#98" id="98">98</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::cpu::Cpu;
 <span class="kw">use </span><span class="kw">crate</span>::mmu::Memory;
 
@@ -186,12 +180,6 @@
             rl_c.clock_cycles_condition
         );
         <span class="macro">assert_eq!</span>(instruction.unwrap().description, rl_c.description);
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_get_instruction_by_opcode_cb_unimplemented() {
-        <span class="kw">let </span>instruction = get_instruction_by_opcode(<span class="kw-2">&amp;</span>OpCode::CB(<span class="number">0x00</span>));
-        <span class="macro">assert_eq!</span>(instruction, <span class="prelude-val">None</span>);
     }
 }
 </code></pre></div></section></main></body></html>
