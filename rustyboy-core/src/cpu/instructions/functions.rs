@@ -244,6 +244,18 @@ pub fn bit(cpu: &mut Cpu, byte: u8, bit: u8) {
     cpu.reg.set_flag(Flag::HalfCarry);
 }
 
+/// Swap the upper and lower nibbles of a byte.
+/// Sets the zero flag if the result is zero.
+/// Clears all other flags.
+pub fn swap(cpu: &mut Cpu, byte: u8) -> u8 {
+    let result = (byte << 4) | (byte >> 4);
+    cpu.reg.clear_all_flags();
+    if result == 0 {
+        cpu.reg.set_flag(Flag::Zero);
+    }
+    result
+}
+
 /// Rotates a byte left through the carry flag.
 /// Sets the zero flag if the result is zero.
 /// Sets the carry flag to the value of bit 7.
@@ -704,6 +716,23 @@ mod tests {
     pub fn test_bit_zero() {
         let mut cpu = Cpu::new();
         bit(&mut cpu, 0x00, 0);
+        assert!(cpu.reg.check_flag(Flag::Zero));
+    }
+
+    #[test]
+    pub fn test_swap() {
+        let mut cpu = Cpu::new();
+        assert_eq!(swap(&mut cpu, 0x12), 0x21);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Carry))
+    }
+
+    #[test]
+    pub fn test_swap_zero() {
+        let mut cpu = Cpu::new();
+        assert_eq!(swap(&mut cpu, 0x00), 0x00);
         assert!(cpu.reg.check_flag(Flag::Zero));
     }
 

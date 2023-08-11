@@ -85,9 +85,11 @@ impl Registers {
     }
 
     /// Set the AF register pair
+    /// Ensure that the lower four bytes of the F register are zero
     pub fn set_af(&mut self, value: u16) {
         self.a = ((value & 0xFF00) >> 8) as u8;
         self.f = (value & 0x00FF) as u8;
+        self.f &= 0xF0;
     }
 
     /// Set the BC register pair
@@ -236,9 +238,17 @@ mod tests {
     #[test]
     fn test_set_af() {
         let mut regs = Registers::new();
+        regs.set_af(0x1230);
+        assert_eq!(regs.a, 0x12);
+        assert_eq!(regs.f, 0x30);
+    }
+
+    #[test]
+    fn test_set_af_f_lower_nibble_non_zero() {
+        let mut regs = Registers::new();
         regs.set_af(0x1234);
         assert_eq!(regs.a, 0x12);
-        assert_eq!(regs.f, 0x34);
+        assert_eq!(regs.f, 0x30);
     }
 
     #[test]

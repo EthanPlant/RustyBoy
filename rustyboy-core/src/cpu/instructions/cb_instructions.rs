@@ -50,6 +50,18 @@ const RR_E: Instruction = Instruction {
     },
 };
 
+/// 0x37 - SWAP A
+const SWAP_A: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SWAP A",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.a = functions::swap(cpu, cpu.reg.a);
+        InstructionType::ActionTaken
+    },
+};
+
 /// 0x38 - SRL B
 const SRL_B: Instruction = Instruction {
     length: 2,
@@ -82,6 +94,7 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
         0x1A => Some(&RR_D),
         0x1B => Some(&RR_E),
 
+        0x37 => Some(&SWAP_A),
         0x38 => Some(&SRL_B),
 
         0x7C => Some(&BIT_7_H),
@@ -161,6 +174,22 @@ mod tests {
         cpu.reg.clear_flag(Flag::Carry);
         (&RR_E.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x1B));
         assert_eq!(cpu.reg.e, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_swap_a() {
+        let instruction = get_instruction(&0x37).unwrap();
+        assert_eq!(instruction, &SWAP_A);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_swap_a() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x80;
+        (&SWAP_A.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x37));
+        assert_eq!(cpu.reg.a, 0x08);
     }
 
     #[test]
