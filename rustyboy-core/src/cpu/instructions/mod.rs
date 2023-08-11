@@ -89,10 +89,4 @@ mod tests {
         );
         assert_eq!(instruction.unwrap().description, rl_c.description);
     }
-
-    #[test]
-    fn test_get_instruction_by_opcode_cb_unimplemented() {
-        let instruction = get_instruction_by_opcode(&OpCode::CB(0x00));
-        assert_eq!(instruction, None);
-    }
 }

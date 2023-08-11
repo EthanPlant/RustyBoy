@@ -2,6 +2,214 @@ use crate::cpu::cpu::Cpu;
 use crate::cpu::instructions::{functions, Instruction, InstructionType, OpCode};
 use crate::mmu::Memory;
 
+/// 0x00 - RLC B
+const RLC_B: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RLC B",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.b = functions::rlc(cpu, cpu.reg.b);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x01 - RLC C
+const RLC_C: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RLC C",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.c = functions::rlc(cpu, cpu.reg.c);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x02 - RLC D
+const RLC_D: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RLC D",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.d = functions::rlc(cpu, cpu.reg.d);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x03 - RLC E
+const RLC_E: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RLC E",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.e = functions::rlc(cpu, cpu.reg.e);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x04 - RLC H
+const RLC_H: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RLC H",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.h = functions::rlc(cpu, cpu.reg.h);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x05 - RLC L
+const RLC_L: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RLC L",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.l = functions::rlc(cpu, cpu.reg.l);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x06 - RLC (HL)
+const RLC_HL: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 16,
+    clock_cycles_condition: None,
+    description: "RLC (HL)",
+    handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
+        let value = functions::get_hl(cpu, mmu);
+        let result = functions::rlc(cpu, value);
+        mmu.set_byte(cpu.reg.hl(), result);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x07 - RLC A
+const RLC_A: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RLC A",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.a = functions::rlc(cpu, cpu.reg.a);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x08 - RRC B
+const RRC_B: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RRC B",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.b = functions::rrc(cpu, cpu.reg.b);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x09 - RRC C
+const RRC_C: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RRC C",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.c = functions::rrc(cpu, cpu.reg.c);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x0A - RRC D
+const RRC_D: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RRC D",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.d = functions::rrc(cpu, cpu.reg.d);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x0B - RRC E
+const RRC_E: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RRC E",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.e = functions::rrc(cpu, cpu.reg.e);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x0C - RRC H
+const RRC_H: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RRC H",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.h = functions::rrc(cpu, cpu.reg.h);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x0D - RRC L
+const RRC_L: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RRC L",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.l = functions::rrc(cpu, cpu.reg.l);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x0E - RRC (HL)
+const RRC_HL: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 16,
+    clock_cycles_condition: None,
+    description: "RRC (HL)",
+    handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
+        let value = functions::get_hl(cpu, mmu);
+        let result = functions::rrc(cpu, value);
+        mmu.set_byte(cpu.reg.hl(), result);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x0F - RRC A
+const RRC_A: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RRC A",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.a = functions::rrc(cpu, cpu.reg.a);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x10 - RL B
+const RL_B: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RL B",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.b = functions::rl(cpu, cpu.reg.b);
+        InstructionType::ActionTaken
+    },
+};
+
 /// 0x11 - RL C
 const RL_C: Instruction = Instruction {
     length: 2,
@@ -10,6 +218,92 @@ const RL_C: Instruction = Instruction {
     description: "RL C",
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.c = functions::rl(cpu, cpu.reg.c);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x12 - RL D
+const RL_D: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RL D",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.d = functions::rl(cpu, cpu.reg.d);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x13 - RL E
+const RL_E: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RL E",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.e = functions::rl(cpu, cpu.reg.e);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x14 - RL H
+const RL_H: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RL H",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.h = functions::rl(cpu, cpu.reg.h);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x15 - RL L
+const RL_L: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RL L",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.l = functions::rl(cpu, cpu.reg.l);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x16 - RL (HL)
+const RL_HL: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 16,
+    clock_cycles_condition: None,
+    description: "RL (HL)",
+    handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
+        let value = functions::get_hl(cpu, mmu);
+        let result = functions::rl(cpu, value);
+        mmu.set_byte(cpu.reg.hl(), result);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x17 - RL A
+const RL_A: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RL A",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.a = functions::rl(cpu, cpu.reg.a);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x18 - RR B
+const RR_B: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RR B",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.b = functions::rr(cpu, cpu.reg.b);
         InstructionType::ActionTaken
     },
 };
@@ -50,6 +344,338 @@ const RR_E: Instruction = Instruction {
     },
 };
 
+/// 0x1C - RR H
+const RR_H: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RR H",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.h = functions::rr(cpu, cpu.reg.h);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x1D - RR L
+const RR_L: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RR L",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.l = functions::rr(cpu, cpu.reg.l);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x1E - RR (HL)
+const RR_HL: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 16,
+    clock_cycles_condition: None,
+    description: "RR (HL)",
+    handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
+        let value = functions::get_hl(cpu, mmu);
+        let result = functions::rr(cpu, value);
+        mmu.set_byte(cpu.reg.hl(), result);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x1F - RR A
+const RR_A: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RR A",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.a = functions::rr(cpu, cpu.reg.a);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x20 - SLA B
+const SLA_B: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SLA B",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.b = functions::sla(cpu, cpu.reg.b);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x21 - SLA C
+const SLA_C: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SLA C",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.c = functions::sla(cpu, cpu.reg.c);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x22 - SLA D
+const SLA_D: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SLA D",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.d = functions::sla(cpu, cpu.reg.d);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x23 - SLA E
+const SLA_E: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SLA E",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.e = functions::sla(cpu, cpu.reg.e);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x24 - SLA H
+const SLA_H: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SLA H",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.h = functions::sla(cpu, cpu.reg.h);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x25 - SLA L
+const SLA_L: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SLA L",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.l = functions::sla(cpu, cpu.reg.l);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x26 - SLA (HL)
+const SLA_HL: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 16,
+    clock_cycles_condition: None,
+    description: "SLA (HL)",
+    handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
+        let value = functions::get_hl(cpu, mmu);
+        let result = functions::sla(cpu, value);
+        mmu.set_byte(cpu.reg.hl(), result);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x27 - SLA A
+const SLA_A: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SLA A",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.a = functions::sla(cpu, cpu.reg.a);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x28 - SRA B
+const SRA_B: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SRA B",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.b = functions::sra(cpu, cpu.reg.b);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x29 - SRA C
+const SRA_C: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SRA C",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.c = functions::sra(cpu, cpu.reg.c);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x2A - SRA D
+const SRA_D: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SRA D",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.d = functions::sra(cpu, cpu.reg.d);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x2B - SRA E
+const SRA_E: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SRA E",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.e = functions::sra(cpu, cpu.reg.e);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x2C - SRA H
+const SRA_H: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SRA H",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.h = functions::sra(cpu, cpu.reg.h);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x2D - SRA L
+const SRA_L: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SRA L",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.l = functions::sra(cpu, cpu.reg.l);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x2E - SRA (HL)
+const SRA_HL: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 16,
+    clock_cycles_condition: None,
+    description: "SRA (HL)",
+    handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
+        let value = functions::get_hl(cpu, mmu);
+        let result = functions::sra(cpu, value);
+        mmu.set_byte(cpu.reg.hl(), result);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x2F - SRA A
+const SRA_A: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SRA A",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.a = functions::sra(cpu, cpu.reg.a);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x30 - SWAP B
+const SWAP_B: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SWAP B",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.b = functions::swap(cpu, cpu.reg.b);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x31 - SWAP C
+const SWAP_C: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SWAP C",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.c = functions::swap(cpu, cpu.reg.c);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x32 - SWAP D
+const SWAP_D: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SWAP D",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.d = functions::swap(cpu, cpu.reg.d);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x33 - SWAP E
+const SWAP_E: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SWAP E",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.e = functions::swap(cpu, cpu.reg.e);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x34 - SWAP H
+const SWAP_H: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SWAP H",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.h = functions::swap(cpu, cpu.reg.h);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x35 - SWAP L
+const SWAP_L: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SWAP L",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.l = functions::swap(cpu, cpu.reg.l);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x36 - SWAP (HL)
+const SWAP_HL: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 16,
+    clock_cycles_condition: None,
+    description: "SWAP (HL)",
+    handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
+        let value = functions::get_hl(cpu, mmu);
+        let result = functions::swap(cpu, value);
+        mmu.set_byte(cpu.reg.hl(), result);
+        InstructionType::ActionTaken
+    },
+};
+
 /// 0x37 - SWAP A
 const SWAP_A: Instruction = Instruction {
     length: 2,
@@ -70,6 +696,92 @@ const SRL_B: Instruction = Instruction {
     description: "SRL B",
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         cpu.reg.b = functions::srl(cpu, cpu.reg.b);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x39 - SRL C
+const SRL_C: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SRL C",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.c = functions::srl(cpu, cpu.reg.c);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x3A - SRL D
+const SRL_D: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SRL D",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.d = functions::srl(cpu, cpu.reg.d);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x3B - SRL E
+const SRL_E: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SRL E",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.e = functions::srl(cpu, cpu.reg.e);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x3C - SRL H
+const SRL_H: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SRL H",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.h = functions::srl(cpu, cpu.reg.h);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x3D - SRL L
+const SRL_L: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SRL L",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.l = functions::srl(cpu, cpu.reg.l);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x3E - SRL (HL)
+const SRL_HL: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 16,
+    clock_cycles_condition: None,
+    description: "SRL (HL)",
+    handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
+        let value = functions::get_hl(cpu, mmu);
+        let result = functions::srl(cpu, value);
+        mmu.set_byte(cpu.reg.hl(), result);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x3F - SRL A
+const SRL_A: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "SRL A",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.a = functions::srl(cpu, cpu.reg.a);
         InstructionType::ActionTaken
     },
 };
@@ -2413,13 +3125,73 @@ const SET_7_A: Instruction = Instruction {
 /// Get a CB instruction by opcode
 pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
     match op_code {
+        0x00 => Some(&RLC_B),
+        0x01 => Some(&RLC_C),
+        0x02 => Some(&RLC_D),
+        0x03 => Some(&RLC_E),
+        0x04 => Some(&RLC_H),
+        0x05 => Some(&RLC_L),
+        0x06 => Some(&RLC_HL),
+        0x07 => Some(&RLC_A),
+        0x08 => Some(&RRC_B),
+        0x09 => Some(&RRC_C),
+        0x0A => Some(&RRC_D),
+        0x0B => Some(&RRC_E),
+        0x0C => Some(&RRC_H),
+        0x0D => Some(&RRC_L),
+        0x0E => Some(&RRC_HL),
+        0x0F => Some(&RRC_A),
+
+        0x10 => Some(&RL_B),
         0x11 => Some(&RL_C),
+        0x12 => Some(&RL_D),
+        0x13 => Some(&RL_E),
+        0x14 => Some(&RL_H),
+        0x15 => Some(&RL_L),
+        0x16 => Some(&RL_HL),
+        0x17 => Some(&RL_A),
+        0x18 => Some(&RR_B),
         0x19 => Some(&RR_C),
         0x1A => Some(&RR_D),
         0x1B => Some(&RR_E),
+        0x1C => Some(&RR_H),
+        0x1D => Some(&RR_L),
+        0x1E => Some(&RR_HL),
+        0x1F => Some(&RR_A),
 
+        0x20 => Some(&SLA_B),
+        0x21 => Some(&SLA_C),
+        0x22 => Some(&SLA_D),
+        0x23 => Some(&SLA_E),
+        0x24 => Some(&SLA_H),
+        0x25 => Some(&SLA_L),
+        0x26 => Some(&SLA_HL),
+        0x27 => Some(&SLA_A),
+        0x28 => Some(&SRA_B),
+        0x29 => Some(&SRA_C),
+        0x2A => Some(&SRA_D),
+        0x2B => Some(&SRA_E),
+        0x2C => Some(&SRA_H),
+        0x2D => Some(&SRA_L),
+        0x2E => Some(&SRA_HL),
+        0x2F => Some(&SRA_A),
+
+        0x30 => Some(&SWAP_B),
+        0x31 => Some(&SWAP_C),
+        0x32 => Some(&SWAP_D),
+        0x33 => Some(&SWAP_E),
+        0x34 => Some(&SWAP_H),
+        0x35 => Some(&SWAP_L),
+        0x36 => Some(&SWAP_HL),
         0x37 => Some(&SWAP_A),
         0x38 => Some(&SRL_B),
+        0x39 => Some(&SRL_C),
+        0x3A => Some(&SRL_D),
+        0x3B => Some(&SRL_E),
+        0x3C => Some(&SRL_H),
+        0x3D => Some(&SRL_L),
+        0x3E => Some(&SRL_HL),
+        0x3F => Some(&SRL_A),
 
         0x40 => Some(&BIT_0_B),
         0x41 => Some(&BIT_0_C),
@@ -2624,8 +3396,6 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
         0xFD => Some(&SET_7_L),
         0xFE => Some(&SET_7_HL),
         0xFF => Some(&SET_7_A),
-
-        _ => None,
     }
 }
 
@@ -2634,6 +3404,299 @@ mod tests {
     use super::*;
 
     use crate::cpu::registers::Flag;
+
+    #[test]
+    pub fn test_get_instruction_rlc_b() {
+        let instruction = get_instruction(&0x00).unwrap();
+        assert_eq!(instruction, &RLC_B);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rlc_b() {
+        let mut cpu = Cpu::new();
+        cpu.reg.b = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RLC_B.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x00));
+        assert_eq!(cpu.reg.b, 0x01);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rlc_c() {
+        let instruction = get_instruction(&0x01).unwrap();
+        assert_eq!(instruction, &RLC_C);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rlc_c() {
+        let mut cpu = Cpu::new();
+        cpu.reg.c = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RLC_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x01));
+        assert_eq!(cpu.reg.c, 0x01);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rlc_d() {
+        let instruction = get_instruction(&0x02).unwrap();
+        assert_eq!(instruction, &RLC_D);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rlc_d() {
+        let mut cpu = Cpu::new();
+        cpu.reg.d = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RLC_D.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x02));
+        assert_eq!(cpu.reg.d, 0x01);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rlc_e() {
+        let instruction = get_instruction(&0x03).unwrap();
+        assert_eq!(instruction, &RLC_E);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rlc_e() {
+        let mut cpu = Cpu::new();
+        cpu.reg.e = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RLC_E.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x03));
+        assert_eq!(cpu.reg.e, 0x01);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rlc_h() {
+        let instruction = get_instruction(&0x04).unwrap();
+        assert_eq!(instruction, &RLC_H);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rlc_h() {
+        let mut cpu = Cpu::new();
+        cpu.reg.h = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RLC_H.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x04));
+        assert_eq!(cpu.reg.h, 0x01);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rlc_l() {
+        let instruction = get_instruction(&0x05).unwrap();
+        assert_eq!(instruction, &RLC_L);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rlc_l() {
+        let mut cpu = Cpu::new();
+        cpu.reg.l = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RLC_L.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x05));
+        assert_eq!(cpu.reg.l, 0x01);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rlc_hl() {
+        let instruction = get_instruction(&0x06).unwrap();
+        assert_eq!(instruction, &RLC_HL);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 16);
+    }
+
+    #[test]
+    pub fn test_rlc_hl() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        mmu.set_byte(0xC000 as usize, 0x80);
+        cpu.reg.set_hl(0xC000);
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RLC_HL.handler)(&mut cpu, &mut mmu, &OpCode::CB(0x06));
+        assert_eq!(mmu.get_byte(0xC000 as usize), 0x01);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rlc_a() {
+        let instruction = get_instruction(&0x07).unwrap();
+        assert_eq!(instruction, &RLC_A);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rlc_a() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RLC_A.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x07));
+        assert_eq!(cpu.reg.a, 0x01);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rrc_b() {
+        let instruction = get_instruction(&0x08).unwrap();
+        assert_eq!(instruction, &RRC_B);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rrc_b() {
+        let mut cpu = Cpu::new();
+        cpu.reg.b = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RRC_B.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x08));
+        assert_eq!(cpu.reg.b, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rrc_c() {
+        let instruction = get_instruction(&0x09).unwrap();
+        assert_eq!(instruction, &RRC_C);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rrc_c() {
+        let mut cpu = Cpu::new();
+        cpu.reg.c = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RRC_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x09));
+        assert_eq!(cpu.reg.c, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rrc_d() {
+        let instruction = get_instruction(&0x0A).unwrap();
+        assert_eq!(instruction, &RRC_D);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rrc_d() {
+        let mut cpu = Cpu::new();
+        cpu.reg.d = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RRC_D.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x0A));
+        assert_eq!(cpu.reg.d, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rrc_e() {
+        let instruction = get_instruction(&0x0B).unwrap();
+        assert_eq!(instruction, &RRC_E);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rrc_e() {
+        let mut cpu = Cpu::new();
+        cpu.reg.e = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RRC_E.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x0B));
+        assert_eq!(cpu.reg.e, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rrc_h() {
+        let instruction = get_instruction(&0x0C).unwrap();
+        assert_eq!(instruction, &RRC_H);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rrc_h() {
+        let mut cpu = Cpu::new();
+        cpu.reg.h = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RRC_H.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x0C));
+        assert_eq!(cpu.reg.h, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rrc_l() {
+        let instruction = get_instruction(&0x0D).unwrap();
+        assert_eq!(instruction, &RRC_L);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rrc_l() {
+        let mut cpu = Cpu::new();
+        cpu.reg.l = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RRC_L.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x0D));
+        assert_eq!(cpu.reg.l, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rrc_hl() {
+        let instruction = get_instruction(&0x0E).unwrap();
+        assert_eq!(instruction, &RRC_HL);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 16);
+    }
+
+    #[test]
+    pub fn test_rrc_hl() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        mmu.set_byte(0xC000 as usize, 0x80);
+        cpu.reg.set_hl(0xC000);
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RRC_HL.handler)(&mut cpu, &mut mmu, &OpCode::CB(0x0E));
+        assert_eq!(mmu.get_byte(0xC000 as usize), 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rrc_a() {
+        let instruction = get_instruction(&0x0F).unwrap();
+        assert_eq!(instruction, &RRC_A);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rrc_a() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RRC_A.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x0F));
+        assert_eq!(cpu.reg.a, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rl_b() {
+        let instruction = get_instruction(&0x10).unwrap();
+        assert_eq!(instruction, &RL_B);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rl_b() {
+        let mut cpu = Cpu::new();
+        cpu.reg.b = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RL_B.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x10));
+        assert_eq!(cpu.reg.b, 0x00);
+    }
 
     #[test]
     pub fn test_get_instruction_rl_c() {
@@ -2650,6 +3713,127 @@ mod tests {
         cpu.reg.clear_flag(Flag::Carry);
         (&RL_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x11));
         assert_eq!(cpu.reg.c, 0x00);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rl_d() {
+        let instruction = get_instruction(&0x12).unwrap();
+        assert_eq!(instruction, &RL_D);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rl_d() {
+        let mut cpu = Cpu::new();
+        cpu.reg.d = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RL_D.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x12));
+        assert_eq!(cpu.reg.d, 0x00);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rl_e() {
+        let instruction = get_instruction(&0x13).unwrap();
+        assert_eq!(instruction, &RL_E);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rl_e() {
+        let mut cpu = Cpu::new();
+        cpu.reg.e = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RL_E.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x13));
+        assert_eq!(cpu.reg.e, 0x00);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rl_h() {
+        let instruction = get_instruction(&0x14).unwrap();
+        assert_eq!(instruction, &RL_H);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rl_h() {
+        let mut cpu = Cpu::new();
+        cpu.reg.h = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RL_H.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x14));
+        assert_eq!(cpu.reg.h, 0x00);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rl_l() {
+        let instruction = get_instruction(&0x15).unwrap();
+        assert_eq!(instruction, &RL_L);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rl_l() {
+        let mut cpu = Cpu::new();
+        cpu.reg.l = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RL_L.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x15));
+        assert_eq!(cpu.reg.l, 0x00);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rl_hl() {
+        let instruction = get_instruction(&0x16).unwrap();
+        assert_eq!(instruction, &RL_HL);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 16);
+    }
+
+    #[test]
+    pub fn test_rl_hl() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        mmu.set_byte(0xC000 as usize, 0x80);
+        cpu.reg.set_hl(0xC000);
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RL_HL.handler)(&mut cpu, &mut mmu, &OpCode::CB(0x16));
+        assert_eq!(mmu.get_byte(0xC000 as usize), 0x00);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rl_a() {
+        let instruction = get_instruction(&0x17).unwrap();
+        assert_eq!(instruction, &RL_A);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rl_a() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RL_A.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x17));
+        assert_eq!(cpu.reg.a, 0x00);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rr_b() {
+        let instruction = get_instruction(&0x18).unwrap();
+        assert_eq!(instruction, &RR_B);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rr_b() {
+        let mut cpu = Cpu::new();
+        cpu.reg.b = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RR_B.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x18));
+        assert_eq!(cpu.reg.b, 0x40);
     }
 
     #[test]
@@ -2704,6 +3888,450 @@ mod tests {
     }
 
     #[test]
+    pub fn test_get_instruction_rr_h() {
+        let instruction = get_instruction(&0x1C).unwrap();
+        assert_eq!(instruction, &RR_H);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rr_h() {
+        let mut cpu = Cpu::new();
+        cpu.reg.h = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RR_H.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x1C));
+        assert_eq!(cpu.reg.h, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rr_l() {
+        let instruction = get_instruction(&0x1D).unwrap();
+        assert_eq!(instruction, &RR_L);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rr_l() {
+        let mut cpu = Cpu::new();
+        cpu.reg.l = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RR_L.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x1D));
+        assert_eq!(cpu.reg.l, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rr_hl() {
+        let instruction = get_instruction(&0x1E).unwrap();
+        assert_eq!(instruction, &RR_HL);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 16);
+    }
+
+    #[test]
+    pub fn test_rr_hl() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        mmu.set_byte(0xC000 as usize, 0x80);
+        cpu.reg.set_hl(0xC000);
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RR_HL.handler)(&mut cpu, &mut mmu, &OpCode::CB(0x1E));
+        assert_eq!(mmu.get_byte(0xC000 as usize), 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rr_a() {
+        let instruction = get_instruction(&0x1F).unwrap();
+        assert_eq!(instruction, &RR_A);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rr_a() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RR_A.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x1F));
+        assert_eq!(cpu.reg.a, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_sla_b() {
+        let instruction = get_instruction(&0x20).unwrap();
+        assert_eq!(instruction, &SLA_B);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_sla_b() {
+        let mut cpu = Cpu::new();
+        cpu.reg.b = 0x80;
+        (&SLA_B.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x20));
+        assert_eq!(cpu.reg.b, 0x00);
+    }
+
+    #[test]
+    pub fn test_get_instruction_sla_c() {
+        let instruction = get_instruction(&0x21).unwrap();
+        assert_eq!(instruction, &SLA_C);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_sla_c() {
+        let mut cpu = Cpu::new();
+        cpu.reg.c = 0x80;
+        (&SLA_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x21));
+        assert_eq!(cpu.reg.c, 0x00);
+    }
+
+    #[test]
+    pub fn test_get_instruction_sla_d() {
+        let instruction = get_instruction(&0x22).unwrap();
+        assert_eq!(instruction, &SLA_D);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_sla_d() {
+        let mut cpu = Cpu::new();
+        cpu.reg.d = 0x80;
+        (&SLA_D.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x22));
+        assert_eq!(cpu.reg.d, 0x00);
+    }
+
+    #[test]
+    pub fn test_get_instruction_sla_e() {
+        let instruction = get_instruction(&0x23).unwrap();
+        assert_eq!(instruction, &SLA_E);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_sla_e() {
+        let mut cpu = Cpu::new();
+        cpu.reg.e = 0x80;
+        (&SLA_E.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x23));
+        assert_eq!(cpu.reg.e, 0x00);
+    }
+
+    #[test]
+    pub fn test_get_instruction_sla_h() {
+        let instruction = get_instruction(&0x24).unwrap();
+        assert_eq!(instruction, &SLA_H);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_sla_h() {
+        let mut cpu = Cpu::new();
+        cpu.reg.h = 0x80;
+        (&SLA_H.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x24));
+        assert_eq!(cpu.reg.h, 0x00);
+    }
+
+    #[test]
+    pub fn test_get_instruction_sla_l() {
+        let instruction = get_instruction(&0x25).unwrap();
+        assert_eq!(instruction, &SLA_L);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_sla_l() {
+        let mut cpu = Cpu::new();
+        cpu.reg.l = 0x80;
+        (&SLA_L.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x25));
+        assert_eq!(cpu.reg.l, 0x00);
+    }
+
+    #[test]
+    pub fn test_get_instruction_sla_hl() {
+        let instruction = get_instruction(&0x26).unwrap();
+        assert_eq!(instruction, &SLA_HL);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 16);
+    }
+
+    #[test]
+    pub fn test_sla_hl() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        mmu.set_byte(0xC000 as usize, 0x80);
+        cpu.reg.set_hl(0xC000);
+        (&SLA_HL.handler)(&mut cpu, &mut mmu, &OpCode::CB(0x26));
+        assert_eq!(mmu.get_byte(0xC000 as usize), 0x00);
+    }
+
+    #[test]
+    pub fn test_get_instruction_sla_a() {
+        let instruction = get_instruction(&0x27).unwrap();
+        assert_eq!(instruction, &SLA_A);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_sla_a() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x80;
+        (&SLA_A.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x27));
+        assert_eq!(cpu.reg.a, 0x00);
+    }
+
+    #[test]
+    pub fn test_get_instruction_sra_b() {
+        let instruction = get_instruction(&0x28).unwrap();
+        assert_eq!(instruction, &SRA_B);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_sra_b() {
+        let mut cpu = Cpu::new();
+        cpu.reg.b = 0x81;
+        (&SRA_B.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x28));
+        assert_eq!(cpu.reg.b, 0xC0);
+    }
+
+    #[test]
+    pub fn test_get_instruction_sra_c() {
+        let instruction = get_instruction(&0x29).unwrap();
+        assert_eq!(instruction, &SRA_C);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_sra_c() {
+        let mut cpu = Cpu::new();
+        cpu.reg.c = 0x81;
+        (&SRA_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x29));
+        assert_eq!(cpu.reg.c, 0xC0);
+    }
+
+    #[test]
+    pub fn test_get_instruction_sra_d() {
+        let instruction = get_instruction(&0x2A).unwrap();
+        assert_eq!(instruction, &SRA_D);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_sra_d() {
+        let mut cpu = Cpu::new();
+        cpu.reg.d = 0x81;
+        (&SRA_D.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x2A));
+        assert_eq!(cpu.reg.d, 0xC0);
+    }
+
+    #[test]
+    pub fn test_get_instruction_sra_e() {
+        let instruction = get_instruction(&0x2B).unwrap();
+        assert_eq!(instruction, &SRA_E);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_sra_e() {
+        let mut cpu = Cpu::new();
+        cpu.reg.e = 0x81;
+        (&SRA_E.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x2B));
+        assert_eq!(cpu.reg.e, 0xC0);
+    }
+
+    #[test]
+    pub fn test_get_instruction_sra_h() {
+        let instruction = get_instruction(&0x2C).unwrap();
+        assert_eq!(instruction, &SRA_H);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_sra_h() {
+        let mut cpu = Cpu::new();
+        cpu.reg.h = 0x81;
+        (&SRA_H.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x2C));
+        assert_eq!(cpu.reg.h, 0xC0);
+    }
+
+    #[test]
+    pub fn test_get_instruction_sra_l() {
+        let instruction = get_instruction(&0x2D).unwrap();
+        assert_eq!(instruction, &SRA_L);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_sra_l() {
+        let mut cpu = Cpu::new();
+        cpu.reg.l = 0x81;
+        (&SRA_L.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x2D));
+        assert_eq!(cpu.reg.l, 0xC0);
+    }
+
+    #[test]
+    pub fn test_get_instruction_sra_hl() {
+        let instruction = get_instruction(&0x2E).unwrap();
+        assert_eq!(instruction, &SRA_HL);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 16);
+    }
+
+    #[test]
+    pub fn test_sra_hl() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        mmu.set_byte(0xC000 as usize, 0x81);
+        cpu.reg.set_hl(0xC000);
+        (&SRA_HL.handler)(&mut cpu, &mut mmu, &OpCode::CB(0x2E));
+        assert_eq!(mmu.get_byte(0xC000 as usize), 0xC0);
+    }
+
+    #[test]
+    pub fn test_get_instruction_sra_a() {
+        let instruction = get_instruction(&0x2F).unwrap();
+        assert_eq!(instruction, &SRA_A);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_sra_a() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x81;
+        (&SRA_A.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x2F));
+        assert_eq!(cpu.reg.a, 0xC0);
+    }
+
+    #[test]
+    pub fn test_get_instruction_swap_b() {
+        let instruction = get_instruction(&0x30).unwrap();
+        assert_eq!(instruction, &SWAP_B);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_swap_b() {
+        let mut cpu = Cpu::new();
+        cpu.reg.b = 0x80;
+        (&SWAP_B.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x30));
+        assert_eq!(cpu.reg.b, 0x08);
+    }
+
+    #[test]
+    pub fn test_get_instruction_swap_c() {
+        let instruction = get_instruction(&0x31).unwrap();
+        assert_eq!(instruction, &SWAP_C);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_swap_c() {
+        let mut cpu = Cpu::new();
+        cpu.reg.c = 0x80;
+        (&SWAP_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x31));
+        assert_eq!(cpu.reg.c, 0x08);
+    }
+
+    #[test]
+    pub fn test_get_instruction_swap_d() {
+        let instruction = get_instruction(&0x32).unwrap();
+        assert_eq!(instruction, &SWAP_D);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_swap_d() {
+        let mut cpu = Cpu::new();
+        cpu.reg.d = 0x80;
+        (&SWAP_D.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x32));
+        assert_eq!(cpu.reg.d, 0x08);
+    }
+
+    #[test]
+    pub fn test_get_instruction_swap_e() {
+        let instruction = get_instruction(&0x33).unwrap();
+        assert_eq!(instruction, &SWAP_E);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_swap_e() {
+        let mut cpu = Cpu::new();
+        cpu.reg.e = 0x80;
+        (&SWAP_E.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x33));
+        assert_eq!(cpu.reg.e, 0x08);
+    }
+
+    #[test]
+    pub fn test_get_instruction_swap_h() {
+        let instruction = get_instruction(&0x34).unwrap();
+        assert_eq!(instruction, &SWAP_H);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_swap_h() {
+        let mut cpu = Cpu::new();
+        cpu.reg.h = 0x80;
+        (&SWAP_H.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x34));
+        assert_eq!(cpu.reg.h, 0x08);
+    }
+
+    #[test]
+    pub fn test_get_instruction_swap_l() {
+        let instruction = get_instruction(&0x35).unwrap();
+        assert_eq!(instruction, &SWAP_L);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_swap_l() {
+        let mut cpu = Cpu::new();
+        cpu.reg.l = 0x80;
+        (&SWAP_L.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x35));
+        assert_eq!(cpu.reg.l, 0x08);
+    }
+
+    #[test]
+    pub fn test_get_instruction_swap_hl() {
+        let instruction = get_instruction(&0x36).unwrap();
+        assert_eq!(instruction, &SWAP_HL);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 16);
+    }
+
+    #[test]
+    pub fn test_swap_hl() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        mmu.set_byte(0xC000 as usize, 0x80);
+        cpu.reg.set_hl(0xC000);
+        (&SWAP_HL.handler)(&mut cpu, &mut mmu, &OpCode::CB(0x36));
+        assert_eq!(mmu.get_byte(0xC000 as usize), 0x08);
+    }
+
+    #[test]
     pub fn test_get_instruction_swap_a() {
         let instruction = get_instruction(&0x37).unwrap();
         assert_eq!(instruction, &SWAP_A);
@@ -2733,6 +4361,120 @@ mod tests {
         cpu.reg.b = 0x80;
         (&SRL_B.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x38));
         assert_eq!(cpu.reg.b, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_srl_c() {
+        let instruction = get_instruction(&0x39).unwrap();
+        assert_eq!(instruction, &SRL_C);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_srl_c() {
+        let mut cpu = Cpu::new();
+        cpu.reg.c = 0x80;
+        (&SRL_C.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x39));
+        assert_eq!(cpu.reg.c, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_srl_d() {
+        let instruction = get_instruction(&0x3A).unwrap();
+        assert_eq!(instruction, &SRL_D);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_srl_d() {
+        let mut cpu = Cpu::new();
+        cpu.reg.d = 0x80;
+        (&SRL_D.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x3A));
+        assert_eq!(cpu.reg.d, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_srl_e() {
+        let instruction = get_instruction(&0x3B).unwrap();
+        assert_eq!(instruction, &SRL_E);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_srl_e() {
+        let mut cpu = Cpu::new();
+        cpu.reg.e = 0x80;
+        (&SRL_E.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x3B));
+        assert_eq!(cpu.reg.e, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_srl_h() {
+        let instruction = get_instruction(&0x3C).unwrap();
+        assert_eq!(instruction, &SRL_H);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_srl_h() {
+        let mut cpu = Cpu::new();
+        cpu.reg.h = 0x80;
+        (&SRL_H.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x3C));
+        assert_eq!(cpu.reg.h, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_srl_l() {
+        let instruction = get_instruction(&0x3D).unwrap();
+        assert_eq!(instruction, &SRL_L);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_srl_l() {
+        let mut cpu = Cpu::new();
+        cpu.reg.l = 0x80;
+        (&SRL_L.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x3D));
+        assert_eq!(cpu.reg.l, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_srl_hl() {
+        let instruction = get_instruction(&0x3E).unwrap();
+        assert_eq!(instruction, &SRL_HL);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 16);
+    }
+
+    #[test]
+    pub fn test_srl_hl() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        mmu.set_byte(0xC000 as usize, 0x80);
+        cpu.reg.set_hl(0xC000);
+        (&SRL_HL.handler)(&mut cpu, &mut mmu, &OpCode::CB(0x3E));
+        assert_eq!(mmu.get_byte(0xC000 as usize), 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_srl_a() {
+        let instruction = get_instruction(&0x3F).unwrap();
+        assert_eq!(instruction, &SRL_A);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_srl_a() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x80;
+        (&SRL_A.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x3F));
+        assert_eq!(cpu.reg.a, 0x40);
     }
 
     #[test]

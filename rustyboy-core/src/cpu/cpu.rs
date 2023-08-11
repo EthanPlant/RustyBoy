@@ -195,15 +195,4 @@ mod tests {
         mmu.set_byte(0xC000 as usize, 0xD3 as u8);
         cpu.step(&mut mmu);
     }
-
-    #[test]
-    #[should_panic(expected = "Unimplemented CB instruction! 0x00 PC: 0xC000")]
-    fn test_step_unimplemented_cb_instruction() {
-        let mut mmu = Memory::new();
-        let mut cpu = Cpu::new();
-        cpu.reg.pc = 0xC000;
-        mmu.set_byte(0xC000 as usize, 0xCB);
-        mmu.set_byte(0xC001 as usize, 0x00);
-        cpu.step(&mut mmu);
-    }
 }
