@@ -170,6 +170,40 @@ pub fn cp(cpu: &mut Cpu, byte: u8) {
     cpu.reg.set_flag(Flag::Negative);
 }
 
+/// Decimal adjust the A register.
+/// Sets the zero flag if the result is zero.
+/// Clears the half carry flag.
+/// Sets the carry flag if the result overflows.
+/// Implementation taken from https://forums.nesdev.org/viewtopic.php?f=20&t=15944
+pub fn daa(cpu: &mut Cpu) {
+    if !cpu.reg.check_flag(Flag::Negative) {
+        // After an addition, adjust if a (half) carry occured or the result is out of bounds
+        if cpu.reg.check_flag(Flag::Carry) || cpu.reg.a > 0x99 {
+            cpu.reg.a = cpu.reg.a.wrapping_add(0x60);
+            cpu.reg.set_flag(Flag::Carry);
+        }
+        if cpu.reg.check_flag(Flag::HalfCarry) || cpu.reg.a & 0x0F > 0x09 {
+            cpu.reg.a = cpu.reg.a.wrapping_add(0x06);
+        }
+    } else {
+        // After a subtraction, only adjust if a (half) carry occured
+        if cpu.reg.check_flag(Flag::Carry) {
+            cpu.reg.a = cpu.reg.a.wrapping_sub(0x60);
+        }
+        if cpu.reg.check_flag(Flag::HalfCarry) {
+            cpu.reg.a = cpu.reg.a.wrapping_sub(0x06);
+        }
+    }
+
+    if cpu.reg.a == 0 {
+        cpu.reg.set_flag(Flag::Zero);
+    } else {
+        cpu.reg.clear_flag(Flag::Zero);
+    }
+
+    cpu.reg.clear_flag(Flag::HalfCarry);
+}
+
 /// Decrement a byte.
 /// Sets the zero flag if the result is zero.
 /// Sets the subtract flag.
@@ -688,6 +722,130 @@ mod tests {
         cpu.reg.a = 0x00;
         cp(&mut cpu, 0x01);
         assert!(cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_daa_zero() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x00;
+        cpu.reg.clear_all_flags();
+        daa(&mut cpu);
+        assert_eq!(cpu.reg.a, 0x00);
+        assert!(cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_daa_positive() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x01;
+        cpu.reg.clear_all_flags();
+        daa(&mut cpu);
+        assert_eq!(cpu.reg.a, 0x01);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_daa_carry_positive() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x00;
+        cpu.reg.clear_all_flags();
+        cpu.reg.set_flag(Flag::Carry);
+        daa(&mut cpu);
+        assert_eq!(cpu.reg.a, 0x60);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_daa_halfcarry_positive() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x00;
+        cpu.reg.clear_all_flags();
+        cpu.reg.set_flag(Flag::HalfCarry);
+        daa(&mut cpu);
+        assert_eq!(cpu.reg.a, 0x06);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_daa_high_nibble_overflow_positive() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0xA0;
+        cpu.reg.clear_all_flags();
+        daa(&mut cpu);
+        assert_eq!(cpu.reg.a, 0x00);
+        assert!(cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_daa_low_nibble_overflow_positive() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x0A;
+        cpu.reg.clear_all_flags();
+        daa(&mut cpu);
+        assert_eq!(cpu.reg.a, 0x10);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_daa_negative() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x01;
+        cpu.reg.clear_all_flags();
+        cpu.reg.set_flag(Flag::Negative);
+        daa(&mut cpu);
+        assert_eq!(cpu.reg.a, 0x01);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(cpu.reg.check_flag(Flag::Negative));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_daa_carry_negative() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x00;
+        cpu.reg.clear_all_flags();
+        cpu.reg.set_flag(Flag::Negative);
+        cpu.reg.set_flag(Flag::Carry);
+        daa(&mut cpu);
+        assert_eq!(cpu.reg.a, 0xA0);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(cpu.reg.check_flag(Flag::Negative));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_daa_halfcarry_negative() {
+        let mut cpu = Cpu::new();
+        cpu.reg.a = 0x00;
+        cpu.reg.clear_all_flags();
+        cpu.reg.set_flag(Flag::Negative);
+        cpu.reg.set_flag(Flag::HalfCarry);
+        daa(&mut cpu);
+        assert_eq!(cpu.reg.a, 0xFA);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(cpu.reg.check_flag(Flag::Negative));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
     }
 
     #[test]
