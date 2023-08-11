@@ -119,6 +119,23 @@ pub fn add16(cpu: &mut Cpu, word: u16) {
     cpu.reg.set_hl(result);
 }
 
+/// Add a signed byte to the stack pointer.
+/// Sets the carry flag if there's an overflow from the lower byte
+/// Sets the half carry flag if there's an overflow from bit 3
+/// Clears all other flags
+pub fn add_sp(cpu: &mut Cpu, mmu: &mut Memory) -> u16 {
+    let op = get_op8(cpu, mmu, 1) as i8;
+    let result = cpu.reg.sp.wrapping_add_signed(op as i16);
+    cpu.reg.clear_all_flags();
+    if (cpu.reg.sp & 0x0F) + (op as u16 & 0x0F) > 0x0F {
+        cpu.reg.set_flag(Flag::HalfCarry);
+    }
+    if (cpu.reg.sp & 0xFF) + (op as u16 & 0xFF) > 0xFF {
+        cpu.reg.set_flag(Flag::Carry);
+    }
+    result
+}
+
 /// Logical AND on a byte and the A register.
 /// Sets the zero flag if the result is zero.
 /// Sets the half carry flag.
@@ -569,6 +586,52 @@ mod tests {
         add16(&mut cpu, 0x0001);
         assert_eq!(cpu.reg.hl(), 0x0000);
         assert!(cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_add_sp() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        cpu.reg.sp = 0x0001;
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC001 as usize, 0x01);
+        assert_eq!(add_sp(&mut cpu, &mut mmu), 0x0002);
+        assert!(!cpu.reg.check_flag(Flag::Zero));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_add_sp_halfcarry() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        cpu.reg.sp = 0x000F;
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC001 as usize, 0x01);
+        assert_eq!(add_sp(&mut cpu, &mut mmu), 0x0010);
+        assert!(cpu.reg.check_flag(Flag::HalfCarry));
+    }
+
+    #[test]
+    pub fn test_add_sp_carry() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        cpu.reg.sp = 0xFFFF;
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC001 as usize, 0x01);
+        assert_eq!(add_sp(&mut cpu, &mut mmu), 0x0000);
+        assert!(cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_add_sp_negative() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        cpu.reg.sp = 0x0001;
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC001 as usize, 0xFF);
+        assert_eq!(add_sp(&mut cpu, &mut mmu), 0x0000);
     }
 
     #[test]

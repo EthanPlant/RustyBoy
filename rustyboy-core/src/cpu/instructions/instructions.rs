@@ -545,6 +545,18 @@ const LD_HL_DEC_A: Instruction = Instruction {
     },
 };
 
+/// 0x33 - INC SP
+const INC_SP: Instruction = Instruction {
+    length: 1,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "INC SP",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.sp = cpu.reg.sp.wrapping_add(1);
+        InstructionType::ActionTaken
+    },
+};
+
 /// 0x35 - DEC (HL)
 const DEC_HL_PTR: Instruction = Instruction {
     length: 1,
@@ -582,6 +594,30 @@ const JR_C_N: Instruction = Instruction {
             return InstructionType::Jumped;
         }
         InstructionType::None
+    },
+};
+
+/// 0x39 - ADD HL, SP
+const ADD_HL_SP: Instruction = Instruction {
+    length: 1,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "ADD HL SP",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        functions::add16(cpu, cpu.reg.sp);
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0x3B - DEC SP
+const DEC_SP: Instruction = Instruction {
+    length: 1,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "DEC SP",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.sp = cpu.reg.sp.wrapping_sub(1);
+        InstructionType::ActionTaken
     },
 };
 
@@ -1957,6 +1993,18 @@ const RST_20: Instruction = Instruction {
     },
 };
 
+/// 0xE8 - ADD SP, n
+const ADD_SP_N: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 16,
+    clock_cycles_condition: None,
+    description: "ADD SP, n",
+    handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
+        cpu.reg.sp = functions::add_sp(cpu, mmu);
+        InstructionType::ActionTaken
+    },
+};
+
 /// 0xE9 - JP HL
 const JP_HL: Instruction = Instruction {
     length: 1,
@@ -2091,6 +2139,19 @@ const RST_30: Instruction = Instruction {
     },
 };
 
+/// 0xF8 - LD HL, SP + n
+const LD_HL_SP_N: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 12,
+    clock_cycles_condition: None,
+    description: "LD HL, SP + n",
+    handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
+        let res = functions::add_sp(cpu, mmu);
+        cpu.reg.set_hl(res);
+        InstructionType::ActionTaken
+    },
+};
+
 /// 0xF9 - LD SP, HL
 const LD_SP_HL: Instruction = Instruction {
     length: 1,
@@ -2188,9 +2249,12 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
         0x30 => Some(&JR_NC_N),
         0x31 => Some(&LD_SP_NN),
         0x32 => Some(&LD_HL_DEC_A),
+        0x33 => Some(&INC_SP),
         0x35 => Some(&DEC_HL_PTR),
         0x36 => Some(&LD_HL_N),
         0x38 => Some(&JR_C_N),
+        0x39 => Some(&ADD_HL_SP),
+        0x3B => Some(&DEC_SP),
         0x3C => Some(&INC_A),
         0x3D => Some(&DEC_A),
         0x3E => Some(&LD_A_N),
@@ -2313,6 +2377,7 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
         0xE5 => Some(&PUSH_HL),
         0xE6 => Some(&AND_N),
         0xE7 => Some(&RST_20),
+        0xE8 => Some(&ADD_SP_N),
         0xE9 => Some(&JP_HL),
         0xEA => Some(&LD_NN_A),
         0xEE => Some(&XOR_N),
@@ -2325,6 +2390,7 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
         0xF5 => Some(&PUSH_AF),
         0xF6 => Some(&OR_N),
         0xF7 => Some(&RST_30),
+        0xF8 => Some(&LD_HL_SP_N),
         0xF9 => Some(&LD_SP_HL),
         0xFA => Some(&LD_A_NN),
         0xFE => Some(&CP_N),
@@ -3180,6 +3246,47 @@ mod tests {
     }
 
     #[test]
+    pub fn test_get_instruction_add_hl_sp() {
+        let instruction = get_instruction(&0x39).unwrap();
+        assert_eq!(instruction, &ADD_HL_SP);
+        assert_eq!(instruction.length, 1);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_add_hl_sp() {
+        let mut cpu = Cpu::new();
+        cpu.reg.set_hl(0x0001);
+        cpu.reg.sp = 0x0001;
+        (&ADD_HL_SP.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x39));
+        assert_eq!(cpu.reg.hl(), 0x0002);
+    }
+
+    #[test]
+    pub fn test_get_instruction_dec_sp() {
+        let instruction = get_instruction(&0x3B).unwrap();
+        assert_eq!(instruction, &DEC_SP);
+        assert_eq!(instruction.length, 1);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_dec_sp() {
+        let mut cpu = Cpu::new();
+        cpu.reg.sp = 0x0001;
+        (&DEC_SP.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x3B));
+        assert_eq!(cpu.reg.sp, 0x0000);
+    }
+
+    #[test]
+    pub fn test_dec_sp_underflow() {
+        let mut cpu = Cpu::new();
+        cpu.reg.sp = 0x0000;
+        (&DEC_SP.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x3B));
+        assert_eq!(cpu.reg.sp, 0xFFFF);
+    }
+
+    #[test]
     pub fn test_get_instruction_inc_a() {
         let instruction = get_instruction(&0x3C).unwrap();
         assert_eq!(instruction, &INC_A);
@@ -3212,6 +3319,30 @@ mod tests {
         (&LD_HL_DEC_A.handler)(&mut cpu, &mut mmu, &OpCode::Regular(0x32));
         assert_eq!(cpu.reg.hl(), 0xBFFF);
         assert_eq!(mmu.get_byte(0xC000 as usize), 0x01);
+    }
+
+    #[test]
+    pub fn test_get_instruction_inc_sp() {
+        let instruction = get_instruction(&0x33).unwrap();
+        assert_eq!(instruction, &INC_SP);
+        assert_eq!(instruction.length, 1);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_inc_sp() {
+        let mut cpu = Cpu::new();
+        cpu.reg.sp = 0x0000;
+        (&INC_SP.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x33));
+        assert_eq!(cpu.reg.sp, 0x0001);
+    }
+
+    #[test]
+    pub fn test_inc_sp_overflow() {
+        let mut cpu = Cpu::new();
+        cpu.reg.sp = 0xFFFF;
+        (&INC_SP.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0x33));
+        assert_eq!(cpu.reg.sp, 0x0000);
     }
 
     #[test]
@@ -5279,6 +5410,25 @@ mod tests {
     }
 
     #[test]
+    pub fn test_get_instruction_add_sp_n() {
+        let instruction = get_instruction(&0xE8).unwrap();
+        assert_eq!(instruction, &ADD_SP_N);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 16);
+    }
+
+    #[test]
+    pub fn test_add_sp_n() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        cpu.reg.sp = 0x0001;
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC001 as usize, 0x01);
+        (&ADD_SP_N.handler)(&mut cpu, &mut mmu, &OpCode::Regular(0xE8));
+        assert_eq!(cpu.reg.sp, 0x0002);
+    }
+
+    #[test]
     pub fn test_get_instruction_jp_hl() {
         let instruction = get_instruction(&0xE9).unwrap();
         assert_eq!(instruction, &JP_HL);
@@ -5480,6 +5630,25 @@ mod tests {
         assert_eq!(mmu.get_word(0xC000 as usize), 0xC001);
         assert_eq!(cpu.reg.sp, 0xC000);
         assert_eq!(cpu.reg.pc, 0x0030);
+    }
+
+    #[test]
+    pub fn test_get_instruction_ld_hl_sp_n() {
+        let instruction = get_instruction(&0xF8).unwrap();
+        assert_eq!(instruction, &LD_HL_SP_N);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 12);
+    }
+
+    #[test]
+    pub fn test_ld_hl_sp_n() {
+        let mut cpu = Cpu::new();
+        let mut mmu = Memory::new();
+        cpu.reg.sp = 0x0001;
+        cpu.reg.pc = 0xC000;
+        mmu.set_byte(0xC001 as usize, 0x01);
+        (&LD_HL_SP_N.handler)(&mut cpu, &mut mmu, &OpCode::Regular(0xF8));
+        assert_eq!(cpu.reg.hl(), 0x0002);
     }
 
     #[test]

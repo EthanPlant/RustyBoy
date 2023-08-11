@@ -31,7 +31,7 @@ After cloning the repository, simply run `cargo build` in the workspace director
     - [ ] Pass all Blargg test ROMs
         - [ ] 01-special
         - [ ] 02-interrupts
-        - [ ] 03-op sp,hl
+        - [x] 03-op sp,hl
         - [x] 04-op r,imm
         - [x] 05-op rp
         - [x] 06-ld r,r
