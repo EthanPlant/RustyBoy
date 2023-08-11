@@ -3,7 +3,7 @@ pub enum Flag {
     /// Set when an arithmetic operation results in a zero value
     Zero = 0x80,
     /// Set when an arithmetic operation results in a negative value
-    Subtract = 0x40,
+    Negative = 0x40,
     /// Set when an arithmetic operation results in a carry from bit 3 to bit 4
     HalfCarry = 0x20,
     /// Set when an arithmetic operation results in a carry from bit 7 to bit 8
@@ -125,7 +125,7 @@ mod tests {
     #[test]
     fn test_set_subtract_flag() {
         let mut regs = Registers::new();
-        regs.set_flag(Flag::Subtract);
+        regs.set_flag(Flag::Negative);
         assert_eq!(regs.f, 0x40);
     }
 
@@ -155,7 +155,7 @@ mod tests {
     fn test_clear_subtract_flag() {
         let mut regs = Registers::new();
         regs.f = 0xFF;
-        regs.clear_flag(Flag::Subtract);
+        regs.clear_flag(Flag::Negative);
         assert_eq!(regs.f, 0xBF);
     }
 
@@ -188,7 +188,7 @@ mod tests {
         let mut regs = Registers::new();
         regs.f = 0xFF;
         assert_eq!(regs.check_flag(Flag::Zero), true);
-        assert_eq!(regs.check_flag(Flag::Subtract), true);
+        assert_eq!(regs.check_flag(Flag::Negative), true);
         assert_eq!(regs.check_flag(Flag::HalfCarry), true);
         assert_eq!(regs.check_flag(Flag::Carry), true);
     }
@@ -198,7 +198,7 @@ mod tests {
         let mut regs = Registers::new();
         regs.f = 0x00;
         assert_eq!(regs.check_flag(Flag::Zero), false);
-        assert_eq!(regs.check_flag(Flag::Subtract), false);
+        assert_eq!(regs.check_flag(Flag::Negative), false);
         assert_eq!(regs.check_flag(Flag::HalfCarry), false);
         assert_eq!(regs.check_flag(Flag::Carry), false);
     }

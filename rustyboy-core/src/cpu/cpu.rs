@@ -8,7 +8,7 @@ use crate::mmu::Memory;
 pub struct Cpu {
     /// The CPU registers
     pub reg: Registers,
-    pub interrupts_enabled: bool,
+    pub ime: bool,
 }
 
 impl Cpu {
@@ -27,7 +27,7 @@ impl Cpu {
         registers.pc = 0x0100;
         Cpu {
             reg: registers,
-            interrupts_enabled: false,
+            ime: false,
         }
     }
 
@@ -104,7 +104,7 @@ mod tests {
         assert_eq!(cpu.reg.l, 0x4D);
         assert_eq!(cpu.reg.sp, 0xFFFE);
         assert_eq!(cpu.reg.pc, 0x100);
-        assert_eq!(cpu.interrupts_enabled, false)
+        assert_eq!(cpu.ime, false)
     }
 
     #[test]

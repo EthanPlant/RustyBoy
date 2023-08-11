@@ -98,7 +98,7 @@ pub fn add(cpu: &mut Cpu, byte: u8) {
 /// Clears the subtract flag.
 pub fn add16(cpu: &mut Cpu, word: u16) {
     let result = cpu.reg.hl().wrapping_add(word);
-    cpu.reg.clear_flag(Flag::Subtract);
+    cpu.reg.clear_flag(Flag::Negative);
     if (cpu.reg.hl() & 0x0FFF) + (word & 0x0FFF) > 0x0FFF {
         cpu.reg.set_flag(Flag::HalfCarry);
     } else {
@@ -144,7 +144,7 @@ pub fn cp(cpu: &mut Cpu, byte: u8) {
     if (cpu.reg.a & 0x0F) < (byte & 0x0F) {
         cpu.reg.set_flag(Flag::HalfCarry);
     }
-    cpu.reg.set_flag(Flag::Subtract);
+    cpu.reg.set_flag(Flag::Negative);
 }
 
 /// Decrement a byte.
@@ -163,7 +163,7 @@ pub fn dec(cpu: &mut Cpu, byte: u8) -> u8 {
     } else {
         cpu.reg.clear_flag(Flag::HalfCarry);
     }
-    cpu.reg.set_flag(Flag::Subtract);
+    cpu.reg.set_flag(Flag::Negative);
     result
 }
 
@@ -215,7 +215,7 @@ pub fn sub(cpu: &mut Cpu, byte: u8) {
     if (cpu.reg.a & 0x0F) < (byte & 0x0F) {
         cpu.reg.set_flag(Flag::HalfCarry);
     }
-    cpu.reg.set_flag(Flag::Subtract);
+    cpu.reg.set_flag(Flag::Negative);
     cpu.reg.a = cpu.reg.a.wrapping_sub(byte);
 }
 
@@ -240,7 +240,7 @@ pub fn bit(cpu: &mut Cpu, byte: u8, bit: u8) {
     } else {
         cpu.reg.clear_flag(Flag::Zero);
     }
-    cpu.reg.clear_flag(Flag::Subtract);
+    cpu.reg.clear_flag(Flag::Negative);
     cpu.reg.set_flag(Flag::HalfCarry);
 }
 
@@ -409,7 +409,7 @@ mod tests {
         adc(&mut cpu, 0x01);
         assert_eq!(cpu.reg.a, 0x02);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -422,7 +422,7 @@ mod tests {
         adc(&mut cpu, 0x01);
         assert_eq!(cpu.reg.a, 0x03);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -462,7 +462,7 @@ mod tests {
         add(&mut cpu, 0x01);
         assert_eq!(cpu.reg.a, 0x02);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -498,7 +498,7 @@ mod tests {
         cpu.reg.set_hl(0x0001);
         add16(&mut cpu, 0x0001);
         assert_eq!(cpu.reg.hl(), 0x0002);
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -528,7 +528,7 @@ mod tests {
         and(&mut cpu, 0x01);
         assert_eq!(cpu.reg.a, 0x01);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
         assert!(cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -548,7 +548,7 @@ mod tests {
         cp(&mut cpu, 0x01);
         assert_eq!(cpu.reg.a, 0x02);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(cpu.reg.check_flag(Flag::Subtract));
+        assert!(cpu.reg.check_flag(Flag::Negative));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -582,7 +582,7 @@ mod tests {
         let mut cpu = Cpu::new();
         assert_eq!(dec(&mut cpu, 0x02), 0x01);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(cpu.reg.check_flag(Flag::Subtract));
+        assert!(cpu.reg.check_flag(Flag::Negative));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
     }
 
@@ -611,7 +611,7 @@ mod tests {
         let mut cpu = Cpu::new();
         assert_eq!(inc(&mut cpu, 0x01), 0x02);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry))
     }
 
@@ -636,7 +636,7 @@ mod tests {
         or(&mut cpu, 0x02);
         assert_eq!(cpu.reg.a, 0x03);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -656,7 +656,7 @@ mod tests {
         sub(&mut cpu, 0x01);
         assert_eq!(cpu.reg.a, 0x01);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(cpu.reg.check_flag(Flag::Subtract));
+        assert!(cpu.reg.check_flag(Flag::Negative));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -691,7 +691,7 @@ mod tests {
         xor_bytes(&mut cpu, 0x01, 0x03);
         assert_eq!(cpu.reg.a, 0x02);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -708,7 +708,7 @@ mod tests {
         let mut cpu = Cpu::new();
         bit(&mut cpu, 0x01, 0);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
         assert!(cpu.reg.check_flag(Flag::HalfCarry))
     }
 
@@ -724,7 +724,7 @@ mod tests {
         let mut cpu = Cpu::new();
         assert_eq!(swap(&mut cpu, 0x12), 0x21);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry))
     }
@@ -742,7 +742,7 @@ mod tests {
         cpu.reg.clear_flag(Flag::Carry);
         assert_eq!(rl(&mut cpu, 0x7F), 0xFE);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -785,7 +785,7 @@ mod tests {
         cpu.reg.clear_flag(Flag::Carry);
         assert_eq!(rr(&mut cpu, 0xFE), 0x7F);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -827,7 +827,7 @@ mod tests {
         let mut cpu = Cpu::new();
         assert_eq!(srl(&mut cpu, 0xFE), 0x7F);
         assert!(!cpu.reg.check_flag(Flag::Zero));
-        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::Negative));
         assert!(!cpu.reg.check_flag(Flag::HalfCarry));
         assert!(!cpu.reg.check_flag(Flag::Carry));
     }

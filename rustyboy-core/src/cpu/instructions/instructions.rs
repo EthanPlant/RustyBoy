@@ -1773,7 +1773,7 @@ const DI: Instruction = Instruction {
     description: "DI",
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
         log::trace!("Disabling IME");
-        cpu.interrupts_enabled = false;
+        cpu.ime = false;
         InstructionType::ActionTaken
     },
 };
@@ -4588,9 +4588,9 @@ mod tests {
     #[test]
     pub fn test_di() {
         let mut cpu = Cpu::new();
-        cpu.interrupts_enabled = true;
+        cpu.ime = true;
         (&DI.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0xF3));
-        assert_eq!(cpu.interrupts_enabled, false);
+        assert_eq!(cpu.ime, false);
     }
 
     #[test]
