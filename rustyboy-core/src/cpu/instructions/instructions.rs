@@ -2869,7 +2869,7 @@ const DI: Instruction = Instruction {
     clock_cycles_condition: None,
     description: "DI",
     handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
-        log::trace!("Disabling IME");
+        log::trace!("Disabling interrupts!");
         cpu.ime = false;
         InstructionType::ActionTaken
     },
@@ -2944,6 +2944,18 @@ const LD_A_NN: Instruction = Instruction {
     description: "LD A [nn]",
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
         cpu.reg.a = mmu.get_byte(functions::get_op16(cpu, mmu));
+        InstructionType::ActionTaken
+    },
+};
+
+/// 0xFB - EI
+const EI: Instruction = Instruction {
+    length: 1,
+    clock_cycles: 4,
+    clock_cycles_condition: None,
+    description: "EI",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.ei = true;
         InstructionType::ActionTaken
     },
 };
@@ -3229,6 +3241,7 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
         0xF8 => Some(&LD_HL_SP_N),
         0xF9 => Some(&LD_SP_HL),
         0xFA => Some(&LD_A_NN),
+        0xFB => Some(&EI),
         0xFE => Some(&CP_N),
         0xFF => Some(&RST_38),
 
@@ -7633,6 +7646,22 @@ mod tests {
         mmu.set_byte(0xFF01 as usize, 0x01);
         (&LD_A_NN.handler)(&mut cpu, &mut mmu, &OpCode::Regular(0xFA));
         assert_eq!(cpu.reg.a, 0x01);
+    }
+
+    #[test]
+    pub fn test_get_instruction_ei() {
+        let instruction = get_instruction(&0xFB).unwrap();
+        assert_eq!(instruction, &EI);
+        assert_eq!(instruction.length, 1);
+        assert_eq!(instruction.clock_cycles, 4);
+    }
+
+    #[test]
+    pub fn test_ei() {
+        let mut cpu = Cpu::new();
+        cpu.ei = false;
+        (&EI.handler)(&mut cpu, &mut Memory::new(), &OpCode::Regular(0xFB));
+        assert_eq!(cpu.ei, true);
     }
 
     #[test]

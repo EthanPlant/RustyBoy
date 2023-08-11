@@ -1,4 +1,5 @@
 use crate::cartridge::Cartridge;
+use crate::cpu::interrupts::{InterruptState, INTERRUPT_ENABLE_ADDR, INTERRUPT_FLAG_ADDR};
 
 const ROM_START: usize = 0x0000;
 const ROM_END: usize = 0x7FFF;
@@ -33,12 +34,15 @@ const HRAM_START: usize = 0xFF80;
 const HRAM_END: usize = 0xFFFE;
 const HRAM_SIZE: usize = HRAM_END - HRAM_START + 1;
 
-const IE: usize = 0xFFFF;
 
 /// The MMU (Memory Management Unit) is responsible for managing the gameboy's memory
 pub struct Memory {
     /// The cartridge's data
     cart: Cartridge,
+
+    /// Interrupt registers
+    pub interrupts: InterruptState,
+
     vram: [u8; VRAM_SIZE],
     wram: [u8; WRAM_SIZE],
     oam: [u8; OAM_SIZE],
@@ -51,6 +55,7 @@ impl Memory {
     pub fn new() -> Self {
         Memory {
             cart: Cartridge::new(),
+            interrupts: InterruptState::new(),
             vram: [0xFF; VRAM_SIZE],
             wram: [0xFF; WRAM_SIZE],
             oam: [0xFF; OAM_SIZE],
@@ -66,6 +71,7 @@ impl Memory {
         io[0x44] = 0x90; // Stub LY to 0x90 (144) to simulate VBlank
         Memory {
             cart: cart,
+            interrupts: InterruptState::new(),
             vram: [0xFF; VRAM_SIZE],
             wram: [0xFF; WRAM_SIZE],
             oam: [0xFF; OAM_SIZE],
@@ -91,10 +97,10 @@ impl Memory {
                 log::warn!("Attempted prohibited read from unused memory {}", addr);
                 0xFF
             }
+            INTERRUPT_ENABLE_ADDR => self.interrupts.enabled_interrupts,
+            INTERRUPT_FLAG_ADDR => self.interrupts.requested_interrupts,
             IO_START..=IO_END => self.io[addr - IO_START],
             HRAM_START..=HRAM_END => self.hram[addr - HRAM_START],
-            // TODO handle interrupt enable register
-            IE => 0xFF,
             _ => {
                 log::error!("Attempted to read from invalid memory address {}", addr);
                 0xFF
@@ -124,6 +130,8 @@ impl Memory {
             UNUSED_START..=UNUSED_END => {
                 log::warn!("Attempted prohibited write to unused memory {}", addr);
             }
+            INTERRUPT_ENABLE_ADDR => self.interrupts.enabled_interrupts = v,
+            INTERRUPT_FLAG_ADDR => self.interrupts.requested_interrupts = v,
             IO_START..=IO_END => {
                 // Logging for Blargg tests
                 if addr == 0xFF02 && v == 0x81 {
@@ -133,8 +141,6 @@ impl Memory {
                 }
             }
             HRAM_START..=HRAM_END => self.hram[addr - HRAM_START] = v,
-            // TODO handle interrupt enable register
-            IE => (),
             _ => {
                 log::error!("Attempted to write to invalid memory address {}", addr);
             }
@@ -233,12 +239,6 @@ mod tests {
         let mut mem = Memory::new();
         mem.hram[0x00] = 0x01;
         assert_eq!(mem.get_byte(HRAM_START), 0x01);
-    }
-
-    #[test]
-    fn test_get_byte_ie() {
-        let mem = Memory::new();
-        assert_eq!(mem.get_byte(IE), 0xFF);
     }
 
     #[test]
@@ -368,13 +368,6 @@ mod tests {
         let mut mem = Memory::new();
         mem.set_byte(HRAM_START, 0x01);
         assert_eq!(mem.hram[0x0000], 0x01);
-    }
-
-    #[test]
-    fn test_set_byte_ie() {
-        let mut mem = Memory::new();
-        mem.set_byte(IE, 0x01);
-        assert_eq!(mem.get_byte(IE), 0xFF);
     }
 
     #[test]

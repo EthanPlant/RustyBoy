@@ -1,5 +1,5 @@
-use crate::cpu::instructions;
-use crate::cpu::instructions::{Instruction, InstructionType, OpCode};
+use crate::cpu::instructions::{get_instruction_by_opcode, Instruction, InstructionType, OpCode};
+use crate::cpu::interrupts::handle_interrupts;
 use crate::cpu::registers::Registers;
 use crate::mmu::Memory;
 
@@ -8,7 +8,10 @@ use crate::mmu::Memory;
 pub struct Cpu {
     /// The CPU registers
     pub reg: Registers,
+    /// Interrupt Master Enable
     pub ime: bool,
+    /// Boolean to track if EI was called to emulate EI delay
+    pub ei: bool, 
 }
 
 impl Cpu {
@@ -28,6 +31,7 @@ impl Cpu {
         Cpu {
             reg: registers,
             ime: false,
+            ei: false,
         }
     }
 
@@ -36,9 +40,12 @@ impl Cpu {
         log::trace!("A:{:02X} F:{:02X} B:{:02X} C:{:02X} D:{:02X} E:{:02X} H:{:02X} L:{:02X} SP:{:02X} PC: {:04X} ({:02X} {:02X} {:02X} {:02X})",
         self.reg.a, self.reg.f, self.reg.b, self.reg.c, self.reg.d, self.reg.e, self.reg.h, self.reg.l, self.reg.sp, self.reg.pc, mmu.get_byte(self.reg.pc), mmu.get_byte(self.reg.pc + 1), mmu.get_byte(self.reg.pc + 2), mmu.get_byte(self.reg.pc + 3));
 
+        // Process any interrupts before executing the next instruction
+        self.check_interrupts(mmu);
+
         let op_code = self.read_opcode(mmu);
 
-        let instruction = match instructions::get_instruction_by_opcode(&op_code) {
+        let instruction = match get_instruction_by_opcode(&op_code) {
             Some(instruction) => instruction,
             None => {
                 match op_code {
@@ -58,6 +65,24 @@ impl Cpu {
         self.execute_instruction(mmu, instruction, &op_code);
         // Add spacing between this and the next instruction
         log::trace!("Finished executing instruction\n");
+    }
+
+    /// Handle interrupts
+    fn check_interrupts(&mut self, mmu: &mut Memory) {
+        if self.ime {
+            match handle_interrupts(self, mmu) {
+                Some(_) => {
+                    self.ime = false
+                },
+                _ => (),
+            }
+        } else {
+            if self.ei {
+                log::trace!("Enabling interrupts!");
+                self.ime = true;
+                self.ei = false;
+            }
+        }
     }
 
     /// Execute an instruction

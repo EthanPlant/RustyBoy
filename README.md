@@ -26,7 +26,7 @@ After cloning the repository, simply run `cargo build` in the workspace director
 - [ ] CPU
     - [x] Registers and flags
     - [ ] Implement instructions
-    - [ ] Interrupts
+    - [x] Interrupts
     - [ ] Pass the boot ROM
     - [ ] Pass all Blargg test ROMs
         - [x] 01-special
