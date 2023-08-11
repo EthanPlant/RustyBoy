@@ -69,7 +69,7 @@ impl Memory {
             vram: [0xFF; VRAM_SIZE],
             wram: [0xFF; WRAM_SIZE],
             oam: [0xFF; OAM_SIZE],
-            io: [0xFF; IO_SIZE],
+            io: io,
             hram: [0xFF; HRAM_SIZE],
         }
     }
