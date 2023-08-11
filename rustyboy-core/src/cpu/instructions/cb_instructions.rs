@@ -861,7 +861,7 @@ const BIT_0_L: Instruction = Instruction {
 /// 0x46 - BIT 0, (HL)
 const BIT_0_HL: Instruction = Instruction {
     length: 2,
-    clock_cycles: 16,
+    clock_cycles: 12,
     clock_cycles_condition: None,
     description: "BIT 0 (HL)",
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
@@ -957,7 +957,7 @@ const BIT_1_L: Instruction = Instruction {
 /// 0x4E - BIT 1, (HL)
 const BIT_1_HL: Instruction = Instruction {
     length: 2,
-    clock_cycles: 16,
+    clock_cycles: 12,
     clock_cycles_condition: None,
     description: "BIT 1 (HL)",
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
@@ -1053,7 +1053,7 @@ const BIT_2_L: Instruction = Instruction {
 /// 0x56 - BIT 2, (HL)
 const BIT_2_HL: Instruction = Instruction {
     length: 2,
-    clock_cycles: 16,
+    clock_cycles: 12,
     clock_cycles_condition: None,
     description: "BIT 2 (HL)",
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
@@ -1149,7 +1149,7 @@ const BIT_3_L: Instruction = Instruction {
 /// 0x5E - BIT 3, (HL)
 const BIT_3_HL: Instruction = Instruction {
     length: 2,
-    clock_cycles: 16,
+    clock_cycles: 12,
     clock_cycles_condition: None,
     description: "BIT 3 (HL)",
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
@@ -1245,7 +1245,7 @@ const BIT_4_L: Instruction = Instruction {
 /// 0x66 - BIT 4, (HL)
 const BIT_4_HL: Instruction = Instruction {
     length: 2,
-    clock_cycles: 16,
+    clock_cycles: 12,
     clock_cycles_condition: None,
     description: "BIT 4 (HL)",
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
@@ -1341,7 +1341,7 @@ const BIT_5_L: Instruction = Instruction {
 /// 0x6E - BIT 5, (HL)
 const BIT_5_HL: Instruction = Instruction {
     length: 2,
-    clock_cycles: 16,
+    clock_cycles: 12,
     clock_cycles_condition: None,
     description: "BIT 5 (HL)",
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
@@ -1437,7 +1437,7 @@ const BIT_6_L: Instruction = Instruction {
 /// 0x76 - BIT 6, (HL)
 const BIT_6_HL: Instruction = Instruction {
     length: 2,
-    clock_cycles: 16,
+    clock_cycles: 12,
     clock_cycles_condition: None,
     description: "BIT 6 (HL)",
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
@@ -1533,7 +1533,7 @@ const BIT_7_L: Instruction = Instruction {
 /// 0x7E - BIT 7, (HL)
 const BIT_7_HL: Instruction = Instruction {
     length: 2,
-    clock_cycles: 16,
+    clock_cycles: 12,
     clock_cycles_condition: None,
     description: "BIT 7 (HL)",
     handler: |cpu: &mut Cpu, mmu: &mut Memory, _: &OpCode| {
