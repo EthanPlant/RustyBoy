@@ -43,7 +43,7 @@ impl InterruptState {
     pub fn interrupt_fired(&self, interrupt: &Interrupt) -> bool {
         let interrupt_value = *interrupt as u8;
 
-        self.requested_interrupts & interrupt_value == interrupt_value 
+        self.requested_interrupts & interrupt_value == interrupt_value
             && self.enabled_interrupts & interrupt_value == interrupt_value
     }
 }
@@ -66,7 +66,6 @@ pub fn handle_interrupts(cpu: &mut Cpu, mmu: &mut Memory) -> Option<u8> {
         return Some(12);
     }
 
-
     if handle_interrupt(cpu, mmu, &Interrupt::Serial, SERIAL_ISR) {
         return Some(12);
     }
@@ -87,7 +86,6 @@ fn handle_interrupt(cpu: &mut Cpu, mmu: &mut Memory, interrupt: &Interrupt, isr_
     mmu.interrupts.clear_interrupt(interrupt);
     true
 }
-
 
 #[cfg(test)]
 mod tests {

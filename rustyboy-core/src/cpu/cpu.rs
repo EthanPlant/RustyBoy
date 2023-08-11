@@ -11,7 +11,7 @@ pub struct Cpu {
     /// Interrupt Master Enable
     pub ime: bool,
     /// Boolean to track if EI was called to emulate EI delay
-    pub ei: bool, 
+    pub ei: bool,
 }
 
 impl Cpu {
@@ -77,7 +77,7 @@ impl Cpu {
                 Some(cycles) => {
                     self.ime = false;
                     return cycles;
-                },
+                }
                 _ => {
                     return 0;
                 }
@@ -94,7 +94,7 @@ impl Cpu {
     }
 
     /// Execute an instruction
-    fn execute_instruction (
+    fn execute_instruction(
         &mut self,
         mmu: &mut Memory,
         instruction: &Instruction,
@@ -103,16 +103,14 @@ impl Cpu {
         let result = (instruction.handler)(self, mmu, op_code);
         // Update the program counter based on the instruction length and type
         match result {
-            InstructionType::Jumped => {
-                match instruction.clock_cycles_condition {
-                    Some(cycles) => {
-                        return cycles;
-                    }
-                    _ => {
-                        return instruction.clock_cycles;
-                    }
+            InstructionType::Jumped => match instruction.clock_cycles_condition {
+                Some(cycles) => {
+                    return cycles;
                 }
-            }
+                _ => {
+                    return instruction.clock_cycles;
+                }
+            },
             _ => {
                 self.reg.pc += instruction.length;
                 return instruction.clock_cycles;

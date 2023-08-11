@@ -1,4 +1,4 @@
 pub mod cpu;
-pub mod interrupts;
 mod instructions;
+pub mod interrupts;
 mod registers;

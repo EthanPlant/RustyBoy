@@ -1,5 +1,8 @@
 use crate::cartridge::Cartridge;
-use crate::cpu::interrupts::{InterruptState, INTERRUPT_ENABLE_ADDR, INTERRUPT_FLAG_ADDR};
+use crate::cpu::interrupts::{
+    Interrupt, InterruptState, INTERRUPT_ENABLE_ADDR, INTERRUPT_FLAG_ADDR,
+};
+use crate::io::timer::{Timer, DIV_ADDR, TAC_ADDR, TIMA_ADDR, TMA_ADDR};
 
 const ROM_START: usize = 0x0000;
 const ROM_END: usize = 0x7FFF;
@@ -34,7 +37,6 @@ const HRAM_START: usize = 0xFF80;
 const HRAM_END: usize = 0xFFFE;
 const HRAM_SIZE: usize = HRAM_END - HRAM_START + 1;
 
-
 /// The MMU (Memory Management Unit) is responsible for managing the gameboy's memory
 pub struct Memory {
     /// The cartridge's data
@@ -42,6 +44,9 @@ pub struct Memory {
 
     /// Interrupt registers
     pub interrupts: InterruptState,
+
+    /// Timer
+    pub timer: Timer,
 
     vram: [u8; VRAM_SIZE],
     wram: [u8; WRAM_SIZE],
@@ -56,6 +61,7 @@ impl Memory {
         Memory {
             cart: Cartridge::new(),
             interrupts: InterruptState::new(),
+            timer: Timer::new(),
             vram: [0xFF; VRAM_SIZE],
             wram: [0xFF; WRAM_SIZE],
             oam: [0xFF; OAM_SIZE],
@@ -72,11 +78,22 @@ impl Memory {
         Memory {
             cart: cart,
             interrupts: InterruptState::new(),
+            timer: Timer::new(),
             vram: [0xFF; VRAM_SIZE],
             wram: [0xFF; WRAM_SIZE],
             oam: [0xFF; OAM_SIZE],
             io: io,
             hram: [0xFF; HRAM_SIZE],
+        }
+    }
+
+    /// Step the IO devices
+    pub fn step(&mut self, clock_cycles: u8) {
+        self.timer.step(clock_cycles);
+
+        if self.timer.interrupt_fired {
+            self.timer.interrupt_fired = false;
+            self.interrupts.requested_interrupts |= Interrupt::Timer as u8;
         }
     }
 
@@ -97,10 +114,16 @@ impl Memory {
                 log::warn!("Attempted prohibited read from unused memory {}", addr);
                 0xFF
             }
-            INTERRUPT_ENABLE_ADDR => self.interrupts.enabled_interrupts,
-            INTERRUPT_FLAG_ADDR => self.interrupts.requested_interrupts,
-            IO_START..=IO_END => self.io[addr - IO_START],
+            IO_START..=IO_END => match addr {
+                DIV_ADDR => self.timer.divider,
+                TIMA_ADDR => self.timer.counter,
+                TMA_ADDR => self.timer.modulo,
+                TAC_ADDR => self.timer.control,
+                INTERRUPT_FLAG_ADDR => self.interrupts.requested_interrupts,
+                _ => self.io[addr - IO_START],
+            },
             HRAM_START..=HRAM_END => self.hram[addr - HRAM_START],
+            INTERRUPT_ENABLE_ADDR => self.interrupts.enabled_interrupts,
             _ => {
                 log::error!("Attempted to read from invalid memory address {}", addr);
                 0xFF
@@ -130,17 +153,25 @@ impl Memory {
             UNUSED_START..=UNUSED_END => {
                 log::warn!("Attempted prohibited write to unused memory {}", addr);
             }
-            INTERRUPT_ENABLE_ADDR => self.interrupts.enabled_interrupts = v,
-            INTERRUPT_FLAG_ADDR => self.interrupts.requested_interrupts = v,
+
             IO_START..=IO_END => {
-                // Logging for Blargg tests
-                if addr == 0xFF02 && v == 0x81 {
-                    print!("{}", self.io[0xFF01 - IO_START] as char);
-                } else {
-                    self.io[addr - IO_START] = v;
+                match addr {
+                    // Logging for Blargg test
+                    0xFF02 => {
+                        if v == 0x81 {
+                            print!("{}", self.io[0xFF01 - IO_START] as char);
+                        }
+                    }
+                    DIV_ADDR => self.timer.divider = 0, // All writes to DIV reset it to 0
+                    TIMA_ADDR => self.timer.counter = v,
+                    TMA_ADDR => self.timer.modulo = v,
+                    TAC_ADDR => self.timer.control = v,
+                    INTERRUPT_FLAG_ADDR => self.interrupts.requested_interrupts = v,
+                    _ => self.io[addr - IO_START] = v,
                 }
             }
             HRAM_START..=HRAM_END => self.hram[addr - HRAM_START] = v,
+            INTERRUPT_ENABLE_ADDR => self.interrupts.enabled_interrupts = v,
             _ => {
                 log::error!("Attempted to write to invalid memory address {}", addr);
             }

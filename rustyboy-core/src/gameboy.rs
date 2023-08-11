@@ -19,7 +19,9 @@ impl Gameboy {
 
     /// Step through the emulation
     pub fn step(&mut self) {
-        self.clock.cycle(self.cpu.step(&mut self.mmu));
+        let cycles = self.cpu.step(&mut self.mmu);
+        self.mmu.step(cycles);
+        self.clock.cycle(cycles);
     }
 }
 

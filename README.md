@@ -44,7 +44,7 @@ After cloning the repository, simply run `cargo build` in the workspace director
     - [x] Proper memory map
     - [ ] Memory mapped IO
     - [ ] OAM DMA
-- [ ] Timer
+- [x] Timer
 - [ ] Cartridges
     - [x] No MBC
     - [ ] MBC-1

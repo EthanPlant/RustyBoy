@@ -3,7 +3,7 @@ pub struct Clock {
     /// The amount of CPU clock cycles that have passed since the emulator started running
     pub clock_cycles_passed: u64,
     /// The amount of machine cycles that have passed since the emulator started running
-    pub machine_cycles_passed: u64,  
+    pub machine_cycles_passed: u64,
 }
 
 impl Clock {
