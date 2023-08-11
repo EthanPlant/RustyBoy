@@ -244,6 +244,16 @@ pub fn bit(cpu: &mut Cpu, byte: u8, bit: u8) {
     cpu.reg.set_flag(Flag::HalfCarry);
 }
 
+/// Resets a bit in a byte.
+pub fn res(byte: u8, bit: u8) -> u8 {
+    byte & !(1 << bit)
+}
+
+/// Sets a bit in a byte.
+pub fn set(byte: u8, bit: u8) -> u8 {
+    byte | (1 << bit)
+}
+
 /// Swap the upper and lower nibbles of a byte.
 /// Sets the zero flag if the result is zero.
 /// Clears all other flags.
@@ -717,6 +727,16 @@ mod tests {
         let mut cpu = Cpu::new();
         bit(&mut cpu, 0x00, 0);
         assert!(cpu.reg.check_flag(Flag::Zero));
+    }
+
+    #[test]
+    pub fn test_res() {
+        assert_eq!(res(0xFF, 0), 0xFE);
+    }
+
+    #[test]
+    pub fn test_set() {
+        assert_eq!(set(0x00, 0), 0x01);
     }
 
     #[test]
