@@ -38,6 +38,18 @@ const RR_D: Instruction = Instruction {
     },
 };
 
+/// 0x1B - RR E
+const RR_E: Instruction = Instruction {
+    length: 2,
+    clock_cycles: 8,
+    clock_cycles_condition: None,
+    description: "RR E",
+    handler: |cpu: &mut Cpu, _: &mut Memory, _: &OpCode| {
+        cpu.reg.e = functions::rr(cpu, cpu.reg.e);
+        InstructionType::ActionTaken
+    },
+};
+
 /// 0x38 - SRL B
 const SRL_B: Instruction = Instruction {
     length: 2,
@@ -68,6 +80,7 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
         0x11 => Some(&RL_C),
         0x19 => Some(&RR_C),
         0x1A => Some(&RR_D),
+        0x1B => Some(&RR_E),
 
         0x38 => Some(&SRL_B),
 
@@ -131,6 +144,23 @@ mod tests {
         cpu.reg.clear_flag(Flag::Carry);
         (&RR_D.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x1A));
         assert_eq!(cpu.reg.d, 0x40);
+    }
+
+    #[test]
+    pub fn test_get_instruction_rr_e() {
+        let instruction = get_instruction(&0x1B).unwrap();
+        assert_eq!(instruction, &RR_E);
+        assert_eq!(instruction.length, 2);
+        assert_eq!(instruction.clock_cycles, 8);
+    }
+
+    #[test]
+    pub fn test_rr_e() {
+        let mut cpu = Cpu::new();
+        cpu.reg.e = 0x80;
+        cpu.reg.clear_flag(Flag::Carry);
+        (&RR_E.handler)(&mut cpu, &mut Memory::new(), &OpCode::CB(0x1B));
+        assert_eq!(cpu.reg.e, 0x40);
     }
 
     #[test]

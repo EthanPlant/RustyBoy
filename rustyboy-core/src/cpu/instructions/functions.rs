@@ -92,6 +92,27 @@ pub fn add(cpu: &mut Cpu, byte: u8) {
     cpu.reg.a = result;
 }
 
+/// Add a word to the HL register.
+/// Sets the carry flag if the result overflows.
+/// Sets the half carry flag if overflow from bit 11
+/// Clears the subtract flag.
+pub fn add16(cpu: &mut Cpu, word: u16) {
+    let result = cpu.reg.hl().wrapping_add(word);
+    cpu.reg.clear_flag(Flag::Subtract);
+    if (cpu.reg.hl() & 0x0FFF) + (word & 0x0FFF) > 0x0FFF {
+        cpu.reg.set_flag(Flag::HalfCarry);
+    } else {
+        cpu.reg.clear_flag(Flag::HalfCarry);
+    }
+
+    if (cpu.reg.hl() as u32) + (word as u32) > 0xFFFF {
+        cpu.reg.set_flag(Flag::Carry);
+    } else {
+        cpu.reg.clear_flag(Flag::Carry);
+    }
+    cpu.reg.set_hl(result);
+}
+
 /// Logical AND on a byte and the A register.
 /// Sets the zero flag if the result is zero.
 /// Sets the half carry flag.
@@ -456,6 +477,35 @@ mod tests {
         cpu.reg.a = 0xFF;
         add(&mut cpu, 0x02);
         assert_eq!(cpu.reg.a, 0x01);
+        assert!(cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_add16() {
+        let mut cpu = Cpu::new();
+        cpu.reg.set_hl(0x0001);
+        add16(&mut cpu, 0x0001);
+        assert_eq!(cpu.reg.hl(), 0x0002);
+        assert!(!cpu.reg.check_flag(Flag::Subtract));
+        assert!(!cpu.reg.check_flag(Flag::HalfCarry));
+        assert!(!cpu.reg.check_flag(Flag::Carry));
+    }
+
+    #[test]
+    pub fn test_add16_halfcarry() {
+        let mut cpu = Cpu::new();
+        cpu.reg.set_hl(0x0FFF);
+        add16(&mut cpu, 0x0001);
+        assert_eq!(cpu.reg.hl(), 0x1000);
+        assert!(cpu.reg.check_flag(Flag::HalfCarry));
+    }
+
+    #[test]
+    pub fn test_add16_carry() {
+        let mut cpu = Cpu::new();
+        cpu.reg.set_hl(0xFFFF);
+        add16(&mut cpu, 0x0001);
+        assert_eq!(cpu.reg.hl(), 0x0000);
         assert!(cpu.reg.check_flag(Flag::Carry));
     }
 
