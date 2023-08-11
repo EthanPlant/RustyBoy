@@ -511,14 +511,14 @@
     <span class="doccomment">/// Create a new Memory with a ROM file
     </span><span class="kw">pub fn </span>new_with_rom(rom_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>cart = Cartridge::new_from_rom(rom_name);
-        <span class="kw">let </span><span class="kw-2">mut </span>io: [u8; IO_END - IO_START] = [<span class="number">0xFF</span>; IO_END - IO_START];
+        <span class="kw">let </span><span class="kw-2">mut </span>io: [u8; IO_SIZE] = [<span class="number">0xFF</span>; IO_SIZE];
         io[<span class="number">0x44</span>] = <span class="number">0x90</span>; <span class="comment">// Stub LY to 0x90 (144) to simulate VBlank
         </span>Memory {
             cart: cart,
             vram: [<span class="number">0xFF</span>; VRAM_SIZE],
             wram: [<span class="number">0xFF</span>; WRAM_SIZE],
             oam: [<span class="number">0xFF</span>; OAM_SIZE],
-            io: [<span class="number">0xFF</span>; IO_SIZE],
+            io: io,
             hram: [<span class="number">0xFF</span>; HRAM_SIZE],
         }
     }
