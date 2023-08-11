@@ -440,14 +440,8 @@
 <a href="#440" id="440">440</a>
 <a href="#441" id="441">441</a>
 <a href="#442" id="442">442</a>
-<a href="#443" id="443">443</a>
-<a href="#444" id="444">444</a>
-<a href="#445" id="445">445</a>
-<a href="#446" id="446">446</a>
-<a href="#447" id="447">447</a>
-<a href="#448" id="448">448</a>
-<a href="#449" id="449">449</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cartridge::Cartridge;
+<span class="kw">use </span><span class="kw">crate</span>::cpu::interrupts::{InterruptState, INTERRUPT_ENABLE_ADDR, INTERRUPT_FLAG_ADDR};
 
 <span class="kw">const </span>ROM_START: usize = <span class="number">0x0000</span>;
 <span class="kw">const </span>ROM_END: usize = <span class="number">0x7FFF</span>;
@@ -482,12 +476,15 @@
 <span class="kw">const </span>HRAM_END: usize = <span class="number">0xFFFE</span>;
 <span class="kw">const </span>HRAM_SIZE: usize = HRAM_END - HRAM_START + <span class="number">1</span>;
 
-<span class="kw">const </span>IE: usize = <span class="number">0xFFFF</span>;
 
 <span class="doccomment">/// The MMU (Memory Management Unit) is responsible for managing the gameboy&#39;s memory
 </span><span class="kw">pub struct </span>Memory {
     <span class="doccomment">/// The cartridge&#39;s data
     </span>cart: Cartridge,
+
+    <span class="doccomment">/// Interrupt registers
+    </span><span class="kw">pub </span>interrupts: InterruptState,
+
     vram: [u8; VRAM_SIZE],
     wram: [u8; WRAM_SIZE],
     oam: [u8; OAM_SIZE],
@@ -500,6 +497,7 @@
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         Memory {
             cart: Cartridge::new(),
+            interrupts: InterruptState::new(),
             vram: [<span class="number">0xFF</span>; VRAM_SIZE],
             wram: [<span class="number">0xFF</span>; WRAM_SIZE],
             oam: [<span class="number">0xFF</span>; OAM_SIZE],
@@ -515,6 +513,7 @@
         io[<span class="number">0x44</span>] = <span class="number">0x90</span>; <span class="comment">// Stub LY to 0x90 (144) to simulate VBlank
         </span>Memory {
             cart: cart,
+            interrupts: InterruptState::new(),
             vram: [<span class="number">0xFF</span>; VRAM_SIZE],
             wram: [<span class="number">0xFF</span>; WRAM_SIZE],
             oam: [<span class="number">0xFF</span>; OAM_SIZE],
@@ -540,10 +539,10 @@
                 <span class="macro">log::warn!</span>(<span class="string">&quot;Attempted prohibited read from unused memory {}&quot;</span>, addr);
                 <span class="number">0xFF
             </span>}
+            INTERRUPT_ENABLE_ADDR =&gt; <span class="self">self</span>.interrupts.enabled_interrupts,
+            INTERRUPT_FLAG_ADDR =&gt; <span class="self">self</span>.interrupts.requested_interrupts,
             IO_START..=IO_END =&gt; <span class="self">self</span>.io[addr - IO_START],
             HRAM_START..=HRAM_END =&gt; <span class="self">self</span>.hram[addr - HRAM_START],
-            <span class="comment">// TODO handle interrupt enable register
-            </span>IE =&gt; <span class="number">0xFF</span>,
             <span class="kw">_ </span>=&gt; {
                 <span class="macro">log::error!</span>(<span class="string">&quot;Attempted to read from invalid memory address {}&quot;</span>, addr);
                 <span class="number">0xFF
@@ -573,6 +572,8 @@
             UNUSED_START..=UNUSED_END =&gt; {
                 <span class="macro">log::warn!</span>(<span class="string">&quot;Attempted prohibited write to unused memory {}&quot;</span>, addr);
             }
+            INTERRUPT_ENABLE_ADDR =&gt; <span class="self">self</span>.interrupts.enabled_interrupts = v,
+            INTERRUPT_FLAG_ADDR =&gt; <span class="self">self</span>.interrupts.requested_interrupts = v,
             IO_START..=IO_END =&gt; {
                 <span class="comment">// Logging for Blargg tests
                 </span><span class="kw">if </span>addr == <span class="number">0xFF02 </span>&amp;&amp; v == <span class="number">0x81 </span>{
@@ -582,8 +583,6 @@
                 }
             }
             HRAM_START..=HRAM_END =&gt; <span class="self">self</span>.hram[addr - HRAM_START] = v,
-            <span class="comment">// TODO handle interrupt enable register
-            </span>IE =&gt; (),
             <span class="kw">_ </span>=&gt; {
                 <span class="macro">log::error!</span>(<span class="string">&quot;Attempted to write to invalid memory address {}&quot;</span>, addr);
             }
@@ -682,12 +681,6 @@
         <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
         mem.hram[<span class="number">0x00</span>] = <span class="number">0x01</span>;
         <span class="macro">assert_eq!</span>(mem.get_byte(HRAM_START), <span class="number">0x01</span>);
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_get_byte_ie() {
-        <span class="kw">let </span>mem = Memory::new();
-        <span class="macro">assert_eq!</span>(mem.get_byte(IE), <span class="number">0xFF</span>);
     }
 
     <span class="attr">#[test]
@@ -817,13 +810,6 @@
         <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
         mem.set_byte(HRAM_START, <span class="number">0x01</span>);
         <span class="macro">assert_eq!</span>(mem.hram[<span class="number">0x0000</span>], <span class="number">0x01</span>);
-    }
-
-    <span class="attr">#[test]
-    </span><span class="kw">fn </span>test_set_byte_ie() {
-        <span class="kw">let </span><span class="kw-2">mut </span>mem = Memory::new();
-        mem.set_byte(IE, <span class="number">0x01</span>);
-        <span class="macro">assert_eq!</span>(mem.get_byte(IE), <span class="number">0xFF</span>);
     }
 
     <span class="attr">#[test]

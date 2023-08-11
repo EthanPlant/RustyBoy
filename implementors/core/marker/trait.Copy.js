@@ -1,0 +1,3 @@
+(function() {var implementors = {
+"rustyboy_core":[["impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.71.1/core/marker/trait.Copy.html\" title=\"trait core::marker::Copy\">Copy</a> for <a class=\"enum\" href=\"rustyboy_core/cpu/interrupts/enum.Interrupt.html\" title=\"enum rustyboy_core::cpu::interrupts::Interrupt\">Interrupt</a>"]]
+};if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

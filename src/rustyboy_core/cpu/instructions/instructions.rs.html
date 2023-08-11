@@ -7674,6 +7674,35 @@
 <a href="#7674" id="7674">7674</a>
 <a href="#7675" id="7675">7675</a>
 <a href="#7676" id="7676">7676</a>
+<a href="#7677" id="7677">7677</a>
+<a href="#7678" id="7678">7678</a>
+<a href="#7679" id="7679">7679</a>
+<a href="#7680" id="7680">7680</a>
+<a href="#7681" id="7681">7681</a>
+<a href="#7682" id="7682">7682</a>
+<a href="#7683" id="7683">7683</a>
+<a href="#7684" id="7684">7684</a>
+<a href="#7685" id="7685">7685</a>
+<a href="#7686" id="7686">7686</a>
+<a href="#7687" id="7687">7687</a>
+<a href="#7688" id="7688">7688</a>
+<a href="#7689" id="7689">7689</a>
+<a href="#7690" id="7690">7690</a>
+<a href="#7691" id="7691">7691</a>
+<a href="#7692" id="7692">7692</a>
+<a href="#7693" id="7693">7693</a>
+<a href="#7694" id="7694">7694</a>
+<a href="#7695" id="7695">7695</a>
+<a href="#7696" id="7696">7696</a>
+<a href="#7697" id="7697">7697</a>
+<a href="#7698" id="7698">7698</a>
+<a href="#7699" id="7699">7699</a>
+<a href="#7700" id="7700">7700</a>
+<a href="#7701" id="7701">7701</a>
+<a href="#7702" id="7702">7702</a>
+<a href="#7703" id="7703">7703</a>
+<a href="#7704" id="7704">7704</a>
+<a href="#7705" id="7705">7705</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cpu::cpu::Cpu;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::instructions::{functions, Instruction, InstructionType, OpCode};
 <span class="kw">use </span><span class="kw">crate</span>::cpu::registers::Flag;
@@ -10545,7 +10574,7 @@
     clock_cycles_condition: <span class="prelude-val">None</span>,
     description: <span class="string">&quot;DI&quot;</span>,
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
-        <span class="macro">log::trace!</span>(<span class="string">&quot;Disabling IME&quot;</span>);
+        <span class="macro">log::trace!</span>(<span class="string">&quot;Disabling interrupts!&quot;</span>);
         cpu.ime = <span class="bool-val">false</span>;
         InstructionType::ActionTaken
     },
@@ -10620,6 +10649,18 @@
     description: <span class="string">&quot;LD A [nn]&quot;</span>,
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, mmu: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         cpu.reg.a = mmu.get_byte(functions::get_op16(cpu, mmu));
+        InstructionType::ActionTaken
+    },
+};
+
+<span class="doccomment">/// 0xFB - EI
+</span><span class="kw">const </span>EI: Instruction = Instruction {
+    length: <span class="number">1</span>,
+    clock_cycles: <span class="number">4</span>,
+    clock_cycles_condition: <span class="prelude-val">None</span>,
+    description: <span class="string">&quot;EI&quot;</span>,
+    handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
+        cpu.ei = <span class="bool-val">true</span>;
         InstructionType::ActionTaken
     },
 };
@@ -10905,6 +10946,7 @@
         <span class="number">0xF8 </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LD_HL_SP_N),
         <span class="number">0xF9 </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LD_SP_HL),
         <span class="number">0xFA </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>LD_A_NN),
+        <span class="number">0xFB </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>EI),
         <span class="number">0xFE </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>CP_N),
         <span class="number">0xFF </span>=&gt; <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span>RST_38),
 
@@ -15309,6 +15351,22 @@
         mmu.set_byte(<span class="number">0xFF01 </span><span class="kw">as </span>usize, <span class="number">0x01</span>);
         (<span class="kw-2">&amp;</span>LD_A_NN.handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>mmu, <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0xFA</span>));
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x01</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">pub fn </span>test_get_instruction_ei() {
+        <span class="kw">let </span>instruction = get_instruction(<span class="kw-2">&amp;</span><span class="number">0xFB</span>).unwrap();
+        <span class="macro">assert_eq!</span>(instruction, <span class="kw-2">&amp;</span>EI);
+        <span class="macro">assert_eq!</span>(instruction.length, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(instruction.clock_cycles, <span class="number">4</span>);
+    }
+
+    <span class="attr">#[test]
+    </span><span class="kw">pub fn </span>test_ei() {
+        <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
+        cpu.ei = <span class="bool-val">false</span>;
+        (<span class="kw-2">&amp;</span>EI.handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>Memory::new(), <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0xFB</span>));
+        <span class="macro">assert_eq!</span>(cpu.ei, <span class="bool-val">true</span>);
     }
 
     <span class="attr">#[test]
