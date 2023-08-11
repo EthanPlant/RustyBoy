@@ -217,7 +217,7 @@
 </span><span class="kw">pub struct </span>Cpu {
     <span class="doccomment">/// The CPU registers
     </span><span class="kw">pub </span>reg: Registers,
-    <span class="kw">pub </span>interrupts_enabled: bool,
+    <span class="kw">pub </span>ime: bool,
 }
 
 <span class="kw">impl </span>Cpu {
@@ -236,7 +236,7 @@
         registers.pc = <span class="number">0x0100</span>;
         Cpu {
             reg: registers,
-            interrupts_enabled: <span class="bool-val">false</span>,
+            ime: <span class="bool-val">false</span>,
         }
     }
 
@@ -313,7 +313,7 @@
         <span class="macro">assert_eq!</span>(cpu.reg.l, <span class="number">0x4D</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.sp, <span class="number">0xFFFE</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.pc, <span class="number">0x100</span>);
-        <span class="macro">assert_eq!</span>(cpu.interrupts_enabled, <span class="bool-val">false</span>)
+        <span class="macro">assert_eq!</span>(cpu.ime, <span class="bool-val">false</span>)
     }
 
     <span class="attr">#[test]

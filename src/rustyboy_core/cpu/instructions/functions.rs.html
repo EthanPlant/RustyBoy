@@ -946,7 +946,7 @@
 /// Clears the subtract flag.
 </span><span class="kw">pub fn </span>add16(cpu: <span class="kw-2">&amp;mut </span>Cpu, word: u16) {
     <span class="kw">let </span>result = cpu.reg.hl().wrapping_add(word);
-    cpu.reg.clear_flag(Flag::Subtract);
+    cpu.reg.clear_flag(Flag::Negative);
     <span class="kw">if </span>(cpu.reg.hl() &amp; <span class="number">0x0FFF</span>) + (word &amp; <span class="number">0x0FFF</span>) &gt; <span class="number">0x0FFF </span>{
         cpu.reg.set_flag(Flag::HalfCarry);
     } <span class="kw">else </span>{
@@ -992,7 +992,7 @@
     <span class="kw">if </span>(cpu.reg.a &amp; <span class="number">0x0F</span>) &lt; (byte &amp; <span class="number">0x0F</span>) {
         cpu.reg.set_flag(Flag::HalfCarry);
     }
-    cpu.reg.set_flag(Flag::Subtract);
+    cpu.reg.set_flag(Flag::Negative);
 }
 
 <span class="doccomment">/// Decrement a byte.
@@ -1011,7 +1011,7 @@
     } <span class="kw">else </span>{
         cpu.reg.clear_flag(Flag::HalfCarry);
     }
-    cpu.reg.set_flag(Flag::Subtract);
+    cpu.reg.set_flag(Flag::Negative);
     result
 }
 
@@ -1063,7 +1063,7 @@
     <span class="kw">if </span>(cpu.reg.a &amp; <span class="number">0x0F</span>) &lt; (byte &amp; <span class="number">0x0F</span>) {
         cpu.reg.set_flag(Flag::HalfCarry);
     }
-    cpu.reg.set_flag(Flag::Subtract);
+    cpu.reg.set_flag(Flag::Negative);
     cpu.reg.a = cpu.reg.a.wrapping_sub(byte);
 }
 
@@ -1088,7 +1088,7 @@
     } <span class="kw">else </span>{
         cpu.reg.clear_flag(Flag::Zero);
     }
-    cpu.reg.clear_flag(Flag::Subtract);
+    cpu.reg.clear_flag(Flag::Negative);
     cpu.reg.set_flag(Flag::HalfCarry);
 }
 
@@ -1257,7 +1257,7 @@
         adc(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x01</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x02</span>);
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Zero));
-        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Subtract));
+        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Negative));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::HalfCarry));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -1270,7 +1270,7 @@
         adc(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x01</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x03</span>);
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Zero));
-        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Subtract));
+        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Negative));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::HalfCarry));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -1310,7 +1310,7 @@
         add(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x01</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x02</span>);
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Zero));
-        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Subtract));
+        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Negative));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::HalfCarry));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -1346,7 +1346,7 @@
         cpu.reg.set_hl(<span class="number">0x0001</span>);
         add16(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x0001</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.hl(), <span class="number">0x0002</span>);
-        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Subtract));
+        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Negative));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::HalfCarry));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -1376,7 +1376,7 @@
         and(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x01</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x01</span>);
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Zero));
-        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Subtract));
+        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Negative));
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::HalfCarry));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -1396,7 +1396,7 @@
         cp(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x01</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x02</span>);
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Zero));
-        <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Subtract));
+        <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Negative));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::HalfCarry));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -1430,7 +1430,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="macro">assert_eq!</span>(dec(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x02</span>), <span class="number">0x01</span>);
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Zero));
-        <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Subtract));
+        <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Negative));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::HalfCarry));
     }
 
@@ -1459,7 +1459,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="macro">assert_eq!</span>(inc(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x01</span>), <span class="number">0x02</span>);
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Zero));
-        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Subtract));
+        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Negative));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::HalfCarry))
     }
 
@@ -1484,7 +1484,7 @@
         or(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x02</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x03</span>);
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Zero));
-        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Subtract));
+        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Negative));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::HalfCarry));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -1504,7 +1504,7 @@
         sub(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x01</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x01</span>);
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Zero));
-        <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Subtract));
+        <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::Negative));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::HalfCarry));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -1539,7 +1539,7 @@
         xor_bytes(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x01</span>, <span class="number">0x03</span>);
         <span class="macro">assert_eq!</span>(cpu.reg.a, <span class="number">0x02</span>);
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Zero));
-        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Subtract));
+        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Negative));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::HalfCarry));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -1556,7 +1556,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         bit(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x01</span>, <span class="number">0</span>);
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Zero));
-        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Subtract));
+        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Negative));
         <span class="macro">assert!</span>(cpu.reg.check_flag(Flag::HalfCarry))
     }
 
@@ -1572,7 +1572,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="macro">assert_eq!</span>(swap(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x12</span>), <span class="number">0x21</span>);
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Zero));
-        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Subtract));
+        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Negative));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::HalfCarry));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Carry))
     }
@@ -1590,7 +1590,7 @@
         cpu.reg.clear_flag(Flag::Carry);
         <span class="macro">assert_eq!</span>(rl(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0x7F</span>), <span class="number">0xFE</span>);
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Zero));
-        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Subtract));
+        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Negative));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::HalfCarry));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -1633,7 +1633,7 @@
         cpu.reg.clear_flag(Flag::Carry);
         <span class="macro">assert_eq!</span>(rr(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0xFE</span>), <span class="number">0x7F</span>);
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Zero));
-        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Subtract));
+        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Negative));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::HalfCarry));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Carry));
     }
@@ -1675,7 +1675,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
         <span class="macro">assert_eq!</span>(srl(<span class="kw-2">&amp;mut </span>cpu, <span class="number">0xFE</span>), <span class="number">0x7F</span>);
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Zero));
-        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Subtract));
+        <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Negative));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::HalfCarry));
         <span class="macro">assert!</span>(!cpu.reg.check_flag(Flag::Carry));
     }

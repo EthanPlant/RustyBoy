@@ -6441,7 +6441,7 @@
     description: <span class="string">&quot;DI&quot;</span>,
     handler: |cpu: <span class="kw-2">&amp;mut </span>Cpu, <span class="kw">_</span>: <span class="kw-2">&amp;mut </span>Memory, <span class="kw">_</span>: <span class="kw-2">&amp;</span>OpCode| {
         <span class="macro">log::trace!</span>(<span class="string">&quot;Disabling IME&quot;</span>);
-        cpu.interrupts_enabled = <span class="bool-val">false</span>;
+        cpu.ime = <span class="bool-val">false</span>;
         InstructionType::ActionTaken
     },
 };
@@ -9256,9 +9256,9 @@
     <span class="attr">#[test]
     </span><span class="kw">pub fn </span>test_di() {
         <span class="kw">let </span><span class="kw-2">mut </span>cpu = Cpu::new();
-        cpu.interrupts_enabled = <span class="bool-val">true</span>;
+        cpu.ime = <span class="bool-val">true</span>;
         (<span class="kw-2">&amp;</span>DI.handler)(<span class="kw-2">&amp;mut </span>cpu, <span class="kw-2">&amp;mut </span>Memory::new(), <span class="kw-2">&amp;</span>OpCode::Regular(<span class="number">0xF3</span>));
-        <span class="macro">assert_eq!</span>(cpu.interrupts_enabled, <span class="bool-val">false</span>);
+        <span class="macro">assert_eq!</span>(cpu.ime, <span class="bool-val">false</span>);
     }
 
     <span class="attr">#[test]

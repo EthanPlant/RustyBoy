@@ -280,7 +280,7 @@
     <span class="doccomment">/// Set when an arithmetic operation results in a zero value
     </span>Zero = <span class="number">0x80</span>,
     <span class="doccomment">/// Set when an arithmetic operation results in a negative value
-    </span>Subtract = <span class="number">0x40</span>,
+    </span>Negative = <span class="number">0x40</span>,
     <span class="doccomment">/// Set when an arithmetic operation results in a carry from bit 3 to bit 4
     </span>HalfCarry = <span class="number">0x20</span>,
     <span class="doccomment">/// Set when an arithmetic operation results in a carry from bit 7 to bit 8
@@ -402,7 +402,7 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_set_subtract_flag() {
         <span class="kw">let </span><span class="kw-2">mut </span>regs = Registers::new();
-        regs.set_flag(Flag::Subtract);
+        regs.set_flag(Flag::Negative);
         <span class="macro">assert_eq!</span>(regs.f, <span class="number">0x40</span>);
     }
 
@@ -432,7 +432,7 @@
     </span><span class="kw">fn </span>test_clear_subtract_flag() {
         <span class="kw">let </span><span class="kw-2">mut </span>regs = Registers::new();
         regs.f = <span class="number">0xFF</span>;
-        regs.clear_flag(Flag::Subtract);
+        regs.clear_flag(Flag::Negative);
         <span class="macro">assert_eq!</span>(regs.f, <span class="number">0xBF</span>);
     }
 
@@ -465,7 +465,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>regs = Registers::new();
         regs.f = <span class="number">0xFF</span>;
         <span class="macro">assert_eq!</span>(regs.check_flag(Flag::Zero), <span class="bool-val">true</span>);
-        <span class="macro">assert_eq!</span>(regs.check_flag(Flag::Subtract), <span class="bool-val">true</span>);
+        <span class="macro">assert_eq!</span>(regs.check_flag(Flag::Negative), <span class="bool-val">true</span>);
         <span class="macro">assert_eq!</span>(regs.check_flag(Flag::HalfCarry), <span class="bool-val">true</span>);
         <span class="macro">assert_eq!</span>(regs.check_flag(Flag::Carry), <span class="bool-val">true</span>);
     }
@@ -475,7 +475,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>regs = Registers::new();
         regs.f = <span class="number">0x00</span>;
         <span class="macro">assert_eq!</span>(regs.check_flag(Flag::Zero), <span class="bool-val">false</span>);
-        <span class="macro">assert_eq!</span>(regs.check_flag(Flag::Subtract), <span class="bool-val">false</span>);
+        <span class="macro">assert_eq!</span>(regs.check_flag(Flag::Negative), <span class="bool-val">false</span>);
         <span class="macro">assert_eq!</span>(regs.check_flag(Flag::HalfCarry), <span class="bool-val">false</span>);
         <span class="macro">assert_eq!</span>(regs.check_flag(Flag::Carry), <span class="bool-val">false</span>);
     }
