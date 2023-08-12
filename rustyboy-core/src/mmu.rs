@@ -3,6 +3,9 @@ use crate::cpu::interrupts::{
     Interrupt, InterruptState, INTERRUPT_ENABLE_ADDR, INTERRUPT_FLAG_ADDR,
 };
 use crate::io::timer::{Timer, DIV_ADDR, TAC_ADDR, TIMA_ADDR, TMA_ADDR};
+use crate::mbc;
+use crate::mbc::Mbc;
+use crate::mbc::rom_only::RomOnly;
 
 const ROM_START: usize = 0x0000;
 const ROM_END: usize = 0x7FFF;
@@ -40,7 +43,7 @@ const HRAM_SIZE: usize = HRAM_END - HRAM_START + 1;
 /// The MMU (Memory Management Unit) is responsible for managing the gameboy's memory
 pub struct Memory {
     /// The cartridge's data
-    cart: Cartridge,
+    cart: Box<dyn Mbc>,
 
     /// Interrupt registers
     pub interrupts: InterruptState,
@@ -59,7 +62,7 @@ impl Memory {
     /// Create a new empty Memory
     pub fn new() -> Self {
         Memory {
-            cart: Cartridge::new(),
+            cart: Box::new(RomOnly::new(Cartridge::new())),
             interrupts: InterruptState::new(),
             timer: Timer::new(),
             vram: [0xFF; VRAM_SIZE],
@@ -76,7 +79,7 @@ impl Memory {
         let mut io: [u8; IO_SIZE] = [0xFF; IO_SIZE];
         io[0x44] = 0x90; // Stub LY to 0x90 (144) to simulate VBlank
         Memory {
-            cart: cart,
+            cart: mbc::from_cartridge(cart),
             interrupts: InterruptState::new(),
             timer: Timer::new(),
             vram: [0xFF; VRAM_SIZE],

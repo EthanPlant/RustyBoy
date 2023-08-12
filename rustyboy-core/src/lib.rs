@@ -4,4 +4,5 @@ pub mod gameboy;
 pub mod io;
 pub mod mmu;
 pub mod sysclock;
+mod mbc;
 mod util;

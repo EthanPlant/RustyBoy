@@ -5,7 +5,7 @@ const ROM_SIZE_ADDR: u16 = 0x0148;
 const RAM_SIZE_ADDR: u16 = 0x0149;
 
 #[derive(PartialEq)]
-enum CartridgeType {
+pub enum CartridgeType {
     RomOnly = 0x00,
     Mbc1 = 0x01,
     Mbc1Ram = 0x02,
@@ -205,14 +205,16 @@ impl TryFrom<u8> for RamSize {
 }
 
 pub struct Cartridge {
-    rom: Vec<u8>,
-    ram: Vec<u8>,
+    pub cart_type: CartridgeType,
+    pub rom: Vec<u8>,
+    pub ram: Vec<u8>,
 }
 
 impl Cartridge {
     /// Create a new Cartridge
     pub fn new() -> Self {
         Cartridge {
+            cart_type: CartridgeType::RomOnly,
             rom: vec![0xFF; 0x8000],
             ram: vec![0xFF; 0x2000],
         }
@@ -232,36 +234,7 @@ impl Cartridge {
         log::debug!("ROM Size: {}", rom_size);
         log::debug!("RAM Size: {}\n", ram_size);
 
-        // Temporarily need to disable this check to get blargg tests to boot
-        // if cart_type != CartridgeType::RomOnly {
-        //     panic!("Only ROM only cartridges are supported at this time");
-        // }
-
-        Cartridge { rom, ram }
-    }
-
-    /// Read a byte from the ROM
-    pub fn read_byte_from_rom(&self, addr: usize) -> u8 {
-        self.rom[addr]
-    }
-
-    /// Read a byte from the RAM
-    pub fn read_byte_from_ram(&self, addr: usize) -> u8 {
-        self.ram[addr]
-    }
-
-    /// Write a byte to the ROM
-    pub fn write_byte_to_rom(&mut self, addr: usize, v: u8) {
-        log::warn!(
-            "Attempted write to ROM at {:04X} with value {:02X}",
-            addr,
-            v
-        );
-    }
-
-    /// Write a byte to the RAM
-    pub fn write_byte_to_ram(&mut self, addr: usize, v: u8) {
-        self.ram[addr] = v;
+        Cartridge { cart_type, rom, ram }
     }
 
     /// Get the title of the ROM from the header
@@ -294,35 +267,5 @@ mod tests {
         let cart = Cartridge::new_from_rom("resources/test-rom.gb");
         assert_eq!(cart.rom.len(), 0x8000);
         assert_eq!(cart.ram.len(), 0);
-    }
-
-    #[test]
-    fn test_read_byte_from_rom() {
-        let mut cart = Cartridge::new();
-        cart.rom[0x0101] = 0xC3;
-        assert_eq!(cart.read_byte_from_rom(0x0101), 0xC3);
-    }
-
-    #[test]
-    fn test_read_byte_from_ram() {
-        let mut cart = Cartridge::new();
-        cart.ram[0x0000] = 0x01;
-        assert_eq!(cart.read_byte_from_ram(0x0000), 0x01);
-    }
-
-    #[test]
-    fn test_write_byte_to_rom() {
-        let mut cart = Cartridge::new();
-        cart.rom[0x0101] = 0xC3;
-        cart.write_byte_to_rom(0x0101, 0x00);
-        assert_eq!(cart.read_byte_from_rom(0x0101), 0xC3);
-    }
-
-    #[test]
-    fn test_write_byte_to_ram() {
-        let mut cart = Cartridge::new();
-        cart.ram[0x0000] = 0x01;
-        cart.write_byte_to_ram(0x0000, 0x01);
-        assert_eq!(cart.read_byte_from_ram(0x0000), 0x01);
     }
 }
