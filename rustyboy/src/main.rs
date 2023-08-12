@@ -72,6 +72,10 @@ fn main() {
 
     event_loop.run(move |event, _, control_flow| {
         match event {
+            Event::RedrawRequested(_) => {
+                generate_pixels(pixels.frame_mut(), &gb.mmu.ppu.frame_buffer);
+                pixels.render().expect("Failed to render!");
+            }
             Event::WindowEvent {
                 event: WindowEvent::CloseRequested,
                 window_id,
@@ -88,7 +92,8 @@ fn main() {
         }
 
         gb.step();
-        generate_pixels(pixels.frame_mut(), &gb.mmu.ppu.frame_buffer);
-        pixels.render().expect("Failed to render!");
+        window.request_redraw();
+        // generate_pixels(pixels.frame_mut(), &gb.mmu.ppu.frame_buffer);
+        // pixels.render().expect("Failed to render!");
     });
 }
