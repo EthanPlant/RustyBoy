@@ -42,7 +42,7 @@ After cloning the repository, simply run `cargo build` in the workspace director
 - [ ] Graphics
     - [x] Draw Background
     - [x] Background scrolling
-    - [ ] Draw window
+    - [x] Draw window
     - [ ] Draw sprites
     - [ ] Handle flipped sprites
     - [ ] Handle 8x16 sprites

@@ -65,6 +65,8 @@ pub struct Ppu {
     pub oam: [u8; 0xA0],
     /// The PPU's internal clock
     clock: u32,
+    /// Internal window line counter
+    window_line_counter: u8,
 }
 
 impl Ppu {
@@ -99,6 +101,7 @@ impl Ppu {
             vram_changed: false,
             oam: [0; 0xA0],
             clock: 0,
+            window_line_counter: 0,
         }
     }
 
@@ -134,6 +137,7 @@ impl Ppu {
                         if self.ly == MAX_SCANLINE as u8 {
                             self.stat.mode = Mode::OamSearch;
                             self.ly = 0;
+                            self.window_line_counter = 0;
                             if self.stat.mode_2_oam_interrupt {
                                 self.lcd_interrupt_fired = true;
                             }
@@ -177,6 +181,10 @@ impl Ppu {
         if self.lcdc.enabled {
             if self.lcdc.background_enabled {
                 self.draw_background();
+
+                if self.lcdc.window_enabled {
+                   self.draw_window();
+                }
             }
         }
     }
@@ -219,5 +227,50 @@ impl Ppu {
                 _ => Color::Black,
             };
         }
+    }
+
+    fn draw_window(&mut self) {
+        let window_x = self.wx.wrapping_sub(7);
+        let window_y = self.wy;
+        if window_x > 159 || window_y > 143 || self.ly < window_y {
+            return;
+        }
+        let tilemap: u16 = if self.lcdc.window_tile_map {
+            0x9C00
+        } else {
+            0x9800
+        };
+        let tiledata: u16 = if self.lcdc.background_tile_data {
+            0x8000
+        } else {
+            0x8800
+        };
+        let y_pos = self.window_line_counter;
+        let tile_row = ((y_pos / 8) as u16) * 32;
+        for pixel in window_x..WIDTH as u8 {
+            let x_pos = pixel as u8 - window_x;
+            let tile_col = x_pos / 8;
+            let tile_no =
+                self.vram[(tilemap + tile_row as u16 + tile_col as u16) as usize - 0x8000];
+            
+            let tile_addr = if self.lcdc.background_tile_data {
+                tiledata + (tile_no as u16 * 16)
+            } else {
+                tiledata + ((tile_no as i8 as i16 + 128) as u16 * 16)
+            };
+            let tile_line = (y_pos % 8) * 2;
+            let lo = self.vram[(tile_addr + tile_line as u16) as usize - 0x8000];
+            let hi = self.vram[(tile_addr + tile_line as u16 + 1) as usize - 0x8000];
+            let color_val = (lo >> (7 - (x_pos % 8)) & 0x1) | (hi >> (7 - (x_pos % 8)) & 0x1) << 1;
+            let color = (self.bgp >> (color_val * 2)) & 0x3;
+            self.frame_buffer[self.ly as usize * WIDTH + pixel as usize] = match color {
+                0 => Color::White,
+                1 => Color::LightGray,
+                2 => Color::DarkGray,
+                3 => Color::Black,
+                _ => Color::Black,
+            };
+        }
+        self.window_line_counter += 1;
     }
 }
