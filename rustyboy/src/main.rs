@@ -19,13 +19,13 @@ struct Args {
 }
 
 fn generate_pixels(frame: &mut [u8], &framebuffer: &[Color; 160 * 144]) {
-    for (i, pixel) in frame.chunks_exact_mut(3).enumerate() {
-        let color = framebuffer[i / 3];
+    for (i, pixel) in frame.chunks_exact_mut(4).enumerate() {
+        let color = framebuffer[i];
         let mut rgb = match color {
-            Color::White => [255, 255, 255],
-            Color::LightGray => [192, 192, 192],
-            Color::DarkGray => [96, 96, 96],
-            Color::Black => [0, 0, 0],
+            Color::White => [255, 255, 255, 255],
+            Color::LightGray => [192, 192, 192, 255],
+            Color::DarkGray => [96, 96, 96, 255],
+            Color::Black => [0, 0, 0, 255],
         };
         pixel.copy_from_slice(&mut rgb);
     }

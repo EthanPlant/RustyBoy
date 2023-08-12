@@ -76,7 +76,7 @@ impl Ppu {
                 1 => frame_buffer[i] = Color::LightGray,
                 2 => frame_buffer[i] = Color::DarkGray,
                 3 => frame_buffer[i] = Color::Black,
-                _ => unreachable!(),
+                _ => (),
             }
         }
         Ppu {
@@ -111,7 +111,7 @@ impl Ppu {
                     if self.clock >= HBLANK_CYCLES {
                         self.clock = 0;
                         // TODO drawing
-                        self.frame_buffer = [Color::Black; WIDTH * HEIGHT];
+                        //self.frame_buffer = [Color::Black; WIDTH * HEIGHT];
                         self.ly += 1;
                         self.check_lyc();
                         if self.ly >= HEIGHT as u8 {
@@ -130,7 +130,7 @@ impl Ppu {
                 }
                 Mode::VBlank => {
                     if self.clock >= VBLANK_CYCLES {
-                        self.frame_buffer = [Color::DarkGray; WIDTH * HEIGHT];
+                        //self.frame_buffer = [Color::DarkGray; WIDTH * HEIGHT];
                         self.clock = 0;
                         self.ly += 1;
                         self.check_lyc();
@@ -145,7 +145,7 @@ impl Ppu {
                 }
                 Mode::OamSearch => {
                     if self.clock >= OAM_SEARCH_CYCLES {
-                        self.frame_buffer = [Color::LightGray; WIDTH * HEIGHT];
+                        //self.frame_buffer = [Color::LightGray; WIDTH * HEIGHT];
                         self.clock = 0;
                         self.stat.mode = Mode::PixelTransfer;
                     }
@@ -154,7 +154,7 @@ impl Ppu {
                     if self.clock >= PIXEL_TRANSFER_CYCLES {
                         self.clock = 0;
                         self.stat.mode = Mode::HBlank;
-                        self.frame_buffer = [Color::White; WIDTH * HEIGHT];
+                        //self.frame_buffer = [Color::White; WIDTH * HEIGHT];
                         if self.stat.mode_0_hblank_interrupt {
                             self.lcd_interrupt_fired = true;
                         }
@@ -162,7 +162,7 @@ impl Ppu {
                 }
             }
         } else {
-            self.frame_buffer = [Color::White; WIDTH * HEIGHT];
+            //self.frame_buffer = [Color::White; WIDTH * HEIGHT];
             self.clock = 0;
         }
     }
