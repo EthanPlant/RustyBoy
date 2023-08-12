@@ -75,3 +75,4 @@ After cloning the repository, simply run `cargo build` in the workspace director
 - [x] Gameboy boot ROM
 - [x] Blargg cpu_instrs
 - [x] Blargg instr_timing
+- [x] Mooneye daa
