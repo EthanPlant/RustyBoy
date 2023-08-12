@@ -40,11 +40,26 @@ fn main() {
         .build(&event_loop)
         .unwrap();
 
+    let tile_window = WindowBuilder::new()
+        .with_title("Tiles")
+        .with_inner_size(winit::dpi::LogicalSize::new(96 * 3, 256 * 3))
+        .build(&event_loop)
+        .unwrap();
+
     let mut pixels = {
         let window_size = window.inner_size();
         let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
         Pixels::new(160, 144, surface_texture).unwrap()
     };
+
+    let tile_pixels = {
+        let window_size = tile_window.inner_size();
+        let surface_texture =
+            SurfaceTexture::new(window_size.width, window_size.height, &tile_window);
+        Pixels::new(96, 256, surface_texture).unwrap()
+    };
+
+    tile_pixels.render().expect("Failed to render tiles!");
 
     // If no log level is specified, default to info or above
     env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
@@ -61,6 +76,14 @@ fn main() {
                 event: WindowEvent::CloseRequested,
                 window_id,
             } if window.id() == window_id => *control_flow = ControlFlow::Exit,
+
+            Event::WindowEvent {
+                event: WindowEvent::Resized(size),
+                window_id,
+            } if window.id() == window_id => pixels
+                .resize_surface(size.width, size.height)
+                .expect("Failed to resize surface!"),
+
             _ => (),
         }
 
