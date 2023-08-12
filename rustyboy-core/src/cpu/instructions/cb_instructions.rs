@@ -4578,7 +4578,7 @@ mod tests {
         let instruction = get_instruction(&0x46).unwrap();
         assert_eq!(instruction, &BIT_0_HL);
         assert_eq!(instruction.length, 2);
-        assert_eq!(instruction.clock_cycles, 16);
+        assert_eq!(instruction.clock_cycles, 12);
     }
 
     #[test]
@@ -4708,7 +4708,7 @@ mod tests {
         let instruction = get_instruction(&0x4E).unwrap();
         assert_eq!(instruction, &BIT_1_HL);
         assert_eq!(instruction.length, 2);
-        assert_eq!(instruction.clock_cycles, 16);
+        assert_eq!(instruction.clock_cycles, 12);
     }
 
     #[test]
@@ -4838,7 +4838,7 @@ mod tests {
         let instruction = get_instruction(&0x56).unwrap();
         assert_eq!(instruction, &BIT_2_HL);
         assert_eq!(instruction.length, 2);
-        assert_eq!(instruction.clock_cycles, 16);
+        assert_eq!(instruction.clock_cycles, 12);
     }
 
     #[test]
@@ -4968,7 +4968,7 @@ mod tests {
         let instruction = get_instruction(&0x5E).unwrap();
         assert_eq!(instruction, &BIT_3_HL);
         assert_eq!(instruction.length, 2);
-        assert_eq!(instruction.clock_cycles, 16);
+        assert_eq!(instruction.clock_cycles, 12);
     }
 
     #[test]
@@ -5098,7 +5098,7 @@ mod tests {
         let instruction = get_instruction(&0x66).unwrap();
         assert_eq!(instruction, &BIT_4_HL);
         assert_eq!(instruction.length, 2);
-        assert_eq!(instruction.clock_cycles, 16);
+        assert_eq!(instruction.clock_cycles, 12);
     }
 
     #[test]
@@ -5228,7 +5228,7 @@ mod tests {
         let instruction = get_instruction(&0x6E).unwrap();
         assert_eq!(instruction, &BIT_5_HL);
         assert_eq!(instruction.length, 2);
-        assert_eq!(instruction.clock_cycles, 16);
+        assert_eq!(instruction.clock_cycles, 12);
     }
 
     #[test]
@@ -5358,7 +5358,7 @@ mod tests {
         let instruction = get_instruction(&0x76).unwrap();
         assert_eq!(instruction, &BIT_6_HL);
         assert_eq!(instruction.length, 2);
-        assert_eq!(instruction.clock_cycles, 16);
+        assert_eq!(instruction.clock_cycles, 12);
     }
 
     #[test]
@@ -5488,7 +5488,7 @@ mod tests {
         let instruction = get_instruction(&0x7E).unwrap();
         assert_eq!(instruction, &BIT_7_HL);
         assert_eq!(instruction.length, 2);
-        assert_eq!(instruction.clock_cycles, 16);
+        assert_eq!(instruction.clock_cycles, 12);
     }
 
     #[test]
