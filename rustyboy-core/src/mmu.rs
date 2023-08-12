@@ -16,7 +16,6 @@ const ROM_END: usize = 0x7FFF;
 
 const VRAM_START: usize = 0x8000;
 const VRAM_END: usize = 0x9FFF;
-const VRAM_SIZE: usize = VRAM_END - VRAM_START + 1;
 
 const CART_RAM_START: usize = 0xA000;
 const CART_RAM_END: usize = 0xBFFF;
@@ -30,7 +29,6 @@ const ECHO_RAM_END: usize = 0xFDFF;
 
 const OAM_START: usize = 0xFE00;
 const OAM_END: usize = 0xFE9F;
-const OAM_SIZE: usize = OAM_END - OAM_START + 1;
 
 const UNUSED_START: usize = 0xFEA0;
 const UNUSED_END: usize = 0xFEFF;
@@ -55,12 +53,8 @@ pub struct Memory {
     pub timer: Timer,
     /// The PPU
     pub ppu: Ppu,
-    /// VRAM
-    vram: [u8; VRAM_SIZE],
     /// WRAM
     wram: [u8; WRAM_SIZE],
-    /// Object Attribute Memory
-    oam: [u8; OAM_SIZE],
     /// IO Registers
     io: [u8; IO_SIZE],
     /// High RAM
@@ -76,9 +70,7 @@ impl Memory {
             interrupts: InterruptState::new(),
             timer: Timer::new(),
             ppu: Ppu::new(),
-            vram: [0xFF; VRAM_SIZE],
             wram: [0xFF; WRAM_SIZE],
-            oam: [0xFF; OAM_SIZE],
             io: [0xFF; IO_SIZE],
             hram: [0xFF; HRAM_SIZE],
         }
@@ -94,9 +86,7 @@ impl Memory {
             interrupts: InterruptState::new(),
             timer: Timer::new(),
             ppu: Ppu::new(),
-            vram: [0xFF; VRAM_SIZE],
             wram: [0xFF; WRAM_SIZE],
-            oam: [0xFF; OAM_SIZE],
             io: [0xFF; IO_SIZE],
             hram: [0xFF; HRAM_SIZE],
         }
@@ -128,14 +118,14 @@ impl Memory {
         let addr = addr.into();
         match addr {
             ROM_START..=ROM_END => self.cart.read_byte_from_rom(addr),
-            VRAM_START..=VRAM_END => self.vram[addr - VRAM_START],
+            VRAM_START..=VRAM_END => self.ppu.vram[addr - VRAM_START],
             CART_RAM_START..=CART_RAM_END => self.cart.read_byte_from_ram(addr - CART_RAM_START),
             WRAM_START..=WRAM_END => self.wram[addr - WRAM_START],
             ECHO_RAM_START..=ECHO_RAM_END => {
                 log::warn!("Attempted prohibited read from echo RAM {}", addr);
                 self.wram[addr - ECHO_RAM_START]
             }
-            OAM_START..=OAM_END => self.oam[addr - OAM_START],
+            OAM_START..=OAM_END => self.ppu.oam[addr - OAM_START],
             UNUSED_START..=UNUSED_END => {
                 log::warn!("Attempted prohibited read from unused memory {}", addr);
                 0xFF
@@ -179,14 +169,14 @@ impl Memory {
         );
         match addr {
             ROM_START..=ROM_END => self.cart.write_byte_to_rom(addr, v),
-            VRAM_START..=VRAM_END => self.vram[addr - VRAM_START] = v,
+            VRAM_START..=VRAM_END => self.ppu.vram[addr - VRAM_START] = v,
             CART_RAM_START..=CART_RAM_END => self.cart.write_byte_to_ram(addr - CART_RAM_START, v),
             WRAM_START..=WRAM_END => self.wram[addr - WRAM_START] = v,
             ECHO_RAM_START..=ECHO_RAM_END => {
                 log::warn!("Attempted prohibited write to echo RAM {}", addr);
                 self.wram[addr - ECHO_RAM_START] = v
             }
-            OAM_START..=OAM_END => self.oam[addr - OAM_START] = v,
+            OAM_START..=OAM_END => self.ppu.oam[addr - OAM_START] = v,
             UNUSED_START..=UNUSED_END => {
                 log::warn!("Attempted prohibited write to unused memory {}", addr);
             }
@@ -272,7 +262,7 @@ mod tests {
     #[test]
     fn test_get_byte_vram() {
         let mut mem = Memory::new();
-        mem.vram[0x00] = 0x01;
+        mem.ppu.vram[0x00] = 0x01;
         assert_eq!(mem.get_byte(VRAM_START), 0x01);
     }
 
@@ -299,7 +289,7 @@ mod tests {
     #[test]
     fn test_get_byte_oam() {
         let mut mem = Memory::new();
-        mem.oam[0x00] = 0x01;
+        mem.ppu.oam[0x00] = 0x01;
         assert_eq!(mem.get_byte(OAM_START), 0x01);
     }
 
@@ -332,8 +322,8 @@ mod tests {
     #[test]
     fn test_get_word_vram() {
         let mut mem = Memory::new();
-        mem.vram[0x00] = 0x01;
-        mem.vram[0x01] = 0x02;
+        mem.ppu.vram[0x00] = 0x01;
+        mem.ppu.vram[0x01] = 0x02;
         assert_eq!(mem.get_word(VRAM_START), 0x0201);
     }
 
@@ -362,8 +352,8 @@ mod tests {
     #[test]
     fn test_get_word_oam() {
         let mut mem = Memory::new();
-        mem.oam[0x00] = 0x01;
-        mem.oam[0x01] = 0x02;
+        mem.ppu.oam[0x00] = 0x01;
+        mem.ppu.oam[0x01] = 0x02;
         assert_eq!(mem.get_word(OAM_START), 0x0201);
     }
 
@@ -400,7 +390,7 @@ mod tests {
     fn test_set_byte_vram() {
         let mut mem = Memory::new();
         mem.set_byte(VRAM_START, 0x01);
-        assert_eq!(mem.vram[0x0000], 0x01);
+        assert_eq!(mem.ppu.vram[0x0000], 0x01);
     }
 
     #[test]
@@ -428,7 +418,7 @@ mod tests {
     fn test_set_byte_oam() {
         let mut mem = Memory::new();
         mem.set_byte(OAM_START, 0x01);
-        assert_eq!(mem.oam[0x0000], 0x01);
+        assert_eq!(mem.ppu.oam[0x0000], 0x01);
     }
 
     #[test]
@@ -463,8 +453,8 @@ mod tests {
     fn test_set_word_vram() {
         let mut mem = Memory::new();
         mem.set_word(VRAM_START, 0x0102);
-        assert_eq!(mem.vram[0x0000], 0x02);
-        assert_eq!(mem.vram[0x0001], 0x01);
+        assert_eq!(mem.ppu.vram[0x0000], 0x02);
+        assert_eq!(mem.ppu.vram[0x0001], 0x01);
     }
 
     #[test]
@@ -495,8 +485,8 @@ mod tests {
     fn test_set_word_oam() {
         let mut mem = Memory::new();
         mem.set_word(OAM_START, 0x0102);
-        assert_eq!(mem.oam[0x0000], 0x02);
-        assert_eq!(mem.oam[0x0001], 0x01);
+        assert_eq!(mem.ppu.oam[0x0000], 0x02);
+        assert_eq!(mem.ppu.oam[0x0001], 0x01);
     }
 
     #[test]
