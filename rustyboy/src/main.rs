@@ -14,6 +14,8 @@ use rustyboy_core::{gameboy::Gameboy, ppu::ppu::Color};
 struct Args {
     #[arg(short, long)]
     rom: String,
+    #[arg(short, long)]
+    show_tiles: bool,
 }
 
 fn generate_pixels(frame: &mut [u8], &framebuffer: &[Color; 160 * 144]) {
@@ -32,8 +34,8 @@ fn generate_pixels(frame: &mut [u8], &framebuffer: &[Color; 160 * 144]) {
 fn generate_tiles(frame: &mut [u8], vram: &[u8]) {
     for i in 0..384 {
         let tile = &vram[i * 16..(i + 1) * 16];
-        let tile_x = (i % 12) * 8;
-        let tile_y = (i / 12) * 8;
+        let tile_x = (i % 16) * 8;
+        let tile_y = (i / 16) * 8;
         for j in 0..8 {
             let lo = tile[j * 2];
             let hi = tile[j * 2 + 1];
@@ -53,7 +55,7 @@ fn generate_tiles(frame: &mut [u8], vram: &[u8]) {
                 };
                 let pixel_x = tile_x + k;
                 let pixel_y = tile_y + j;
-                let pixel_index = (pixel_y * 12 * 8 + pixel_x) * 4;
+                let pixel_index = (pixel_y * 16 * 8 + pixel_x) * 4;
                 frame[pixel_index..pixel_index + 4].copy_from_slice(&mut rgb);
             }
         }
@@ -73,9 +75,13 @@ fn main() {
 
     let tile_window = WindowBuilder::new()
         .with_title("Tiles")
-        .with_inner_size(winit::dpi::LogicalSize::new(96 * 3, 256 * 3))
+        .with_inner_size(winit::dpi::LogicalSize::new(128 * 4, 192 * 4))
         .build(&event_loop)
         .unwrap();
+
+    if !args.show_tiles {
+        tile_window.set_visible(false);
+    }
 
     let mut pixels = {
         let window_size = window.inner_size();
@@ -87,7 +93,7 @@ fn main() {
         let window_size = tile_window.inner_size();
         let surface_texture =
             SurfaceTexture::new(window_size.width, window_size.height, &tile_window);
-        Pixels::new(12 * 8, 32 * 8, surface_texture).unwrap()
+        Pixels::new(16 * 8, 24 * 8, surface_texture).unwrap()
     };
 
     tile_pixels.render().expect("Failed to render tiles!");
