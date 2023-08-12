@@ -7,6 +7,7 @@ pub const SCY_ADDR: usize = 0xFF42;
 pub const SCX_ADDR: usize = 0xFF43;
 pub const LY_ADDR: usize = 0xFF44;
 pub const LYC_ADDR: usize = 0xFF45;
+pub const OAM_DMA_ADDR: usize = 0xFF46;
 pub const BGP_ADDR: usize = 0xFF47;
 pub const OBP0_ADDR: usize = 0xFF48;
 pub const OBP1_ADDR: usize = 0xFF49;

@@ -8,7 +8,7 @@ use crate::mbc::rom_only::RomOnly;
 use crate::mbc::Mbc;
 use crate::ppu::ppu::{
     Ppu, BGP_ADDR, LCDC_ADDR, LYC_ADDR, LY_ADDR, OBP0_ADDR, OBP1_ADDR, SCX_ADDR, SCY_ADDR,
-    STAT_ADDR, WX_ADDR, WY_ADDR,
+    STAT_ADDR, WX_ADDR, WY_ADDR, OAM_DMA_ADDR,
 };
 use crate::ppu::stat::Mode;
 
@@ -218,6 +218,12 @@ impl Memory {
                     LYC_ADDR => {
                         self.ppu.lyc = v;
                         self.ppu.check_lyc(); // Check if LYC=LY
+                    }
+                    OAM_DMA_ADDR => {
+                        let start = (v as u16) << 8;
+                        for i in 0..0xA0 {
+                            self.ppu.oam[i] = self.get_byte(start as usize + i);
+                        }
                     }
                     BGP_ADDR => self.ppu.bgp = v,
                     OBP0_ADDR => self.ppu.obp0 = v,
