@@ -21,14 +21,14 @@ pub struct Lcdc {
 impl Lcdc {
     pub fn new() -> Self {
         Lcdc {
-            background_enabled: false,
+            background_enabled: true,
             objects_enabled: false,
             objects_size: false,
             background_tile_map: false,
-            background_tile_data: false,
+            background_tile_data: true,
             window_enabled: false,
             window_tile_map: false,
-            enabled: false,
+            enabled: true,
         }
     }
 

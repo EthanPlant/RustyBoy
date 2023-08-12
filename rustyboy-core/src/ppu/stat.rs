@@ -26,7 +26,7 @@ impl Stat {
     /// Create a new Stat
     pub fn new() -> Self {
         Stat {
-            mode: Mode::HBlank,
+            mode: Mode::VBlank,
             lyc_ly_flag: false,
             mode_0_hblank_interrupt: false,
             mode_1_vblank_interrupt: false,
@@ -47,7 +47,7 @@ impl Stat {
 
 impl Into<u8> for Stat {
     fn into(self) -> u8 {
-        let mut value = 0;
+        let mut value = 0x80;
         if self.lyc_ly_flag {
             value |= 0b0100_0000;
         }
