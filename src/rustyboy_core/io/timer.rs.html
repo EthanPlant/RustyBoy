@@ -153,10 +153,10 @@
 <span class="kw">impl </span>Timer {
     <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         Timer {
-            divider: <span class="number">0x00</span>,
+            divider: <span class="number">0x18</span>,
             counter: <span class="number">0x00</span>,
             modulo: <span class="number">0x00</span>,
-            control: <span class="number">0x00</span>,
+            control: <span class="number">0xF8</span>,
             interrupt_fired: <span class="bool-val">false</span>,
             clock_cycles_div: <span class="number">0</span>,
             clock_cycles_tima: <span class="number">0</span>,
@@ -206,10 +206,10 @@
     <span class="attr">#[test]
     </span><span class="kw">fn </span>test_new() {
         <span class="kw">let </span>timer = Timer::new();
-        <span class="macro">assert_eq!</span>(timer.divider, <span class="number">0x00</span>);
+        <span class="macro">assert_eq!</span>(timer.divider, <span class="number">0x18</span>);
         <span class="macro">assert_eq!</span>(timer.counter, <span class="number">0x00</span>);
         <span class="macro">assert_eq!</span>(timer.modulo, <span class="number">0x00</span>);
-        <span class="macro">assert_eq!</span>(timer.control, <span class="number">0x00</span>);
+        <span class="macro">assert_eq!</span>(timer.control, <span class="number">0xF8</span>);
         <span class="macro">assert_eq!</span>(timer.interrupt_fired, <span class="bool-val">false</span>);
         <span class="macro">assert_eq!</span>(timer.clock_cycles_div, <span class="number">0</span>);
         <span class="macro">assert_eq!</span>(timer.clock_cycles_tima, <span class="number">0</span>);
@@ -219,10 +219,10 @@
     </span><span class="kw">fn </span>test_step() {
         <span class="kw">let </span><span class="kw-2">mut </span>timer = Timer::new();
         timer.step(<span class="number">4</span>);
-        <span class="macro">assert_eq!</span>(timer.divider, <span class="number">0x00</span>);
+        <span class="macro">assert_eq!</span>(timer.divider, <span class="number">0x18</span>);
         <span class="macro">assert_eq!</span>(timer.counter, <span class="number">0x00</span>);
         <span class="macro">assert_eq!</span>(timer.modulo, <span class="number">0x00</span>);
-        <span class="macro">assert_eq!</span>(timer.control, <span class="number">0x00</span>);
+        <span class="macro">assert_eq!</span>(timer.control, <span class="number">0xF8</span>);
         <span class="macro">assert_eq!</span>(timer.interrupt_fired, <span class="bool-val">false</span>);
         <span class="macro">assert_eq!</span>(timer.clock_cycles_div, <span class="number">4</span>);
         <span class="macro">assert_eq!</span>(timer.clock_cycles_tima, <span class="number">0</span>);
@@ -233,10 +233,10 @@
         <span class="kw">let </span><span class="kw-2">mut </span>timer = Timer::new();
         timer.step(<span class="number">0xFF</span>);
         timer.step(<span class="number">0xFF</span>);
-        <span class="macro">assert_eq!</span>(timer.divider, <span class="number">1</span>);
+        <span class="macro">assert_eq!</span>(timer.divider, <span class="number">0x19</span>);
         <span class="macro">assert_eq!</span>(timer.counter, <span class="number">0x00</span>);
         <span class="macro">assert_eq!</span>(timer.modulo, <span class="number">0x00</span>);
-        <span class="macro">assert_eq!</span>(timer.control, <span class="number">0x00</span>);
+        <span class="macro">assert_eq!</span>(timer.control, <span class="number">0xF8</span>);
         <span class="macro">assert_eq!</span>(timer.interrupt_fired, <span class="bool-val">false</span>);
         <span class="macro">assert_eq!</span>(timer.clock_cycles_div, <span class="number">0xFE</span>);
         <span class="macro">assert_eq!</span>(timer.clock_cycles_tima, <span class="number">0</span>);
