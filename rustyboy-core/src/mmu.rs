@@ -6,6 +6,10 @@ use crate::io::timer::{Timer, DIV_ADDR, TAC_ADDR, TIMA_ADDR, TMA_ADDR};
 use crate::mbc;
 use crate::mbc::rom_only::RomOnly;
 use crate::mbc::Mbc;
+use crate::ppu::ppu::{
+    Ppu, BGP_ADDR, LCDC_ADDR, LYC_ADDR, LY_ADDR, OBP0_ADDR, OBP1_ADDR, SCX_ADDR, SCY_ADDR,
+    STAT_ADDR, WX_ADDR, WY_ADDR,
+};
 
 const ROM_START: usize = 0x0000;
 const ROM_END: usize = 0x7FFF;
@@ -45,17 +49,21 @@ pub struct Memory {
     /// The cartridge's data
     cart: Box<dyn Mbc>,
     pub cart_title: String,
-
     /// Interrupt registers
     pub interrupts: InterruptState,
-
     /// Timer
     pub timer: Timer,
-
+    /// The PPU
+    pub ppu: Ppu,
+    /// VRAM
     vram: [u8; VRAM_SIZE],
+    /// WRAM
     wram: [u8; WRAM_SIZE],
+    /// Object Attribute Memory
     oam: [u8; OAM_SIZE],
+    /// IO Registers
     io: [u8; IO_SIZE],
+    /// High RAM
     hram: [u8; HRAM_SIZE],
 }
 
@@ -67,6 +75,7 @@ impl Memory {
             cart_title: String::new(),
             interrupts: InterruptState::new(),
             timer: Timer::new(),
+            ppu: Ppu::new(),
             vram: [0xFF; VRAM_SIZE],
             wram: [0xFF; WRAM_SIZE],
             oam: [0xFF; OAM_SIZE],
@@ -79,17 +88,16 @@ impl Memory {
     pub fn new_with_rom(rom_name: &str) -> Self {
         let cart = Cartridge::new_from_rom(rom_name);
         let title = cart.title.clone();
-        let mut io: [u8; IO_SIZE] = [0xFF; IO_SIZE];
-        io[0x44] = 0x90; // Stub LY to 0x90 (144) to simulate VBlank
         Memory {
             cart: mbc::from_cartridge(cart),
             cart_title: title,
             interrupts: InterruptState::new(),
             timer: Timer::new(),
+            ppu: Ppu::new(),
             vram: [0xFF; VRAM_SIZE],
             wram: [0xFF; WRAM_SIZE],
             oam: [0xFF; OAM_SIZE],
-            io: io,
+            io: [0xFF; IO_SIZE],
             hram: [0xFF; HRAM_SIZE],
         }
     }
@@ -127,6 +135,17 @@ impl Memory {
                 TMA_ADDR => self.timer.modulo,
                 TAC_ADDR => self.timer.control,
                 INTERRUPT_FLAG_ADDR => self.interrupts.requested_interrupts,
+                LCDC_ADDR => self.ppu.lcdc.into(),
+                STAT_ADDR => self.ppu.stat.into(),
+                SCY_ADDR => self.ppu.scy,
+                SCX_ADDR => self.ppu.scx,
+                LY_ADDR => self.ppu.ly,
+                LYC_ADDR => self.ppu.lyc,
+                BGP_ADDR => self.ppu.bgp,
+                OBP0_ADDR => self.ppu.obp0,
+                OBP1_ADDR => self.ppu.obp1,
+                WY_ADDR => self.ppu.wy,
+                WX_ADDR => self.ppu.wx,
                 _ => self.io[addr - IO_START],
             },
             HRAM_START..=HRAM_END => self.hram[addr - HRAM_START],
@@ -174,6 +193,17 @@ impl Memory {
                     TMA_ADDR => self.timer.modulo = v,
                     TAC_ADDR => self.timer.control = v,
                     INTERRUPT_FLAG_ADDR => self.interrupts.requested_interrupts = v,
+                    LCDC_ADDR => self.ppu.lcdc.set(v),
+                    STAT_ADDR => self.ppu.stat.set(v),
+                    SCY_ADDR => self.ppu.scy = v,
+                    SCX_ADDR => self.ppu.scx = v,
+                    LY_ADDR => self.ppu.ly = v,
+                    LYC_ADDR => self.ppu.lyc = v,
+                    BGP_ADDR => self.ppu.bgp = v,
+                    OBP0_ADDR => self.ppu.obp0 = v,
+                    OBP1_ADDR => self.ppu.obp1 = v,
+                    WY_ADDR => self.ppu.wy = v,
+                    WX_ADDR => self.ppu.wx = v,
                     _ => self.io[addr - IO_START] = v,
                 }
             }
