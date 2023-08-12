@@ -21,8 +21,16 @@
 <a href="#21" id="21">21</a>
 <a href="#22" id="22">22</a>
 <a href="#23" id="23">23</a>
+<a href="#24" id="24">24</a>
+<a href="#25" id="25">25</a>
+<a href="#26" id="26">26</a>
+<a href="#27" id="27">27</a>
+<a href="#28" id="28">28</a>
+<a href="#29" id="29">29</a>
+<a href="#30" id="30">30</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cartridge::{Cartridge, CartridgeType};
 
+<span class="kw">mod </span>mbc1;
 <span class="kw">pub mod </span>rom_only;
 
 <span class="kw">pub fn </span>from_cartridge(cart: Cartridge) -&gt; Box&lt;<span class="kw">dyn </span>Mbc&gt; {
@@ -32,7 +40,13 @@
         }
         <span class="comment">// Do this for now just to get Blargg working
         </span>CartridgeType::Mbc1 =&gt; {
-            <span class="kw">return </span>Box::new(rom_only::RomOnly::new(cart));
+            <span class="kw">return </span>Box::new(mbc1::Mbc1::new(cart));
+        }
+        CartridgeType::Mbc1Ram =&gt; {
+            <span class="kw">return </span>Box::new(mbc1::Mbc1::new(cart));
+        }
+        CartridgeType::Mbc1RamBattery =&gt; {
+            <span class="kw">return </span>Box::new(mbc1::Mbc1::new(cart));
         }
         <span class="kw">_ </span>=&gt; <span class="macro">unimplemented!</span>(),
     }
@@ -43,4 +57,5 @@
     <span class="kw">fn </span>write_byte_to_rom(<span class="kw-2">&amp;mut </span><span class="self">self</span>, addr: usize, value: u8);
     <span class="kw">fn </span>read_byte_from_ram(<span class="kw-2">&amp;</span><span class="self">self</span>, addr: usize) -&gt; u8;
     <span class="kw">fn </span>write_byte_to_ram(<span class="kw-2">&amp;mut </span><span class="self">self</span>, addr: usize, value: u8);
-}</code></pre></div></section></main></body></html>
+}
+</code></pre></div></section></main></body></html>

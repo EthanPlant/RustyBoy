@@ -269,6 +269,10 @@
 <a href="#269" id="269">269</a>
 <a href="#270" id="270">270</a>
 <a href="#271" id="271">271</a>
+<a href="#272" id="272">272</a>
+<a href="#273" id="273">273</a>
+<a href="#274" id="274">274</a>
+<a href="#275" id="275">275</a>
 </pre></div><pre class="rust"><code><span class="kw">const </span>TITLE_START_ADDR: u16 = <span class="number">0x0134</span>;
 <span class="kw">const </span>TITLE_END_ADDR: u16 = <span class="number">0x0143</span>;
 <span class="kw">const </span>CART_TYPE_ADDR: u16 = <span class="number">0x0147</span>;
@@ -505,7 +509,11 @@
         <span class="macro">log::debug!</span>(<span class="string">&quot;ROM Size: {}&quot;</span>, rom_size);
         <span class="macro">log::debug!</span>(<span class="string">&quot;RAM Size: {}\n&quot;</span>, ram_size);
 
-        Cartridge { cart_type, rom, ram }
+        Cartridge {
+            cart_type,
+            rom,
+            ram,
+        }
     }
 
     <span class="doccomment">/// Get the title of the ROM from the header

@@ -59,6 +59,10 @@
 <a href="#59" id="59">59</a>
 <a href="#60" id="60">60</a>
 <a href="#61" id="61">61</a>
+<a href="#62" id="62">62</a>
+<a href="#63" id="63">63</a>
+<a href="#64" id="64">64</a>
+<a href="#65" id="65">65</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cartridge::Cartridge;
 <span class="kw">use </span><span class="kw">crate</span>::mbc::Mbc;
 
@@ -78,7 +82,11 @@
     }
 
     <span class="kw">fn </span>write_byte_to_rom(<span class="kw-2">&amp;mut </span><span class="self">self</span>, addr: usize, value: u8) {
-        <span class="macro">log::warn!</span>(<span class="string">&quot;Attempted to write to ROM at address {:#06X} with value {:#04X}&quot;</span>, addr, value);
+        <span class="macro">log::warn!</span>(
+            <span class="string">&quot;Attempted to write to ROM at address {:#06X} with value {:#04X}&quot;</span>,
+            addr,
+            value
+        );
     }
 
     <span class="kw">fn </span>read_byte_from_ram(<span class="kw-2">&amp;</span><span class="self">self</span>, addr: usize) -&gt; u8 {
@@ -119,4 +127,5 @@
         <span class="macro">assert_eq!</span>(rom_only.read_byte_from_ram(<span class="number">0x0000</span>), <span class="number">0xFF</span>);
         <span class="macro">assert_eq!</span>(rom_only.read_byte_from_ram(<span class="number">0x1FFF</span>), <span class="number">0x00</span>);
     }
-}</code></pre></div></section></main></body></html>
+}
+</code></pre></div></section></main></body></html>
