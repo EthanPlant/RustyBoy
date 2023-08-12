@@ -9,4 +9,6 @@ edition = "2021"
 clap = { version = "4.3.19", features = ["derive"] }
 env_logger = "0.10.0"
 log = "0.4.19"
+pixels = "0.13.0"
 rustyboy-core = { path = "../rustyboy-core" }
+winit = "0.28.6"
