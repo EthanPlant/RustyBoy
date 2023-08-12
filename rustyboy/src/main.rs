@@ -1,7 +1,11 @@
-
 use clap::Parser;
 use env_logger::Env;
-use winit::{window::WindowBuilder, event_loop::{ControlFlow, EventLoop}, event::{Event, WindowEvent}};
+use pixels::{Pixels, SurfaceTexture};
+use winit::{
+    event::{Event, WindowEvent},
+    event_loop::{ControlFlow, EventLoop},
+    window::WindowBuilder,
+};
 
 use rustyboy_core::gameboy::Gameboy;
 
@@ -12,6 +16,16 @@ struct Args {
     rom: String,
 }
 
+fn generate_pixels(frame: &mut [u8]) {
+    for (i, pixel) in frame.chunks_exact_mut(3).enumerate() {
+        let x = (i % 160) as u8;
+        let y = (i / 160) as u8;
+
+        let rgb = [x, y, 255];
+        pixel.copy_from_slice(&rgb);
+    }
+}
+
 fn main() {
     let args = Args::parse();
 
@@ -19,15 +33,24 @@ fn main() {
 
     let window = WindowBuilder::new()
         .with_title("RustyBoy")
-        .with_inner_size(winit::dpi::LogicalSize::new(160, 144))
+        .with_inner_size(winit::dpi::LogicalSize::new(160 * 4, 144 * 4))
         .build(&event_loop)
         .unwrap();
+
+    let mut pixels = {
+        let window_size = window.inner_size();
+        let surface_texture = SurfaceTexture::new(window_size.width, window_size.height, &window);
+        Pixels::new(160, 144, surface_texture).unwrap()
+    };
+
+    generate_pixels(&mut pixels.frame_mut());
+    pixels.render().expect("Failed to render pixels");
 
     // If no log level is specified, default to info or above
     env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
     let mut gb = Gameboy::new(&args.rom);
-    
+
     event_loop.run(move |event, _, control_flow| {
         *control_flow = ControlFlow::Wait;
         gb.step();
