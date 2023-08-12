@@ -17,7 +17,11 @@ impl Mbc for RomOnly {
     }
 
     fn write_byte_to_rom(&mut self, addr: usize, value: u8) {
-        log::warn!("Attempted to write to ROM at address {:#06X} with value {:#04X}", addr, value);
+        log::warn!(
+            "Attempted to write to ROM at address {:#06X} with value {:#04X}",
+            addr,
+            value
+        );
     }
 
     fn read_byte_from_ram(&self, addr: usize) -> u8 {

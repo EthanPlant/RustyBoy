@@ -37,7 +37,7 @@ After cloning the repository, simply run `cargo build` in the workspace director
 - [x] Timer
 - [ ] Cartridges
     - [x] No MBC
-    - [ ] MBC-1
+    - [x] MBC-1
     - [ ] MBC-5
 - [ ] Input
 - [ ] Graphics

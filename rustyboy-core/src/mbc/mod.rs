@@ -1,5 +1,6 @@
 use crate::cartridge::{Cartridge, CartridgeType};
 
+mod mbc1;
 pub mod rom_only;
 
 pub fn from_cartridge(cart: Cartridge) -> Box<dyn Mbc> {
@@ -9,7 +10,13 @@ pub fn from_cartridge(cart: Cartridge) -> Box<dyn Mbc> {
         }
         // Do this for now just to get Blargg working
         CartridgeType::Mbc1 => {
-            return Box::new(rom_only::RomOnly::new(cart));
+            return Box::new(mbc1::Mbc1::new(cart));
+        }
+        CartridgeType::Mbc1Ram => {
+            return Box::new(mbc1::Mbc1::new(cart));
+        }
+        CartridgeType::Mbc1RamBattery => {
+            return Box::new(mbc1::Mbc1::new(cart));
         }
         _ => unimplemented!(),
     }

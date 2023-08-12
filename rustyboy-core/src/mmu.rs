@@ -4,8 +4,8 @@ use crate::cpu::interrupts::{
 };
 use crate::io::timer::{Timer, DIV_ADDR, TAC_ADDR, TIMA_ADDR, TMA_ADDR};
 use crate::mbc;
-use crate::mbc::Mbc;
 use crate::mbc::rom_only::RomOnly;
+use crate::mbc::Mbc;
 
 const ROM_START: usize = 0x0000;
 const ROM_END: usize = 0x7FFF;

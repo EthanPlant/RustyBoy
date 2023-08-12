@@ -234,7 +234,11 @@ impl Cartridge {
         log::debug!("ROM Size: {}", rom_size);
         log::debug!("RAM Size: {}\n", ram_size);
 
-        Cartridge { cart_type, rom, ram }
+        Cartridge {
+            cart_type,
+            rom,
+            ram,
+        }
     }
 
     /// Get the title of the ROM from the header
