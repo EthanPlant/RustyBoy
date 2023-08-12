@@ -105,9 +105,12 @@ fn main() {
         match event {
             Event::RedrawRequested(_) => {
                 generate_pixels(pixels.frame_mut(), &gb.mmu.ppu.frame_buffer);
-                generate_tiles(tile_pixels.frame_mut(), &gb.mmu.ppu.vram);
                 pixels.render().expect("Failed to render!");
-                tile_pixels.render().expect("Failed to render tiles!");
+                if gb.mmu.ppu.vram_changed {
+                    generate_tiles(tile_pixels.frame_mut(), &gb.mmu.ppu.vram);
+                    tile_pixels.render().expect("Failed to render tiles!");
+                    gb.mmu.ppu.vram_changed = false;
+                }
             }
             Event::WindowEvent {
                 event: WindowEvent::CloseRequested,
@@ -126,7 +129,5 @@ fn main() {
 
         gb.step();
         window.request_redraw();
-        // generate_pixels(pixels.frame_mut(), &gb.mmu.ppu.frame_buffer);
-        // pixels.render().expect("Failed to render!");
     });
 }

@@ -231,7 +231,14 @@ impl Cartridge {
         // For some reason some games try writing to SRAM even if they don't have any
         // This causes a panic if we don't allocate any RAM
         // So we allocate 2KB of RAM if the game doesn't have any
-        let ram = vec![0; if ram_size != RamSize::None {ram_size as usize} else {0x2000}];
+        let ram = vec![
+            0;
+            if ram_size != RamSize::None {
+                ram_size as usize
+            } else {
+                0x2000
+            }
+        ];
         let title = Self::get_title(&rom);
 
         log::info!("Loaded ROM from {}", rom_name);

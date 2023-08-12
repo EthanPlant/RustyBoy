@@ -170,7 +170,10 @@ impl Memory {
         );
         match addr {
             ROM_START..=ROM_END => self.cart.write_byte_to_rom(addr, v),
-            VRAM_START..=VRAM_END => self.ppu.vram[addr - VRAM_START] = v,
+            VRAM_START..=VRAM_END => {
+                self.ppu.vram_changed = true;
+                self.ppu.vram[addr - VRAM_START] = v
+            }
             CART_RAM_START..=CART_RAM_END => self.cart.write_byte_to_ram(addr - CART_RAM_START, v),
             WRAM_START..=WRAM_END => self.wram[addr - WRAM_START] = v,
             ECHO_RAM_START..=ECHO_RAM_END => {

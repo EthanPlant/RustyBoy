@@ -59,6 +59,7 @@ pub struct Ppu {
     pub vblank_interrupt_fired: bool,
     /// VRAM
     pub vram: [u8; 0x2000],
+    pub vram_changed: bool,
     /// OAM
     pub oam: [u8; 0xA0],
     /// The PPU's internal clock
@@ -94,6 +95,7 @@ impl Ppu {
             lcd_interrupt_fired: false,
             vblank_interrupt_fired: false,
             vram: [0; 0x2000],
+            vram_changed: false,
             oam: [0; 0xA0],
             clock: 0,
         }
