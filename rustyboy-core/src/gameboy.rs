@@ -1,6 +1,6 @@
 use crate::cpu::cpu::Cpu;
 use crate::mmu::Memory;
-use crate::sysclock::Clock;
+use crate::sysclock::{Clock, CYCLES_PER_FRAME};
 
 pub struct Gameboy {
     pub mmu: Memory,
@@ -19,9 +19,13 @@ impl Gameboy {
 
     /// Step through the emulation
     pub fn step(&mut self) {
-        let cycles = self.cpu.step(&mut self.mmu);
-        self.mmu.step(cycles);
-        self.clock.cycle(cycles);
+        while self.clock.clock_cycles_passed < CYCLES_PER_FRAME {
+            let cycles = self.cpu.step(&mut self.mmu);
+            self.mmu.step(cycles);
+            self.clock.cycle(cycles);
+        }
+
+        self.clock.reset();
     }
 }
 

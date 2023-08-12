@@ -1,9 +1,13 @@
 /// The system clock
+
+/// The amount of clock cycles per frame
+pub const CYCLES_PER_FRAME: u32 = 70221;
+
 pub struct Clock {
     /// The amount of CPU clock cycles that have passed since the emulator started running
-    pub clock_cycles_passed: u64,
+    pub clock_cycles_passed: u32,
     /// The amount of machine cycles that have passed since the emulator started running
-    pub machine_cycles_passed: u64,
+    pub machine_cycles_passed: u32,
 }
 
 impl Clock {
@@ -17,8 +21,8 @@ impl Clock {
 
     /// Add cycles to the clock
     pub fn cycle(&mut self, cycles: u8) {
-        self.clock_cycles_passed += cycles as u64;
-        self.machine_cycles_passed += (cycles / 4) as u64;
+        self.clock_cycles_passed += cycles as u32;
+        self.machine_cycles_passed += (cycles / 4) as u32;
     }
 
     /// Reset the clock
