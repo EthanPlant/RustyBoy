@@ -474,10 +474,6 @@
 <a href="#474" id="474">474</a>
 <a href="#475" id="475">475</a>
 <a href="#476" id="476">476</a>
-<a href="#477" id="477">477</a>
-<a href="#478" id="478">478</a>
-<a href="#479" id="479">479</a>
-<a href="#480" id="480">480</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cartridge::Cartridge;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::interrupts::{
     Interrupt, InterruptState, INTERRUPT_ENABLE_ADDR, INTERRUPT_FLAG_ADDR,
@@ -524,7 +520,6 @@
 </span><span class="kw">pub struct </span>Memory {
     <span class="doccomment">/// The cartridge&#39;s data
     </span>cart: Box&lt;<span class="kw">dyn </span>Mbc&gt;,
-    <span class="kw">pub </span>cart_title: String,
 
     <span class="doccomment">/// Interrupt registers
     </span><span class="kw">pub </span>interrupts: InterruptState,
@@ -544,7 +539,6 @@
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         Memory {
             cart: Box::new(RomOnly::new(Cartridge::new())),
-            cart_title: String::new(),
             interrupts: InterruptState::new(),
             timer: Timer::new(),
             vram: [<span class="number">0xFF</span>; VRAM_SIZE],
@@ -558,12 +552,10 @@
     <span class="doccomment">/// Create a new Memory with a ROM file
     </span><span class="kw">pub fn </span>new_with_rom(rom_name: <span class="kw-2">&amp;</span>str) -&gt; <span class="self">Self </span>{
         <span class="kw">let </span>cart = Cartridge::new_from_rom(rom_name);
-        <span class="kw">let </span>title = cart.title.clone();
         <span class="kw">let </span><span class="kw-2">mut </span>io: [u8; IO_SIZE] = [<span class="number">0xFF</span>; IO_SIZE];
         io[<span class="number">0x44</span>] = <span class="number">0x90</span>; <span class="comment">// Stub LY to 0x90 (144) to simulate VBlank
         </span>Memory {
             cart: mbc::from_cartridge(cart),
-            cart_title: title,
             interrupts: InterruptState::new(),
             timer: Timer::new(),
             vram: [<span class="number">0xFF</span>; VRAM_SIZE],
