@@ -3,7 +3,7 @@ on:
   push:
     branches: [main]
     paths:
-      - "rustboy/**"
+      - "rustyboy/**"
       - "rustyboy-core/**"
   pull_request:
     branches: [main]
