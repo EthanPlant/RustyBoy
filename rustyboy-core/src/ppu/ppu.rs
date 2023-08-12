@@ -1,5 +1,5 @@
 use crate::ppu::lcdc::Lcdc;
-use crate::ppu::stat::Stat;
+use crate::ppu::stat::{Mode, Stat};
 
 pub const LCDC_ADDR: usize = 0xFF40;
 pub const STAT_ADDR: usize = 0xFF41;
@@ -15,6 +15,10 @@ pub const WX_ADDR: usize = 0xFF4B;
 
 const WIDTH: usize = 160;
 const HEIGHT: usize = 144;
+const HBLANK_CYCLES: u32 = 204;
+const VBLANK_CYCLES: u32 = 4560;
+const OAM_SEARCH_CYCLES: u32 = 80;
+const PIXEL_TRANSFER_CYCLES: u32 = 172;
 
 #[derive(Copy, Clone)]
 pub enum Color {
@@ -49,6 +53,12 @@ pub struct Ppu {
     pub wx: u8,
     /// Frame buffer
     pub frame_buffer: [Color; WIDTH * HEIGHT],
+    /// Has an LCD interrupt been fired
+    pub lcd_interrupt_fired: bool,
+    /// Has a VBlank interrupt been fired
+    pub vblank_interrupt_fired: bool,
+    /// The PPU's internal clock
+    clock: u32,
 }
 
 impl Ppu {
@@ -77,6 +87,86 @@ impl Ppu {
             wy: 0,
             wx: 0,
             frame_buffer: frame_buffer,
+            lcd_interrupt_fired: false,
+            vblank_interrupt_fired: false,
+            clock: 0,
+        }
+    }
+
+    pub fn step(&mut self, clock_cycles: u8) {
+        // Get current mode
+        let mode = self.stat.mode;
+        if self.lcdc.enabled {
+            self.clock += clock_cycles as u32;
+            match mode {
+                Mode::HBlank => {
+                    if self.clock >= HBLANK_CYCLES {
+                        self.clock = 0;
+                        // TODO drawing
+                        self.frame_buffer = [Color::Black; WIDTH * HEIGHT];
+                        self.ly += 1;
+                        self.check_lyc();
+                        if self.ly >= HEIGHT as u8 {
+                            self.stat.mode = Mode::VBlank;
+                            self.vblank_interrupt_fired = true;
+                            if self.stat.mode_1_vblank_interrupt {
+                                self.lcd_interrupt_fired = true;
+                            }
+                        } else {
+                            self.stat.mode = Mode::OamSearch;
+                            if self.stat.mode_2_oam_interrupt {
+                                self.lcd_interrupt_fired = true;
+                            }
+                        }
+                    }
+                }
+                Mode::VBlank => {
+                    if self.clock >= VBLANK_CYCLES {
+                        self.frame_buffer = [Color::DarkGray; WIDTH * HEIGHT];
+                        self.clock = 0;
+                        self.ly += 1;
+                        self.check_lyc();
+                        if (self.ly as u32) >= (HEIGHT as u32 + 10) {
+                            self.stat.mode = Mode::OamSearch;
+                            self.ly = 0;
+                            if self.stat.mode_2_oam_interrupt {
+                                self.lcd_interrupt_fired = true;
+                            }
+                        }
+                    }
+                }
+                Mode::OamSearch => {
+                    if self.clock >= OAM_SEARCH_CYCLES {
+                        self.frame_buffer = [Color::LightGray; WIDTH * HEIGHT];
+                        self.clock = 0;
+                        self.stat.mode = Mode::PixelTransfer;
+                    }
+                }
+                Mode::PixelTransfer => {
+                    if self.clock >= PIXEL_TRANSFER_CYCLES {
+                        self.clock = 0;
+                        self.stat.mode = Mode::HBlank;
+                        self.frame_buffer = [Color::White; WIDTH * HEIGHT];
+                        if self.stat.mode_0_hblank_interrupt {
+                            self.lcd_interrupt_fired = true;
+                        }
+                    }
+                }
+            }
+        } else {
+            self.frame_buffer = [Color::White; WIDTH * HEIGHT];
+            self.clock = 0;
+        }
+    }
+
+    pub fn check_lyc(&mut self) {
+        if self.ly == self.lyc {
+            self.stat.lyc_ly_flag = true;
+            if self.stat.lyc_ly_interrupt {
+                self.lcd_interrupt_fired = true;
+            }
+        } else {
+            self.stat.lyc_ly_flag = false;
         }
     }
 }

@@ -105,10 +105,21 @@ impl Memory {
     /// Step the IO devices
     pub fn step(&mut self, clock_cycles: u8) {
         self.timer.step(clock_cycles);
+        self.ppu.step(clock_cycles * 4);
 
         if self.timer.interrupt_fired {
             self.timer.interrupt_fired = false;
             self.interrupts.requested_interrupts |= Interrupt::Timer as u8;
+        }
+
+        if self.ppu.lcd_interrupt_fired {
+            self.ppu.lcd_interrupt_fired = false;
+            self.interrupts.requested_interrupts |= Interrupt::LcdStat as u8;
+        }
+
+        if self.ppu.vblank_interrupt_fired {
+            self.ppu.vblank_interrupt_fired = false;
+            self.interrupts.requested_interrupts |= Interrupt::VBlank as u8;
         }
     }
 
@@ -198,7 +209,10 @@ impl Memory {
                     SCY_ADDR => self.ppu.scy = v,
                     SCX_ADDR => self.ppu.scx = v,
                     LY_ADDR => self.ppu.ly = v,
-                    LYC_ADDR => self.ppu.lyc = v,
+                    LYC_ADDR => {
+                        self.ppu.lyc = v;
+                        self.ppu.check_lyc(); // Check if LYC=LY
+                    }
                     BGP_ADDR => self.ppu.bgp = v,
                     OBP0_ADDR => self.ppu.obp0 = v,
                     OBP1_ADDR => self.ppu.obp1 = v,
