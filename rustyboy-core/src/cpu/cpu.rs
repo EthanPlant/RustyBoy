@@ -44,12 +44,6 @@ impl Cpu {
         log::trace!("A:{:02X} F:{:02X} B:{:02X} C:{:02X} D:{:02X} E:{:02X} H:{:02X} L:{:02X} SP:{:02X} PC: {:04X} ({:02X} {:02X} {:02X} {:02X})",
         self.reg.a, self.reg.f, self.reg.b, self.reg.c, self.reg.d, self.reg.e, self.reg.h, self.reg.l, self.reg.sp, self.reg.pc, mmu.get_byte(self.reg.pc), mmu.get_byte(self.reg.pc + 1), mmu.get_byte(self.reg.pc + 2), mmu.get_byte(self.reg.pc + 3));
 
-        // Process any interrupts before executing the next instruction
-        let cycles_used = self.check_interrupts(mmu);
-        if cycles_used != 0 {
-            return cycles_used;
-        }
-
         let op_code = self.read_opcode(mmu);
 
         let instruction = match get_instruction_by_opcode(&op_code) {
@@ -70,6 +64,7 @@ impl Cpu {
 
         if self.halted && pending_interrupt(mmu) {
             self.halted = false;
+            log::trace!("Exiting HALT");
             if !self.ime {
                 // HALT bug
                 // If interrupts are disabled but there's a pending interrupt, HALT ends
@@ -83,9 +78,15 @@ impl Cpu {
             return 4;
         }
 
+        // Process any interrupts before executing the next instruction
+        let cycles_used = self.check_interrupts(mmu);
+        if cycles_used != 0 {
+                return cycles_used;
+        }
+
         log::trace!("Executing instruction: {}", instruction.description);
 
-        return self.execute_instruction(mmu, instruction, &op_code);
+        self.execute_instruction(mmu, instruction, &op_code)
     }
 
     /// Handle interrupts
