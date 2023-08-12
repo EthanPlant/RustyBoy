@@ -471,11 +471,17 @@
 <a href="#471" id="471">471</a>
 <a href="#472" id="472">472</a>
 <a href="#473" id="473">473</a>
+<a href="#474" id="474">474</a>
+<a href="#475" id="475">475</a>
+<a href="#476" id="476">476</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span><span class="kw">crate</span>::cartridge::Cartridge;
 <span class="kw">use </span><span class="kw">crate</span>::cpu::interrupts::{
     Interrupt, InterruptState, INTERRUPT_ENABLE_ADDR, INTERRUPT_FLAG_ADDR,
 };
 <span class="kw">use </span><span class="kw">crate</span>::io::timer::{Timer, DIV_ADDR, TAC_ADDR, TIMA_ADDR, TMA_ADDR};
+<span class="kw">use </span><span class="kw">crate</span>::mbc;
+<span class="kw">use </span><span class="kw">crate</span>::mbc::Mbc;
+<span class="kw">use </span><span class="kw">crate</span>::mbc::rom_only::RomOnly;
 
 <span class="kw">const </span>ROM_START: usize = <span class="number">0x0000</span>;
 <span class="kw">const </span>ROM_END: usize = <span class="number">0x7FFF</span>;
@@ -513,7 +519,7 @@
 <span class="doccomment">/// The MMU (Memory Management Unit) is responsible for managing the gameboy&#39;s memory
 </span><span class="kw">pub struct </span>Memory {
     <span class="doccomment">/// The cartridge&#39;s data
-    </span>cart: Cartridge,
+    </span>cart: Box&lt;<span class="kw">dyn </span>Mbc&gt;,
 
     <span class="doccomment">/// Interrupt registers
     </span><span class="kw">pub </span>interrupts: InterruptState,
@@ -532,7 +538,7 @@
     <span class="doccomment">/// Create a new empty Memory
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         Memory {
-            cart: Cartridge::new(),
+            cart: Box::new(RomOnly::new(Cartridge::new())),
             interrupts: InterruptState::new(),
             timer: Timer::new(),
             vram: [<span class="number">0xFF</span>; VRAM_SIZE],
@@ -549,7 +555,7 @@
         <span class="kw">let </span><span class="kw-2">mut </span>io: [u8; IO_SIZE] = [<span class="number">0xFF</span>; IO_SIZE];
         io[<span class="number">0x44</span>] = <span class="number">0x90</span>; <span class="comment">// Stub LY to 0x90 (144) to simulate VBlank
         </span>Memory {
-            cart: cart,
+            cart: mbc::from_cartridge(cart),
             interrupts: InterruptState::new(),
             timer: Timer::new(),
             vram: [<span class="number">0xFF</span>; VRAM_SIZE],

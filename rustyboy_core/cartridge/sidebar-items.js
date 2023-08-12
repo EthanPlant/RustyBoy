@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"struct":["Cartridge"]};
+window.SIDEBAR_ITEMS = {"enum":["CartridgeType"],"struct":["Cartridge"]};
