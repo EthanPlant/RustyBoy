@@ -44,6 +44,7 @@ const HRAM_SIZE: usize = HRAM_END - HRAM_START + 1;
 pub struct Memory {
     /// The cartridge's data
     cart: Box<dyn Mbc>,
+    pub cart_title: String,
 
     /// Interrupt registers
     pub interrupts: InterruptState,
@@ -63,6 +64,7 @@ impl Memory {
     pub fn new() -> Self {
         Memory {
             cart: Box::new(RomOnly::new(Cartridge::new())),
+            cart_title: String::new(),
             interrupts: InterruptState::new(),
             timer: Timer::new(),
             vram: [0xFF; VRAM_SIZE],
@@ -76,10 +78,12 @@ impl Memory {
     /// Create a new Memory with a ROM file
     pub fn new_with_rom(rom_name: &str) -> Self {
         let cart = Cartridge::new_from_rom(rom_name);
+        let title = cart.title.clone();
         let mut io: [u8; IO_SIZE] = [0xFF; IO_SIZE];
         io[0x44] = 0x90; // Stub LY to 0x90 (144) to simulate VBlank
         Memory {
             cart: mbc::from_cartridge(cart),
+            cart_title: title,
             interrupts: InterruptState::new(),
             timer: Timer::new(),
             vram: [0xFF; VRAM_SIZE],

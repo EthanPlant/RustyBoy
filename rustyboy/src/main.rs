@@ -4,7 +4,7 @@ use pixels::{Pixels, SurfaceTexture};
 use winit::{
     event::{Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
-    window::WindowBuilder,
+    window::{Window, WindowBuilder},
 };
 
 use rustyboy_core::gameboy::Gameboy;
@@ -50,6 +50,10 @@ fn main() {
     env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
     let mut gb = Gameboy::new(&args.rom);
+    Window::set_title(
+        &window,
+        ("RustyBoy - ".to_owned() + &gb.mmu.cart_title).as_str(),
+    );
 
     event_loop.run(move |event, _, control_flow| {
         gb.step();

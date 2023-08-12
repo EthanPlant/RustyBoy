@@ -206,6 +206,7 @@ impl TryFrom<u8> for RamSize {
 
 pub struct Cartridge {
     pub cart_type: CartridgeType,
+    pub title: String,
     pub rom: Vec<u8>,
     pub ram: Vec<u8>,
 }
@@ -215,6 +216,7 @@ impl Cartridge {
     pub fn new() -> Self {
         Cartridge {
             cart_type: CartridgeType::RomOnly,
+            title: String::from(""),
             rom: vec![0xFF; 0x8000],
             ram: vec![0xFF; 0x2000],
         }
@@ -227,6 +229,7 @@ impl Cartridge {
         let rom_size = RomSize::try_from(rom[ROM_SIZE_ADDR as usize]).unwrap();
         let ram_size = RamSize::try_from(rom[RAM_SIZE_ADDR as usize]).unwrap();
         let ram = vec![0; ram_size as usize];
+        let title = Self::get_title(&rom);
 
         log::info!("Loaded ROM from {}", rom_name);
         log::debug!("Title: {}", Self::get_title(&rom));
@@ -236,6 +239,7 @@ impl Cartridge {
 
         Cartridge {
             cart_type,
+            title,
             rom,
             ram,
         }

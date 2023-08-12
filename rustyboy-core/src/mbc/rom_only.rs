@@ -2,7 +2,7 @@ use crate::cartridge::Cartridge;
 use crate::mbc::Mbc;
 
 pub struct RomOnly {
-    cart: Cartridge,
+    pub cart: Cartridge,
 }
 
 impl RomOnly {

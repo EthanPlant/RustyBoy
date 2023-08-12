@@ -3,7 +3,7 @@ use crate::mmu::Memory;
 use crate::sysclock::Clock;
 
 pub struct Gameboy {
-    mmu: Memory,
+    pub mmu: Memory,
     cpu: Cpu,
     clock: Clock,
 }
