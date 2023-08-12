@@ -52,7 +52,6 @@ fn main() {
     let mut gb = Gameboy::new(&args.rom);
 
     event_loop.run(move |event, _, control_flow| {
-        *control_flow = ControlFlow::Wait;
         gb.step();
 
         match event {
