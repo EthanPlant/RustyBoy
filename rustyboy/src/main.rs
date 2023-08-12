@@ -7,7 +7,7 @@ use winit::{
     window::{Window, WindowBuilder},
 };
 
-use rustyboy_core::gameboy::Gameboy;
+use rustyboy_core::{gameboy::Gameboy, ppu::ppu::Color};
 
 #[derive(Debug, Parser)]
 #[command(author, version, about)]
@@ -16,13 +16,16 @@ struct Args {
     rom: String,
 }
 
-fn generate_pixels(frame: &mut [u8]) {
+fn generate_pixels(frame: &mut [u8], &framebuffer: &[Color; 160 * 144]) {
     for (i, pixel) in frame.chunks_exact_mut(3).enumerate() {
-        let x = (i % 160) as u8;
-        let y = (i / 160) as u8;
-
-        let rgb = [x, y, 255];
-        pixel.copy_from_slice(&rgb);
+        let color = framebuffer[i / 3];
+        let mut rgb = match color {
+            Color::White => [255, 255, 255],
+            Color::LightGray => [192, 192, 192],
+            Color::DarkGray => [96, 96, 96],
+            Color::Black => [0, 0, 0],
+        };
+        pixel.copy_from_slice(&mut rgb);
     }
 }
 
@@ -43,9 +46,6 @@ fn main() {
         Pixels::new(160, 144, surface_texture).unwrap()
     };
 
-    generate_pixels(&mut pixels.frame_mut());
-    pixels.render().expect("Failed to render pixels");
-
     // If no log level is specified, default to info or above
     env_logger::Builder::from_env(Env::default().default_filter_or("info")).init();
 
@@ -56,8 +56,6 @@ fn main() {
     );
 
     event_loop.run(move |event, _, control_flow| {
-        gb.step();
-
         match event {
             Event::WindowEvent {
                 event: WindowEvent::CloseRequested,
@@ -65,5 +63,9 @@ fn main() {
             } if window.id() == window_id => *control_flow = ControlFlow::Exit,
             _ => (),
         }
+
+        gb.step();
+        generate_pixels(pixels.frame_mut(), &gb.mmu.ppu.frame_buffer);
+        pixels.render().expect("Failed to render!");
     });
 }
