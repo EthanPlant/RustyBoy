@@ -204,6 +204,19 @@ impl TryFrom<u8> for RamSize {
     }
 }
 
+impl Into<usize> for RamSize {
+    fn into(self) -> usize {
+        match self {
+            Self::None => 0,
+            Self::K2 => 0x800,
+            Self::K8 => 0x2000,
+            Self::K32 => 0x8000,
+            Self::K128 => 0x20000,
+            Self::K64 => 0x10000,
+        }
+    }
+}
+
 pub struct Cartridge {
     pub cart_type: CartridgeType,
     pub title: String,
@@ -234,7 +247,7 @@ impl Cartridge {
         let ram = vec![
             0;
             if ram_size != RamSize::None {
-                ram_size as usize
+                ram_size.into()
             } else {
                 0x2000
             }
