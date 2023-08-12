@@ -40,8 +40,8 @@ After cloning the repository, simply run `cargo build` in the workspace director
     - [ ] MBC-5
 - [ ] Input
 - [ ] Graphics
-    - [ ] Draw Background
-    - [ ] Background scrolling
+    - [x] Draw Background
+    - [x] Background scrolling
     - [ ] Draw window
     - [ ] Draw sprites
     - [ ] Handle flipped sprites

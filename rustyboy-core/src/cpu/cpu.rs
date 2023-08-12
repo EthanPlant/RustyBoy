@@ -81,7 +81,7 @@ impl Cpu {
         // Process any interrupts before executing the next instruction
         let cycles_used = self.check_interrupts(mmu);
         if cycles_used != 0 {
-                return cycles_used;
+            return cycles_used;
         }
 
         log::trace!("Executing instruction: {}", instruction.description);

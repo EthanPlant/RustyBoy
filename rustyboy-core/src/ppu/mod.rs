@@ -1,3 +1,3 @@
 mod lcdc;
 pub mod ppu;
-mod stat;
+pub mod stat;

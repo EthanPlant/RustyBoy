@@ -108,16 +108,12 @@ fn main() {
     );
 
     event_loop.run(move |event, _, control_flow| {
+        let next_frame_time =
+            std::time::Instant::now() + std::time::Duration::from_nanos(16_666_667);
+        *control_flow = ControlFlow::WaitUntil(next_frame_time);
+
         match event {
-            Event::RedrawRequested(_) => {
-                generate_pixels(pixels.frame_mut(), &gb.mmu.ppu.frame_buffer);
-                pixels.render().expect("Failed to render!");
-                if gb.mmu.ppu.vram_changed {
-                    generate_tiles(tile_pixels.frame_mut(), &gb.mmu.ppu.vram);
-                    tile_pixels.render().expect("Failed to render tiles!");
-                    gb.mmu.ppu.vram_changed = false;
-                }
-            }
+            Event::RedrawRequested(_) => {}
             Event::WindowEvent {
                 event: WindowEvent::CloseRequested,
                 window_id,
@@ -134,6 +130,12 @@ fn main() {
         }
 
         gb.step();
-        window.request_redraw();
+        generate_pixels(pixels.frame_mut(), &gb.mmu.ppu.frame_buffer);
+        pixels.render().expect("Failed to render!");
+        if gb.mmu.ppu.vram_changed {
+            generate_tiles(tile_pixels.frame_mut(), &gb.mmu.ppu.vram);
+            tile_pixels.render().expect("Failed to render tiles!");
+            gb.mmu.ppu.vram_changed = false;
+        }
     });
 }

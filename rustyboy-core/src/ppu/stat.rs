@@ -37,11 +37,18 @@ impl Stat {
 
     /// Set the value of the STAT register
     pub fn set(&mut self, value: u8) {
-        self.lyc_ly_flag = value & 0b0100_0000 != 0;
+        self.lyc_ly_interrupt = value & 0b0100_0000 != 0;
         self.mode_0_hblank_interrupt = value & 0b0010_0000 != 0;
         self.mode_1_vblank_interrupt = value & 0b0001_0000 != 0;
         self.mode_2_oam_interrupt = value & 0b0000_1000 != 0;
-        self.lyc_ly_interrupt = value & 0b0000_0100 != 0;
+        self.lyc_ly_flag = value & 0b0000_0100 != 0;
+        self.mode = match value & 0b0000_0011 {
+            0b00 => Mode::HBlank,
+            0b01 => Mode::VBlank,
+            0b10 => Mode::OamSearch,
+            0b11 => Mode::PixelTransfer,
+            _ => unreachable!(),
+        }
     }
 }
 

@@ -10,6 +10,7 @@ use crate::ppu::ppu::{
     Ppu, BGP_ADDR, LCDC_ADDR, LYC_ADDR, LY_ADDR, OBP0_ADDR, OBP1_ADDR, SCX_ADDR, SCY_ADDR,
     STAT_ADDR, WX_ADDR, WY_ADDR,
 };
+use crate::ppu::stat::Mode;
 
 const ROM_START: usize = 0x0000;
 const ROM_END: usize = 0x7FFF;
@@ -95,7 +96,7 @@ impl Memory {
     /// Step the IO devices
     pub fn step(&mut self, clock_cycles: u8) {
         self.timer.step(clock_cycles);
-        self.ppu.step(clock_cycles * 4);
+        self.ppu.step(clock_cycles);
 
         if self.timer.interrupt_fired {
             self.timer.interrupt_fired = false;
@@ -198,7 +199,18 @@ impl Memory {
                     TMA_ADDR => self.timer.modulo = v,
                     TAC_ADDR => self.timer.control = v,
                     INTERRUPT_FLAG_ADDR => self.interrupts.requested_interrupts = v,
-                    LCDC_ADDR => self.ppu.lcdc.set(v),
+                    LCDC_ADDR => {
+                        if !self.ppu.lcdc.enabled && v & 0x80 != 0 {
+                            // If the LCD is turned on, switch to mode 2
+                            self.ppu.stat.mode = Mode::OamSearch;
+                        }
+                        if v & 0x80 == 0 && self.ppu.lcdc.enabled {
+                            // If the LCD is turned off, switch to mode 0
+                            self.ppu.stat.mode = Mode::HBlank;
+                            self.ppu.ly = 0;
+                        }
+                        self.ppu.lcdc.set(v);
+                    }
                     STAT_ADDR => self.ppu.stat.set(v),
                     SCY_ADDR => self.ppu.scy = v,
                     SCX_ADDR => self.ppu.scx = v,

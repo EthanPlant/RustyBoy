@@ -15,8 +15,9 @@ pub const WX_ADDR: usize = 0xFF4B;
 
 const WIDTH: usize = 160;
 const HEIGHT: usize = 144;
+const MAX_SCANLINE: u8 = 154;
 const HBLANK_CYCLES: u32 = 204;
-const VBLANK_CYCLES: u32 = 4560;
+const VBLANK_CYCLES: u32 = 456;
 const OAM_SEARCH_CYCLES: u32 = 80;
 const PIXEL_TRANSFER_CYCLES: u32 = 172;
 
@@ -102,16 +103,13 @@ impl Ppu {
     }
 
     pub fn step(&mut self, clock_cycles: u8) {
-        // Get current mode
-        let mode = self.stat.mode;
         if self.lcdc.enabled {
             self.clock += clock_cycles as u32;
-            match mode {
+            match self.stat.mode {
                 Mode::HBlank => {
                     if self.clock >= HBLANK_CYCLES {
                         self.clock = 0;
-                        // TODO drawing
-                        //self.frame_buffer = [Color::Black; WIDTH * HEIGHT];
+                        self.draw();
                         self.ly += 1;
                         self.check_lyc();
                         if self.ly >= HEIGHT as u8 {
@@ -130,11 +128,10 @@ impl Ppu {
                 }
                 Mode::VBlank => {
                     if self.clock >= VBLANK_CYCLES {
-                        //self.frame_buffer = [Color::DarkGray; WIDTH * HEIGHT];
                         self.clock = 0;
                         self.ly += 1;
                         self.check_lyc();
-                        if (self.ly as u32) >= (HEIGHT as u32 + 10) {
+                        if self.ly == MAX_SCANLINE as u8 {
                             self.stat.mode = Mode::OamSearch;
                             self.ly = 0;
                             if self.stat.mode_2_oam_interrupt {
@@ -145,7 +142,6 @@ impl Ppu {
                 }
                 Mode::OamSearch => {
                     if self.clock >= OAM_SEARCH_CYCLES {
-                        //self.frame_buffer = [Color::LightGray; WIDTH * HEIGHT];
                         self.clock = 0;
                         self.stat.mode = Mode::PixelTransfer;
                     }
@@ -154,7 +150,6 @@ impl Ppu {
                     if self.clock >= PIXEL_TRANSFER_CYCLES {
                         self.clock = 0;
                         self.stat.mode = Mode::HBlank;
-                        //self.frame_buffer = [Color::White; WIDTH * HEIGHT];
                         if self.stat.mode_0_hblank_interrupt {
                             self.lcd_interrupt_fired = true;
                         }
@@ -162,7 +157,7 @@ impl Ppu {
                 }
             }
         } else {
-            //self.frame_buffer = [Color::White; WIDTH * HEIGHT];
+            self.frame_buffer = [Color::White; WIDTH * HEIGHT];
             self.clock = 0;
         }
     }
@@ -175,6 +170,54 @@ impl Ppu {
             }
         } else {
             self.stat.lyc_ly_flag = false;
+        }
+    }
+
+    fn draw(&mut self) {
+        if self.lcdc.enabled {
+            if self.lcdc.background_enabled {
+                self.draw_background();
+            }
+        }
+    }
+
+    fn draw_background(&mut self) {
+        let tilemap: u16 = if self.lcdc.background_tile_map {
+            0x9C00
+        } else {
+            0x9800
+        };
+
+        let tiledata: u16 = if self.lcdc.background_tile_data {
+            0x8000
+        } else {
+            0x8800
+        };
+
+        let y_pos = self.scy.wrapping_add(self.ly);
+        let tile_row = ((y_pos / 8) as u16) * 32;
+        for pixel in 0..WIDTH {
+            let x_pos = self.scx.wrapping_add(pixel as u8);
+            let tile_col = x_pos / 8;
+            let tile_no =
+                self.vram[(tilemap + tile_row as u16 + tile_col as u16) as usize - 0x8000];
+            let tile_addr = if self.lcdc.background_tile_data {
+                tiledata + (tile_no as u16 * 16)
+            } else {
+                tiledata + ((tile_no as i8 as i16 + 128) as u16 * 16)
+            };
+            let tile_line = (y_pos % 8) * 2;
+            let lo = self.vram[(tile_addr + tile_line as u16) as usize - 0x8000];
+            let hi = self.vram[(tile_addr + tile_line as u16 + 1) as usize - 0x8000];
+            let color_val = (lo >> (7 - (x_pos % 8)) & 0x1) | (hi >> (7 - (x_pos % 8)) & 0x1) << 1;
+            let color = (self.bgp >> (color_val * 2)) & 0x3;
+            self.frame_buffer[self.ly as usize * WIDTH + pixel as usize] = match color {
+                0 => Color::White,
+                1 => Color::LightGray,
+                2 => Color::DarkGray,
+                3 => Color::Black,
+                _ => Color::Black,
+            };
         }
     }
 }
