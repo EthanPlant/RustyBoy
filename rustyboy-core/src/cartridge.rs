@@ -165,7 +165,7 @@ impl TryFrom<u8> for RomSize {
     }
 }
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, PartialEq)]
 enum RamSize {
     None = 0x00,
     K2 = 0x01,
@@ -228,7 +228,10 @@ impl Cartridge {
         let cart_type = CartridgeType::try_from(rom[CART_TYPE_ADDR as usize]).unwrap();
         let rom_size = RomSize::try_from(rom[ROM_SIZE_ADDR as usize]).unwrap();
         let ram_size = RamSize::try_from(rom[RAM_SIZE_ADDR as usize]).unwrap();
-        let ram = vec![0; ram_size as usize];
+        // For some reason some games try writing to SRAM even if they don't have any
+        // This causes a panic if we don't allocate any RAM
+        // So we allocate 2KB of RAM if the game doesn't have any
+        let ram = vec![0; if ram_size != RamSize::None {ram_size as usize} else {0x2000}];
         let title = Self::get_title(&rom);
 
         log::info!("Loaded ROM from {}", rom_name);

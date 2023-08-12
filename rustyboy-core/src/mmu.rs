@@ -131,6 +131,7 @@ impl Memory {
                 0xFF
             }
             IO_START..=IO_END => match addr {
+                0xFF00 => 0xFF, // Stub this to all 1s for now to stop tetris from getting in a reboot loop
                 DIV_ADDR => self.timer.divider,
                 TIMA_ADDR => self.timer.counter,
                 TMA_ADDR => self.timer.modulo,
