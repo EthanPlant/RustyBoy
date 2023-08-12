@@ -3017,6 +3017,10 @@ pub fn get_instruction(op_code: &u8) -> Option<&Instruction> {
         0x0E => Some(&LD_C_N),
         0x0F => Some(&RRCA),
 
+        0x10 => {
+            log::warn!("STOP instruction called");
+            return Some(&NOP);
+        }
         0x11 => Some(&LD_DE_NN),
         0x12 => Some(&LD_DE_A),
         0x13 => Some(&INC_DE),

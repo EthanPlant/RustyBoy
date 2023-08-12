@@ -23,12 +23,13 @@ Setting `RUST_LOG` to `trace` will cause RustyBoy to output all logs (this will 
 After cloning the repository, simply run `cargo build` in the workspace directory.
 
 ## Roadmap
-- [ ] CPU
+- [x] CPU
     - [x] Registers and flags
-    - [ ] Implement instructions
+    - [x] Implement instructions
     - [x] Interrupts
     - [x] Pass the boot ROM
     - [x] Pass all Blargg test ROMs
+    - [ ] Implement STOP instruction
 - [ ] Memory
     - [x] Proper memory map
     - [ ] Memory mapped IO
