@@ -306,8 +306,8 @@ mod tests {
     #[test]
     fn test_get_byte_io() {
         let mut mem = Memory::new();
-        mem.io[0x00] = 0x01;
-        assert_eq!(mem.get_byte(IO_START), 0x01);
+        mem.io[0x01] = 0x01;
+        assert_eq!(mem.get_byte(0xFF01 as usize), 0x01);
     }
 
     #[test]
@@ -370,9 +370,9 @@ mod tests {
     #[test]
     fn test_get_word_io() {
         let mut mem = Memory::new();
-        mem.io[0x00] = 0x01;
-        mem.io[0x01] = 0x02;
-        assert_eq!(mem.get_word(IO_START), 0x0201);
+        mem.io[0x01] = 0x01;
+        mem.io[0x02] = 0x02;
+        assert_eq!(mem.get_word(0xFF01 as usize), 0x0201);
     }
 
     #[test]

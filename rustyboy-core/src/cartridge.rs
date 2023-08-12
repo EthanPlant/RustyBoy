@@ -284,6 +284,6 @@ mod tests {
     fn test_new_from_rom() {
         let cart = Cartridge::new_from_rom("resources/test-rom.gb");
         assert_eq!(cart.rom.len(), 0x8000);
-        assert_eq!(cart.ram.len(), 0);
+        assert_eq!(cart.ram.len(), 0x2000);
     }
 }
