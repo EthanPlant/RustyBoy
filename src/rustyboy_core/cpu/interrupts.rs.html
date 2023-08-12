@@ -190,7 +190,7 @@
     <span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         InterruptState {
             enabled_interrupts: <span class="number">0x00</span>,
-            requested_interrupts: <span class="number">0x00</span>,
+            requested_interrupts: <span class="number">0xE1</span>,
         }
     }
 
@@ -265,7 +265,7 @@
     </span><span class="kw">fn </span>test_new() {
         <span class="kw">let </span>interrupt_state = InterruptState::new();
         <span class="macro">assert_eq!</span>(interrupt_state.enabled_interrupts, <span class="number">0x00</span>);
-        <span class="macro">assert_eq!</span>(interrupt_state.requested_interrupts, <span class="number">0x00</span>);
+        <span class="macro">assert_eq!</span>(interrupt_state.requested_interrupts, <span class="number">0xE1</span>);
     }
 
     <span class="attr">#[test]

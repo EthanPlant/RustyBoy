@@ -273,6 +273,10 @@
 <a href="#273" id="273">273</a>
 <a href="#274" id="274">274</a>
 <a href="#275" id="275">275</a>
+<a href="#276" id="276">276</a>
+<a href="#277" id="277">277</a>
+<a href="#278" id="278">278</a>
+<a href="#279" id="279">279</a>
 </pre></div><pre class="rust"><code><span class="kw">const </span>TITLE_START_ADDR: u16 = <span class="number">0x0134</span>;
 <span class="kw">const </span>TITLE_END_ADDR: u16 = <span class="number">0x0143</span>;
 <span class="kw">const </span>CART_TYPE_ADDR: u16 = <span class="number">0x0147</span>;
@@ -481,6 +485,7 @@
 
 <span class="kw">pub struct </span>Cartridge {
     <span class="kw">pub </span>cart_type: CartridgeType,
+    <span class="kw">pub </span>title: String,
     <span class="kw">pub </span>rom: Vec&lt;u8&gt;,
     <span class="kw">pub </span>ram: Vec&lt;u8&gt;,
 }
@@ -490,6 +495,7 @@
     </span><span class="kw">pub fn </span>new() -&gt; <span class="self">Self </span>{
         Cartridge {
             cart_type: CartridgeType::RomOnly,
+            title: String::from(<span class="string">&quot;&quot;</span>),
             rom: <span class="macro">vec!</span>[<span class="number">0xFF</span>; <span class="number">0x8000</span>],
             ram: <span class="macro">vec!</span>[<span class="number">0xFF</span>; <span class="number">0x2000</span>],
         }
@@ -502,6 +508,7 @@
         <span class="kw">let </span>rom_size = RomSize::try_from(rom[ROM_SIZE_ADDR <span class="kw">as </span>usize]).unwrap();
         <span class="kw">let </span>ram_size = RamSize::try_from(rom[RAM_SIZE_ADDR <span class="kw">as </span>usize]).unwrap();
         <span class="kw">let </span>ram = <span class="macro">vec!</span>[<span class="number">0</span>; ram_size <span class="kw">as </span>usize];
+        <span class="kw">let </span>title = <span class="self">Self</span>::get_title(<span class="kw-2">&amp;</span>rom);
 
         <span class="macro">log::info!</span>(<span class="string">&quot;Loaded ROM from {}&quot;</span>, rom_name);
         <span class="macro">log::debug!</span>(<span class="string">&quot;Title: {}&quot;</span>, <span class="self">Self</span>::get_title(<span class="kw-2">&amp;</span>rom));
@@ -511,6 +518,7 @@
 
         Cartridge {
             cart_type,
+            title,
             rom,
             ram,
         }

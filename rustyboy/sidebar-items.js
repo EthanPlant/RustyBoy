@@ -1,1 +1,1 @@
-window.SIDEBAR_ITEMS = {"fn":["main"],"struct":["Args"]};
+window.SIDEBAR_ITEMS = {"fn":["generate_pixels","main"],"struct":["Args"]};
