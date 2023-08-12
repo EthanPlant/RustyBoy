@@ -30,7 +30,7 @@ impl InterruptState {
     pub fn new() -> Self {
         InterruptState {
             enabled_interrupts: 0x00,
-            requested_interrupts: 0x00,
+            requested_interrupts: 0xE1,
         }
     }
 
@@ -105,7 +105,7 @@ mod tests {
     fn test_new() {
         let interrupt_state = InterruptState::new();
         assert_eq!(interrupt_state.enabled_interrupts, 0x00);
-        assert_eq!(interrupt_state.requested_interrupts, 0x00);
+        assert_eq!(interrupt_state.requested_interrupts, 0xE1);
     }
 
     #[test]

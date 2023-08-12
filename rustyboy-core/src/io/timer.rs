@@ -31,10 +31,10 @@ pub struct Timer {
 impl Timer {
     pub fn new() -> Self {
         Timer {
-            divider: 0x00,
+            divider: 0x18,
             counter: 0x00,
             modulo: 0x00,
-            control: 0x00,
+            control: 0xF8,
             interrupt_fired: false,
             clock_cycles_div: 0,
             clock_cycles_tima: 0,
@@ -84,10 +84,10 @@ mod tests {
     #[test]
     fn test_new() {
         let timer = Timer::new();
-        assert_eq!(timer.divider, 0x00);
+        assert_eq!(timer.divider, 0x18);
         assert_eq!(timer.counter, 0x00);
         assert_eq!(timer.modulo, 0x00);
-        assert_eq!(timer.control, 0x00);
+        assert_eq!(timer.control, 0xF8);
         assert_eq!(timer.interrupt_fired, false);
         assert_eq!(timer.clock_cycles_div, 0);
         assert_eq!(timer.clock_cycles_tima, 0);
@@ -97,10 +97,10 @@ mod tests {
     fn test_step() {
         let mut timer = Timer::new();
         timer.step(4);
-        assert_eq!(timer.divider, 0x00);
+        assert_eq!(timer.divider, 0x18);
         assert_eq!(timer.counter, 0x00);
         assert_eq!(timer.modulo, 0x00);
-        assert_eq!(timer.control, 0x00);
+        assert_eq!(timer.control, 0xF8);
         assert_eq!(timer.interrupt_fired, false);
         assert_eq!(timer.clock_cycles_div, 4);
         assert_eq!(timer.clock_cycles_tima, 0);
@@ -111,10 +111,10 @@ mod tests {
         let mut timer = Timer::new();
         timer.step(0xFF);
         timer.step(0xFF);
-        assert_eq!(timer.divider, 1);
+        assert_eq!(timer.divider, 0x19);
         assert_eq!(timer.counter, 0x00);
         assert_eq!(timer.modulo, 0x00);
-        assert_eq!(timer.control, 0x00);
+        assert_eq!(timer.control, 0xF8);
         assert_eq!(timer.interrupt_fired, false);
         assert_eq!(timer.clock_cycles_div, 0xFE);
         assert_eq!(timer.clock_cycles_tima, 0);
