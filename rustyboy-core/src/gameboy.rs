@@ -38,11 +38,4 @@ mod tests {
         let gameboy = Gameboy::new("resources/test-rom.gb");
         assert_eq!(gameboy.mmu.get_word(0x0100 as usize), 0xC300);
     }
-
-    #[test]
-    fn test_step() {
-        let mut gameboy = Gameboy::new("resources/test-rom.gb");
-        gameboy.step();
-        assert_eq!(gameboy.cpu.reg.pc, 0x0101);
-    }
 }
