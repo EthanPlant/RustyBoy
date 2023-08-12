@@ -63,13 +63,17 @@
 <a href="#63" id="63">63</a>
 <a href="#64" id="64">64</a>
 <a href="#65" id="65">65</a>
+<a href="#66" id="66">66</a>
+<a href="#67" id="67">67</a>
+<a href="#68" id="68">68</a>
+<a href="#69" id="69">69</a>
 </pre></div><pre class="rust"><code><span class="kw">use </span>clap::Parser;
 <span class="kw">use </span>env_logger::Env;
 <span class="kw">use </span>pixels::{Pixels, SurfaceTexture};
 <span class="kw">use </span>winit::{
     event::{Event, WindowEvent},
     event_loop::{ControlFlow, EventLoop},
-    window::WindowBuilder,
+    window::{Window, WindowBuilder},
 };
 
 <span class="kw">use </span>rustyboy_core::gameboy::Gameboy;
@@ -115,6 +119,10 @@
     </span>env_logger::Builder::from_env(Env::default().default_filter_or(<span class="string">&quot;info&quot;</span>)).init();
 
     <span class="kw">let </span><span class="kw-2">mut </span>gb = Gameboy::new(<span class="kw-2">&amp;</span>args.rom);
+    Window::set_title(
+        <span class="kw-2">&amp;</span>window,
+        (<span class="string">&quot;RustyBoy - &quot;</span>.to_owned() + <span class="kw-2">&amp;</span>gb.mmu.cart_title).as_str(),
+    );
 
     event_loop.run(<span class="kw">move </span>|event, <span class="kw">_</span>, control_flow| {
         gb.step();
