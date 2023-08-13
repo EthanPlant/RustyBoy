@@ -328,9 +328,6 @@ impl Ppu {
                     }
                     let color = (palette >> (color_val * 2)) & 0x3;
                     let x_pos = object_x.wrapping_add(pixel);
-                    if x_pos < 8 || x_pos >= 168 {
-                        continue;
-                    }
                     if bg_priority && self.bg_pixels[self.ly as usize * WIDTH + x_pos as usize] != 0 {
                         continue;
                     }
