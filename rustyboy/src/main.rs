@@ -15,7 +15,7 @@ struct Args {
     #[arg(short, long)]
     rom: String,
     #[arg(short, long)]
-    show_tiles: bool,
+    tiles: bool,
 }
 
 fn generate_pixels(frame: &mut [u8], &framebuffer: &[Color; 160 * 144]) {
@@ -79,7 +79,7 @@ fn main() {
         .build(&event_loop)
         .unwrap();
 
-    if !args.show_tiles {
+    if !args.tiles {
         tile_window.set_visible(false);
     }
 
