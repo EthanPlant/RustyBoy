@@ -7,6 +7,11 @@ A Gameboy emulator written in Rust. It is currently WIP. The end goal at the mom
 ## Running RustyBoy
 `./rustyboy --rom <ROM>`
 
+Two optional flags may also be specified:
+
+- `-o, --objects` - Show the sprite data
+- `-t, --tiles` - Show the tilemap
+
 ## Project Structure
 RustyBoy is split up into two seperate Rust crates in order to keep the emulator itself seperate from any frontend implementation. All code pertaining to the emulation itself is found in `rustboy-core`, while the frontend is contained within `rustyboy`.
 
