@@ -22,7 +22,7 @@ const VBLANK_CYCLES: u32 = 456;
 const OAM_SEARCH_CYCLES: u32 = 80;
 const PIXEL_TRANSFER_CYCLES: u32 = 172;
 
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, PartialEq)]
 pub enum Color {
     White,
     LightGray,
@@ -68,21 +68,13 @@ pub struct Ppu {
     clock: u32,
     /// Internal window line counter
     window_line_counter: u8,
+    /// Tracks the background colors for background priority checking
+    bg_pixels: [u8; WIDTH * HEIGHT],
 }
 
 impl Ppu {
     /// Create a new PPU
     pub fn new() -> Self {
-        let mut frame_buffer = [Color::Black; WIDTH * HEIGHT];
-        for i in 0..WIDTH * HEIGHT {
-            match i % 4 {
-                0 => frame_buffer[i] = Color::White,
-                1 => frame_buffer[i] = Color::LightGray,
-                2 => frame_buffer[i] = Color::DarkGray,
-                3 => frame_buffer[i] = Color::Black,
-                _ => (),
-            }
-        }
         Ppu {
             lcdc: Lcdc::new(),
             stat: Stat::new(),
@@ -95,7 +87,7 @@ impl Ppu {
             obp1: 0,
             wy: 0,
             wx: 0,
-            frame_buffer: frame_buffer,
+            frame_buffer: [Color::White; WIDTH * HEIGHT],
             lcd_interrupt_fired: false,
             vblank_interrupt_fired: false,
             vram: [0; 0x2000],
@@ -103,6 +95,7 @@ impl Ppu {
             oam: [0; 0xA0],
             clock: 0,
             window_line_counter: 0,
+            bg_pixels: [0x00; WIDTH * HEIGHT],
         }
     }
 
@@ -187,6 +180,10 @@ impl Ppu {
                    self.draw_window();
                 }
             }
+
+            if self.lcdc.objects_enabled {
+                self.draw_objects();
+            }
         }
     }
 
@@ -227,6 +224,7 @@ impl Ppu {
                 3 => Color::Black,
                 _ => Color::Black,
             };
+            self.bg_pixels[self.ly as usize * WIDTH + pixel as usize] = color_val;
         }
     }
 
@@ -271,7 +269,80 @@ impl Ppu {
                 3 => Color::Black,
                 _ => Color::Black,
             };
+            self.bg_pixels[self.ly as usize * WIDTH + pixel as usize] = color_val;
         }
         self.window_line_counter += 1;
+    }
+
+    fn draw_objects(&mut self) {
+        let mut object_count = 0;
+        let mut object_x_coords: [u8; 10] = [0; 10];
+
+        for i in 0..40 {
+            let mut should_skip = false;
+            if object_count >= 10 {
+                break;
+            }
+            
+            let object_y = self.oam[i * 4].wrapping_sub(16);
+            let object_x = self.oam[i * 4 + 1].wrapping_sub(8);
+            for j in 0..object_count {
+                if object_x_coords[j] == object_x {
+                    should_skip = true;
+                }
+            }
+            if should_skip {
+                continue;
+            }
+
+            let object_tile = if self.lcdc.objects_size {
+                self.oam[i * 4 + 2] & 0xFE
+            } else {
+                self.oam[i * 4 + 2]
+            };
+            let object_flags = self.oam[i * 4 + 3];
+            let object_height = if self.lcdc.objects_size { 16 } else { 8 };
+            if object_y <= self.ly && self.ly < object_y + object_height {
+                object_count += 1;
+                object_x_coords[object_count - 1] = object_x;
+                let bg_priority = object_flags & 0x80 != 0;
+                let y_flip = object_flags & 0x40 != 0;
+                let x_flip = object_flags & 0x20 != 0;
+                let palette = if object_flags & 0x10 != 0 { self.obp1 } else { self.obp0 };
+                let tile_line = if y_flip {
+                    (object_height - 1 - (self.ly - object_y)) * 2
+                } else {
+                    (self.ly - object_y) * 2
+                };
+                let tile_addr = 0x8000 + (object_tile as u16 * 16) + tile_line as u16;
+                let lo = self.vram[tile_addr as usize - 0x8000];
+                let hi = self.vram[tile_addr as usize + 1 - 0x8000];
+                for pixel in 0..8 {
+                    let color_val = if x_flip {
+                        (lo >> pixel & 0x1) | (hi >> pixel & 0x1) << 1
+                    } else {
+                        (lo >> (7 - pixel) & 0x1) | (hi >> (7 - pixel) & 0x1) << 1
+                    };
+                    if color_val == 0 {
+                        continue;
+                    }
+                    let color = (palette >> (color_val * 2)) & 0x3;
+                    let x_pos = object_x.wrapping_add(pixel);
+                    if x_pos < 8 || x_pos >= 168 {
+                        continue;
+                    }
+                    if bg_priority && self.bg_pixels[self.ly as usize * WIDTH + x_pos as usize] != 0 {
+                        continue;
+                    }
+                    self.frame_buffer[self.ly as usize * WIDTH + x_pos as usize] = match color {
+                        0 => Color::White,
+                        1 => Color::LightGray,
+                        2 => Color::DarkGray,
+                        3 => Color::Black,
+                        _ => Color::Black,
+                    };
+                }
+            }
+        }
     }
 }

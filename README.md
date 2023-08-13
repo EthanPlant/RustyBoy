@@ -44,15 +44,15 @@ After cloning the repository, simply run `cargo build` in the workspace director
     - [x] MBC-1
     - [ ] MBC-5
 - [ ] Input
-- [ ] Graphics
+- [x] Graphics
     - [x] Draw Background
     - [x] Background scrolling
     - [x] Draw window
-    - [ ] Draw sprites
-    - [ ] Handle flipped sprites
-    - [ ] Handle 8x16 sprites
-    - [ ] Correct ordering of sprite and background tiles
-    - [ ] Pass DMG-acid test
+    - [x] Draw sprites
+    - [x] Handle flipped sprites
+    - [x] Handle 8x16 sprites
+    - [x] Correct ordering of sprite and background tiles
+    - [x] Pass DMG-acid test
 - [ ] Audio
     - [ ] Square channels
     - [ ] Volume envelope
