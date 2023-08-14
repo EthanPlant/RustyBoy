@@ -188,12 +188,6 @@ impl Memory {
 
             IO_START..=IO_END => {
                 match addr {
-                    // Logging for Blargg test
-                    0xFF02 => {
-                        if v == 0x81 {
-                            print!("{}", self.io[0xFF01 - IO_START] as char);
-                        }
-                    }
                     DIV_ADDR => self.timer.divider = 0, // All writes to DIV reset it to 0
                     TIMA_ADDR => self.timer.counter = v,
                     TMA_ADDR => self.timer.modulo = v,
