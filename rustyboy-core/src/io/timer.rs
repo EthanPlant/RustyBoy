@@ -49,7 +49,7 @@ impl Timer {
             self.clock_cycles_div -= DIV_CYCLES;
         }
 
-        let speed = self.control << 6;
+        let speed = self.control & 0x03;
         if !binaryutils::is_bit_set(&self.control, 2) {
             return;
         }
@@ -58,9 +58,9 @@ impl Timer {
 
         let timer_cycles = match speed {
             0x00 => SPEED_ZERO_CYCLES,
-            0x40 => SPEED_ONE_CYCLES,
-            0x80 => SPEED_TWO_CYCLES,
-            0xC0 => SPEED_THREE_CYCLES,
+            0x01 => SPEED_ONE_CYCLES,
+            0x02 => SPEED_TWO_CYCLES,
+            0x03 => SPEED_THREE_CYCLES,
             _ => panic!("Unknown timer speed! {:02X}", speed),
         };
 
