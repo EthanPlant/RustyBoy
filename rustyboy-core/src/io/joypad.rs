@@ -57,6 +57,6 @@ impl Joypad {
             return self.button_keys;
         }
 
-        0
+        0xFF
     }
 }
