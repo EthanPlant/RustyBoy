@@ -16,7 +16,7 @@ pub const WX_ADDR: usize = 0xFF4B;
 
 const WIDTH: usize = 160;
 const HEIGHT: usize = 144;
-const MAX_SCANLINE: u8 = 154;
+const MAX_SCANLINE: u8 = 153;
 const HBLANK_CYCLES: u32 = 204;
 const VBLANK_CYCLES: u32 = 456;
 const OAM_SEARCH_CYCLES: u32 = 80;
@@ -105,7 +105,7 @@ impl Ppu {
             match self.stat.mode {
                 Mode::HBlank => {
                     if self.clock >= HBLANK_CYCLES {
-                        self.clock = 0;
+                        self.clock -= HBLANK_CYCLES;
                         self.draw();
                         self.ly += 1;
                         self.check_lyc();
@@ -124,29 +124,33 @@ impl Ppu {
                     }
                 }
                 Mode::VBlank => {
-                    if self.clock >= VBLANK_CYCLES {
-                        self.clock = 0;
-                        self.ly += 1;
+                    if self.clock >= 4 && self.ly == MAX_SCANLINE {
+                        self.ly = 0;
                         self.check_lyc();
-                        if self.ly == MAX_SCANLINE as u8 {
+                    }
+                    if self.clock >= VBLANK_CYCLES {
+                        self.clock -= VBLANK_CYCLES;
+                        if self.ly == 0 {
                             self.stat.mode = Mode::OamSearch;
-                            self.ly = 0;
                             self.window_line_counter = 0;
                             if self.stat.mode_2_oam_interrupt {
                                 self.lcd_interrupt_fired = true;
                             }
+                        } else {
+                            self.ly += 1;
+                            self.check_lyc();
                         }
                     }
                 }
                 Mode::OamSearch => {
                     if self.clock >= OAM_SEARCH_CYCLES {
-                        self.clock = 0;
+                        self.clock -= OAM_SEARCH_CYCLES;
                         self.stat.mode = Mode::PixelTransfer;
                     }
                 }
                 Mode::PixelTransfer => {
                     if self.clock >= PIXEL_TRANSFER_CYCLES {
-                        self.clock = 0;
+                        self.clock -= PIXEL_TRANSFER_CYCLES;
                         self.stat.mode = Mode::HBlank;
                         if self.stat.mode_0_hblank_interrupt {
                             self.lcd_interrupt_fired = true;
