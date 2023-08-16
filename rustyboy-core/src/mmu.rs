@@ -2,6 +2,7 @@ use crate::cartridge::Cartridge;
 use crate::cpu::interrupts::{
     Interrupt, InterruptState, INTERRUPT_ENABLE_ADDR, INTERRUPT_FLAG_ADDR,
 };
+use crate::io::joypad::Joypad;
 use crate::io::timer::{Timer, DIV_ADDR, TAC_ADDR, TIMA_ADDR, TMA_ADDR};
 use crate::mbc;
 use crate::mbc::rom_only::RomOnly;
@@ -48,6 +49,7 @@ pub struct Memory {
     /// The cartridge's data
     cart: Box<dyn Mbc>,
     pub cart_title: String,
+    pub joypad: Joypad,
     /// Interrupt registers
     pub interrupts: InterruptState,
     /// Timer
@@ -60,6 +62,8 @@ pub struct Memory {
     io: [u8; IO_SIZE],
     /// High RAM
     hram: [u8; HRAM_SIZE],
+    joypad_status: u8,
+    joypad_select: u8,
 }
 
 impl Memory {
@@ -68,12 +72,15 @@ impl Memory {
         Memory {
             cart: Box::new(RomOnly::new(Cartridge::new())),
             cart_title: String::new(),
+            joypad: Joypad::new(),
             interrupts: InterruptState::new(),
             timer: Timer::new(),
             ppu: Ppu::new(),
             wram: [0xFF; WRAM_SIZE],
             io: [0xFF; IO_SIZE],
             hram: [0xFF; HRAM_SIZE],
+            joypad_status: 0xFF,
+            joypad_select: 0xFF,
         }
     }
 
@@ -84,12 +91,15 @@ impl Memory {
         Memory {
             cart: mbc::from_cartridge(cart),
             cart_title: title,
+            joypad: Joypad::new(),
             interrupts: InterruptState::new(),
             timer: Timer::new(),
             ppu: Ppu::new(),
             wram: [0xFF; WRAM_SIZE],
             io: [0xFF; IO_SIZE],
             hram: [0xFF; HRAM_SIZE],
+            joypad_status: 0xFF,
+            joypad_select: 0xFF,
         }
     }
 
@@ -97,7 +107,8 @@ impl Memory {
     pub fn step(&mut self, clock_cycles: u8) {
         self.timer.step(clock_cycles);
         self.ppu.step(clock_cycles);
-
+        self.joypad_status = self.joypad.read_value(self.joypad_select);
+        
         if self.timer.interrupt_fired {
             self.timer.interrupt_fired = false;
             self.interrupts.requested_interrupts |= Interrupt::Timer as u8;
@@ -132,7 +143,7 @@ impl Memory {
                 0xFF
             }
             IO_START..=IO_END => match addr {
-                0xFF00 => 0xFF, // Stub this to all 1s for now to stop tetris from getting in a reboot loop
+                0xFF00 => self.joypad_status,
                 DIV_ADDR => self.timer.divider,
                 TIMA_ADDR => self.timer.counter,
                 TMA_ADDR => self.timer.modulo,
@@ -188,6 +199,9 @@ impl Memory {
 
             IO_START..=IO_END => {
                 match addr {
+                    0xFF00 => {
+                        self.joypad_select = v;
+                    }
                     DIV_ADDR => self.timer.divider = 0, // All writes to DIV reset it to 0
                     TIMA_ADDR => self.timer.counter = v,
                     TMA_ADDR => self.timer.modulo = v,

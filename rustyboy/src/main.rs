@@ -2,12 +2,12 @@ use clap::Parser;
 use env_logger::Env;
 use pixels::{Pixels, SurfaceTexture};
 use winit::{
-    event::{Event, WindowEvent},
+    event::{Event, WindowEvent, VirtualKeyCode, ElementState},
     event_loop::{ControlFlow, EventLoop},
     window::{Window, WindowBuilder},
 };
 
-use rustyboy_core::{gameboy::Gameboy, ppu::ppu::Color};
+use rustyboy_core::{gameboy::Gameboy, io::joypad::Key, ppu::ppu::Color};
 
 #[derive(Debug, Parser)]
 #[command(author, version, about)]
@@ -178,6 +178,71 @@ fn main() {
             } if window.id() == window_id => pixels
                 .resize_surface(size.width, size.height)
                 .expect("Failed to resize surface!"),
+
+            Event::WindowEvent {
+                event: WindowEvent::KeyboardInput { device_id, input, is_synthetic },
+                window_id
+            } if window.id() == window_id => {
+                match input.virtual_keycode {
+                    Some(VirtualKeyCode::Up) => {
+                        if input.state == ElementState::Pressed {
+                            gb.mmu.joypad.push_key(Key::Up);
+                        } else {
+                            gb.mmu.joypad.release_key(Key::Up);
+                        }
+                    },
+                    Some(VirtualKeyCode::Down) => {
+                        if input.state == ElementState::Pressed {
+                            gb.mmu.joypad.push_key(Key::Down);
+                        } else {
+                            gb.mmu.joypad.release_key(Key::Down);
+                        }
+                    },
+                    Some(VirtualKeyCode::Left) => {
+                        if input.state == ElementState::Pressed {
+                            gb.mmu.joypad.push_key(Key::Left);
+                        } else {
+                            gb.mmu.joypad.release_key(Key::Left);
+                        }
+                    },
+                    Some(VirtualKeyCode::Right) => {
+                        if input.state == ElementState::Pressed {
+                            gb.mmu.joypad.push_key(Key::Right);
+                        } else {
+                            gb.mmu.joypad.release_key(Key::Right);
+                        }
+                    },
+                    Some(VirtualKeyCode::Z) => {
+                        if input.state == ElementState::Pressed {
+                            gb.mmu.joypad.push_key(Key::A);
+                        } else {
+                            gb.mmu.joypad.release_key(Key::A);
+                        }
+                    },
+                    Some(VirtualKeyCode::X) => {
+                        if input.state == ElementState::Pressed {
+                            gb.mmu.joypad.push_key(Key::B);
+                        } else {
+                            gb.mmu.joypad.release_key(Key::B);
+                        }
+                    },
+                    Some(VirtualKeyCode::Return) => {
+                        if input.state == ElementState::Pressed {
+                            gb.mmu.joypad.push_key(Key::Start);
+                        } else {
+                            gb.mmu.joypad.release_key(Key::Start);
+                        }
+                    },
+                    Some(VirtualKeyCode::Back) => {
+                        if input.state == ElementState::Pressed {
+                            gb.mmu.joypad.push_key(Key::Select);
+                        } else {
+                            gb.mmu.joypad.release_key(Key::Select);
+                        }
+                    },
+                    _ => (),
+                }
+            }
 
             _ => (),
         }
