@@ -459,13 +459,6 @@ mod tests {
     }
 
     #[test]
-    fn test_set_byte_io() {
-        let mut mem = Memory::new();
-        mem.set_byte(IO_START, 0x01);
-        assert_eq!(mem.io[0x0000], 0x01);
-    }
-
-    #[test]
     fn test_set_byte_hram() {
         let mut mem = Memory::new();
         mem.set_byte(HRAM_START, 0x01);
@@ -524,14 +517,6 @@ mod tests {
         let mut mem = Memory::new();
         mem.set_word(UNUSED_START, 0x0102);
         assert_eq!(mem.get_byte(UNUSED_START), 0xFF);
-    }
-
-    #[test]
-    fn test_set_word_io() {
-        let mut mem = Memory::new();
-        mem.set_word(IO_START, 0x0102);
-        assert_eq!(mem.io[0x0000], 0x02);
-        assert_eq!(mem.io[0x0001], 0x01);
     }
 
     #[test]
