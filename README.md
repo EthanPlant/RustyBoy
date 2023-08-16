@@ -43,7 +43,7 @@ After cloning the repository, simply run `cargo build` in the workspace director
     - [x] No MBC
     - [x] MBC-1
     - [ ] MBC-5
-- [ ] Input
+- [x] Input
 - [x] Graphics
     - [x] Draw Background
     - [x] Background scrolling
