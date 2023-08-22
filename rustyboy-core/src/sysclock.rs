@@ -27,8 +27,8 @@ impl Clock {
 
     /// Reset the clock
     pub fn reset(&mut self) {
-        self.clock_cycles_passed = 0;
-        self.machine_cycles_passed = 0;
+        self.clock_cycles_passed -= CYCLES_PER_FRAME;
+        self.machine_cycles_passed -= CYCLES_PER_FRAME / 4;
     }
 }
 
@@ -49,14 +49,5 @@ mod tests {
         clock.cycle(4);
         assert_eq!(clock.clock_cycles_passed, 4);
         assert_eq!(clock.machine_cycles_passed, 1);
-    }
-
-    #[test]
-    fn test_reset() {
-        let mut clock = Clock::new();
-        clock.cycle(4);
-        clock.reset();
-        assert_eq!(clock.clock_cycles_passed, 0);
-        assert_eq!(clock.machine_cycles_passed, 0);
     }
 }

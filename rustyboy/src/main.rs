@@ -154,19 +154,12 @@ fn main() {
     let mut supported_configs_range = device.supported_output_configs().expect("Error while querying configs");
     let supported_config = supported_configs_range.next().expect("No supported config?").with_max_sample_rate();
     let config = supported_config.into();
-    let mut phi = 0.0f32;
-    let mut frequency = 440.0;
-    let mut amplitude = 1.0;
-    let mut note = 0.0;
     let stream = device.build_output_stream(
         &config,
         move |data: &mut [f32], _: &cpal::OutputCallbackInfo| {
             for frame in data.chunks_mut(config.channels as usize) {
-                phi = (phi + (frequency / config.sample_rate.0 as f32)).fract();
-                let make_noise = |phi: f32| -> f32 {amplitude * (2.0 * 3.141592 * phi).sin()};
-                let value = &make_noise(phi);
                 for sample in frame.iter_mut() {
-                    *sample = *value;
+                    *sample = 0.00;
                 }
             }
         },
@@ -191,10 +184,6 @@ fn main() {
     );
 
     event_loop.run(move |event, _, control_flow| {
-        let next_frame_time =
-            std::time::Instant::now() + std::time::Duration::from_nanos(16_666_667);
-        *control_flow = ControlFlow::WaitUntil(next_frame_time);
-
         match event {
             Event::RedrawRequested(_) => {}
             Event::WindowEvent {
@@ -210,7 +199,7 @@ fn main() {
                 .expect("Failed to resize surface!"),
 
             Event::WindowEvent {
-                event: WindowEvent::KeyboardInput { device_id, input, is_synthetic },
+                event: WindowEvent::KeyboardInput { input, .. },
                 window_id
             } if window.id() == window_id => {
                 match input.virtual_keycode {
