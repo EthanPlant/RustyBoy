@@ -106,7 +106,6 @@ impl Ppu {
                 Mode::HBlank => {
                     if self.clock >= HBLANK_CYCLES {
                         self.clock -= HBLANK_CYCLES;
-                        self.draw();
                         self.ly += 1;
                         self.check_lyc();
                         if self.ly >= HEIGHT as u8 {
@@ -152,6 +151,7 @@ impl Ppu {
                     if self.clock >= PIXEL_TRANSFER_CYCLES {
                         self.clock -= PIXEL_TRANSFER_CYCLES;
                         self.stat.mode = Mode::HBlank;
+                        self.draw();
                         if self.stat.mode_0_hblank_interrupt {
                             self.lcd_interrupt_fired = true;
                         }
